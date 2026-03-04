@@ -4,7 +4,7 @@ import * as llmService from '../services/llm.service';
 import logger from '../utils/logger';
 
 const enhanceSchema = z.object({
-    text: z.string().min(10).max(5000),
+    text: z.string().min(10).max(50000),
     tone: z.enum(['Professional', 'Conversational', 'Storytelling', 'Bold/Contrarian']),
 });
 

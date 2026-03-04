@@ -6,7 +6,7 @@ import { Sparkles, Loader2, MessageSquare, Briefcase, BookOpen, Zap } from 'luci
 import { useEnhance } from '../hooks/useEnhance';
 
 const schema = z.object({
-    text: z.string().min(10, 'Your thoughts should be at least 10 characters').max(5000),
+    text: z.string().min(10, 'Your thoughts should be at least 10 characters').max(50000),
     tone: z.enum(['Professional', 'Conversational', 'Storytelling', 'Bold/Contrarian']),
 });
 
@@ -60,7 +60,7 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
                         className="w-full h-64 bg-black/40 border border-white/10 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none text-gray-200 placeholder:text-gray-600"
                     />
                     <div className="absolute bottom-3 right-3 text-xs text-gray-500">
-                        {watch('text').length} / 5,000
+                        {watch('text').length.toLocaleString()} / 50,000
                     </div>
                 </div>
                 {errors.text && <p className="mt-2 text-sm text-red-500">{errors.text.message}</p>}
