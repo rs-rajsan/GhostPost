@@ -1,12 +1,21 @@
 import OpenAI from 'openai';
 import logger from '../utils/logger';
 
-const getOpenAIClient = () => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey || apiKey === 'your_openai_api_key_here') {
-        return null;
+// --- Configuration & Singleton ---
+const getApiKey = () => process.env.OPENAI_API_KEY;
+const isMockMode = () => {
+    const key = getApiKey();
+    return !key || key === 'your_openai_api_key_here';
+};
+
+let openAIClientInstance: OpenAI | null = null;
+const getOpenAIClient = (): OpenAI => {
+    if (!openAIClientInstance) {
+        const apiKey = getApiKey();
+        if (!apiKey) throw new Error('OpenAI API key is missing');
+        openAIClientInstance = new OpenAI({ apiKey });
     }
-    return new OpenAI({ apiKey });
+    return openAIClientInstance;
 };
 
 export interface EnhancePostResponse {
@@ -16,20 +25,8 @@ export interface EnhancePostResponse {
     hashtags: string[];
 }
 
-export const enhancePost = async (text: string, tone: string): Promise<EnhancePostResponse> => {
-    logger.info({ tone }, 'Enhancing post');
-
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
-        logger.warn('OPENAI_API_KEY not set. Returning mock data.');
-        return {
-            enhancedPost: `(MOCK RESULT) This is a polished version of your post in a ${tone} tone.\n\nYour original thoughts: "${text}"\n\nI've restructured this to be more engaging for LinkedIn.`,
-            hookScore: 8,
-            hookTip: "This is a mock tip: try making the first sentence even more punchy!",
-            hashtags: ["#mock", "#linkedin", "#ai"]
-        };
-    }
-
-    const prompt = `
+// --- Logic & Generators ---
+const buildPrompt = (text: string, tone: string): string => `
     You are a world-class LinkedIn ghostwriter for TOP 1% creators. 
     Your mission: Transform raw, messy thoughts into a viral-ready post that stops the scroll and builds authority.
     
@@ -63,11 +60,28 @@ export const enhancePost = async (text: string, tone: string): Promise<EnhancePo
       "hookTip": "...",
       "hashtags": ["#tag1", "#tag2"]
     }
-  `;
+`;
+
+const getMockResponse = (text: string, tone: string): EnhancePostResponse => {
+    logger.warn('OPENAI_API_KEY not set or invalid. Returning mock data.');
+    return {
+        enhancedPost: `(MOCK RESULT) This is a polished version of your post in a ${tone} tone.\n\nYour original thoughts: "${text}"\n\nI've restructured this to be more engaging for LinkedIn.`,
+        hookScore: 8,
+        hookTip: "This is a mock tip: try making the first sentence even more punchy!",
+        hashtags: ["#mock", "#linkedin", "#ai"]
+    };
+};
+
+export const enhancePost = async (text: string, tone: string): Promise<EnhancePostResponse> => {
+    logger.info({ tone, textLength: text.length }, 'Enhancing post started');
+
+    if (isMockMode()) {
+        return getMockResponse(text, tone);
+    }
 
     try {
         const openai = getOpenAIClient();
-        if (!openai) throw new Error('AI Client not initialized');
+        const prompt = buildPrompt(text, tone);
 
         const response = await openai.chat.completions.create({
             model: 'gpt-4o', // Upgrading model for better quality if available, or gpt-4o
@@ -81,7 +95,9 @@ export const enhancePost = async (text: string, tone: string): Promise<EnhancePo
         const content = response.choices[0].message.content;
         if (!content) throw new Error('No content received from OpenAI');
 
-        return JSON.parse(content) as EnhancePostResponse;
+        const parsedContent = JSON.parse(content) as EnhancePostResponse;
+        logger.info('Successfully enhanced post from OpenAI');
+        return parsedContent;
     } catch (error) {
         logger.error({ error }, 'Error enhancing post with OpenAI');
         throw error;

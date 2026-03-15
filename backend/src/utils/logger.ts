@@ -1,4 +1,7 @@
 import pino from 'pino';
+import { AsyncLocalStorage } from 'async_hooks';
+
+export const asyncLocalStorage = new AsyncLocalStorage<Map<string, string>>();
 
 const logger = pino({
     level: process.env.LOG_LEVEL || 'info',
@@ -10,6 +13,13 @@ const logger = pino({
             ignore: 'pid,hostname',
         },
     },
+    mixin() {
+        const store = asyncLocalStorage.getStore();
+        if (store && store.has('requestId')) {
+            return { requestId: store.get('requestId') };
+        }
+        return {};
+    }
 });
 
 export default logger;

@@ -36,6 +36,16 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/enhance', enhanceRouter);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     logger.info(`Server is running on port ${port}`);
+});
+
+server.on('error', (error: NodeJS.ErrnoException) => {
+    if (error.code === 'EADDRINUSE') {
+        logger.error(`Port conflict detected: Port ${port} is already in use. Please free up the port or let the team know of the conflict.`);
+        process.exit(1);
+    } else {
+        logger.error({ error }, 'Failed to start server');
+        process.exit(1);
+    }
 });
