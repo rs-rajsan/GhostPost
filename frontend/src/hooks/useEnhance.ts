@@ -3,15 +3,17 @@ import api from '../lib/api';
 
 interface EnhanceRequest {
     text: string;
-    tone: string;
+    inputType: 'text' | 'article' | 'youtube';
 }
 
-interface EnhanceResponse {
+export interface ToneResponse {
     enhancedPost: string;
     hookScore: number;
     hookTip: string;
     hashtags: string[];
 }
+
+export type EnhanceResponse = Record<'Professional' | 'Conversational' | 'Storytelling' | 'Bold/Contrarian', ToneResponse>;
 
 export const useEnhance = () => {
     return useMutation({

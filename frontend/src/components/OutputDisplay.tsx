@@ -1,22 +1,30 @@
 import { useState } from 'react';
-import { Copy, Check, Info, RefreshCcw, Loader2 } from 'lucide-react';
+import { Copy, Check, Info, RefreshCcw, Loader2, Briefcase, MessageSquare, BookOpen, Zap } from 'lucide-react';
+import type { EnhanceResponse } from '../hooks/useEnhance';
 
 interface OutputDisplayProps {
-    data: {
-        enhancedPost: string;
-        hookScore: number;
-        hookTip: string;
-        hashtags: string[];
-    };
+    data: EnhanceResponse;
     onRegenerate: () => void;
     isPending?: boolean;
 }
 
+type ToneType = keyof EnhanceResponse;
+
 export default function OutputDisplay({ data, onRegenerate, isPending }: OutputDisplayProps) {
     const [copied, setCopied] = useState(false);
+    const [activeTab, setActiveTab] = useState<ToneType>('Professional');
+
+    const tones: { id: ToneType; icon: any; label: string }[] = [
+        { id: 'Professional', icon: Briefcase, label: 'Professional' },
+        { id: 'Conversational', icon: MessageSquare, label: 'Conversational' },
+        { id: 'Storytelling', icon: BookOpen, label: 'Story' },
+        { id: 'Bold/Contrarian', icon: Zap, label: 'Bold' },
+    ];
+
+    const currentData = data[activeTab];
 
     const copyToClipboard = () => {
-        const fullText = `${data.enhancedPost}\n\n${data.hashtags.join(' ')}`;
+        const fullText = `${currentData.enhancedPost}\n\n${currentData.hashtags.join(' ')}`;
         navigator.clipboard.writeText(fullText);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -24,25 +32,44 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
 
     return (
         <div className="space-y-6">
+            {/* Tabs */}
+            <div className="flex bg-white/5 rounded-2xl p-1 gap-1 border border-white/10">
+                {tones.map((tone) => (
+                    <button
+                        key={tone.id}
+                        onClick={() => setActiveTab(tone.id)}
+                        className={`
+                            flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-medium transition-all
+                            ${activeTab === tone.id
+                                ? 'bg-primary text-white shadow-lg'
+                                : 'text-gray-400 hover:text-white hover:bg-white/10'}
+                        `}
+                    >
+                        <tone.icon size={16} />
+                        <span className="hidden sm:inline">{tone.label}</span>
+                    </button>
+                ))}
+            </div>
+
             {/* Metrics Row */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="glass p-4 rounded-2xl flex items-center justify-between">
                     <div>
                         <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Hook Score</p>
-                        <p className="text-2xl font-bold text-green-400">{data.hookScore}/10</p>
+                        <p className="text-2xl font-bold text-green-400">{currentData.hookScore}/10</p>
                     </div>
                     <div className="w-12 h-12 rounded-full border-4 border-white/5 flex items-center justify-center relative">
                         <div
-                            className="absolute inset-0 rounded-full border-4 border-green-500"
-                            style={{ clipPath: `inset(0 ${100 - (data.hookScore * 10)}% 0 0)` }}
+                            className="absolute inset-0 rounded-full border-4 border-green-500 transition-all duration-500"
+                            style={{ clipPath: `inset(0 ${100 - (currentData.hookScore * 10)}% 0 0)` }}
                         />
                     </div>
                 </div>
                 <div className="glass p-4 rounded-2xl flex items-start gap-3">
-                    <Info className="text-primary mt-1" size={16} />
+                    <Info className="text-primary mt-1 shrink-0" size={16} />
                     <div>
                         <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Hook Tip</p>
-                        <p className="text-xs text-gray-300 leading-tight">{data.hookTip}</p>
+                        <p className="text-xs text-gray-300 leading-tight">{currentData.hookTip}</p>
                     </div>
                 </div>
             </div>
@@ -69,10 +96,10 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                     </button>
                 </div>
                 <div className="p-6 bg-black/20 min-h-[300px] text-gray-200 whitespace-pre-wrap leading-relaxed">
-                    {data.enhancedPost}
+                    {currentData.enhancedPost}
 
                     <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap gap-2">
-                        {data.hashtags.map((tag) => (
+                        {currentData.hashtags.map((tag) => (
                             <span key={tag} className="text-sm text-primary font-medium hover:underline cursor-pointer">
                                 {tag}
                             </span>
@@ -93,7 +120,7 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                     ) : (
                         <RefreshCcw size={18} />
                     )}
-                    Regenerate
+                    Regenerate All Variants
                 </button>
             </div>
         </div>

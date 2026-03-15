@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { requestTracer } from './middleware/requestTracer';
 import logger from './utils/logger';
 import enhanceRouter from './routes/enhance.routes';
+import notesRouter from './routes/notes.routes';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/enhance', enhanceRouter);
+app.use('/api/notes', notesRouter);
 
 const server = app.listen(port, () => {
     logger.info(`Server is running on port ${port}`);

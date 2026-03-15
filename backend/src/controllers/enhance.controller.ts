@@ -1,28 +1,45 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import * as llmService from '../services/llm.service';
+import * as extractionService from '../services/extraction.service';
 import logger from '../utils/logger';
 
 const enhanceSchema = z.object({
-    text: z.string().min(10).max(50000),
-    tone: z.enum(['Professional', 'Conversational', 'Storytelling', 'Bold/Contrarian']),
+    inputType: z.enum(['text', 'article', 'youtube']).default('text'),
+    text: z.string().min(10).max(50000)
 });
 
 export const enhance = async (req: Request, res: Response) => {
     try {
-        const { text, tone } = enhanceSchema.parse(req.body);
+        const { text, inputType } = enhanceSchema.parse(req.body);
 
-        logger.info({ tone, textLength: text.length }, 'Processing enhance request');
+        logger.info({ inputType, textLength: text.length }, 'Processing enhance request');
 
-        const result = await llmService.enhancePost(text, tone);
+        // Strategy Pattern for Open-Closed Principle compliance
+        type ExtractorFunction = (input: string) => Promise<string> | string;
+        
+        const extractionStrategies: Record<string, ExtractorFunction> = {
+            'text': (input: string) => input, // Raw text passes through
+            'article': extractionService.extractArticleContent,
+            'youtube': extractionService.extractYoutubeTranscript
+        };
+
+        const extractor = extractionStrategies[inputType];
+        if (!extractor) {
+            return res.status(400).json({ error: `Unsupported input type: ${inputType}` });
+        }
+
+        const contentToEnhance = await extractor(text);
+
+        const result = await llmService.enhancePost(contentToEnhance);
 
         res.status(200).json(result);
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: 'Validation error', details: error.issues });
         }
 
         logger.error({ error }, 'Unexpected error in enhance controller');
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: error.message || 'Internal server error' });
     }
 };

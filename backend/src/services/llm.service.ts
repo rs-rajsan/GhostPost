@@ -18,12 +18,14 @@ const getOpenAIClient = (): OpenAI => {
     return openAIClientInstance;
 };
 
-export interface EnhancePostResponse {
+export interface ToneResponse {
     enhancedPost: string;
     hookScore: number;
     hookTip: string;
     hashtags: string[];
 }
+
+export type EnhancePostResponse = Record<'Professional' | 'Conversational' | 'Storytelling' | 'Bold/Contrarian', ToneResponse>;
 
 // --- Logic & Generators ---
 const buildPrompt = (text: string, tone: string): string => `
@@ -62,44 +64,68 @@ const buildPrompt = (text: string, tone: string): string => `
     }
 `;
 
-const getMockResponse = (text: string, tone: string): EnhancePostResponse => {
+const getMockResponse = (text: string): EnhancePostResponse => {
     logger.warn('OPENAI_API_KEY not set or invalid. Returning mock data.');
-    return {
-        enhancedPost: `(MOCK RESULT) This is a polished version of your post in a ${tone} tone.\n\nYour original thoughts: "${text}"\n\nI've restructured this to be more engaging for LinkedIn.`,
+    const makeMock = (t: string) => ({
+        enhancedPost: `(MOCK RESULT) This is a polished version of your post in a ${t} tone.\n\nYour original thoughts: "${text}"\n\nI've restructured this to be more engaging for LinkedIn.`,
         hookScore: 8,
         hookTip: "This is a mock tip: try making the first sentence even more punchy!",
         hashtags: ["#mock", "#linkedin", "#ai"]
+    });
+
+    return {
+        'Professional': makeMock('Professional'),
+        'Conversational': makeMock('Conversational'),
+        'Storytelling': makeMock('Storytelling'),
+        'Bold/Contrarian': makeMock('Bold/Contrarian'),
     };
 };
 
-export const enhancePost = async (text: string, tone: string): Promise<EnhancePostResponse> => {
-    logger.info({ tone, textLength: text.length }, 'Enhancing post started');
+const generateSingleTone = async (openai: OpenAI, text: string, tone: string): Promise<ToneResponse> => {
+    const prompt = buildPrompt(text, tone);
+    const response = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+            { role: 'system', content: 'You are an elite LinkedIn copywriter. You specialize in viral growth and personal branding.' },
+            { role: 'user', content: prompt }
+        ],
+        response_format: { type: 'json_object' },
+    });
+
+    const content = response.choices[0].message.content;
+    if (!content) throw new Error('No content received from OpenAI');
+
+    return JSON.parse(content) as ToneResponse;
+};
+
+export const enhancePost = async (text: string): Promise<EnhancePostResponse> => {
+    logger.info({ textLength: text.length }, 'Enhancing post started for all 4 tones');
 
     if (isMockMode()) {
-        return getMockResponse(text, tone);
+        return getMockResponse(text);
     }
 
     try {
         const openai = getOpenAIClient();
-        const prompt = buildPrompt(text, tone);
+        
+        const tones = ['Professional', 'Conversational', 'Storytelling', 'Bold/Contrarian'] as const;
+        
+        // Run all inferences concurrently (DRY approach)
+        const results = await Promise.all(
+            tones.map(tone => generateSingleTone(openai, text, tone))
+        );
 
-        const response = await openai.chat.completions.create({
-            model: 'gpt-4o', // Upgrading model for better quality if available, or gpt-4o
-            messages: [
-                { role: 'system', content: 'You are an elite LinkedIn copywriter. You specialize in viral growth and personal branding.' },
-                { role: 'user', content: prompt }
-            ],
-            response_format: { type: 'json_object' },
-        });
+        logger.info('Successfully enhanced post from OpenAI across all tones');
+        
+        // Reconstruct expected Response payload
+        const responsePayload = tones.reduce((acc, tone, index) => {
+            acc[tone] = results[index];
+            return acc;
+        }, {} as EnhancePostResponse);
 
-        const content = response.choices[0].message.content;
-        if (!content) throw new Error('No content received from OpenAI');
-
-        const parsedContent = JSON.parse(content) as EnhancePostResponse;
-        logger.info('Successfully enhanced post from OpenAI');
-        return parsedContent;
+        return responsePayload;
     } catch (error) {
-        logger.error({ error }, 'Error enhancing post with OpenAI');
+        logger.error({ error }, 'Error enhancing post with OpenAI in parallel');
         throw error;
     }
 };
