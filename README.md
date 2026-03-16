@@ -1,63 +1,87 @@
-# LinkEnhance AI 🚀
+# GhostPost 👻
 
-LinkEnhance AI is a premium SaaS tool designed to turn your raw, messy thoughts into high-performing LinkedIn posts.
+GhostPost is an AI-powered content enhancement platform designed to transform raw thoughts, messy notes, web articles, YouTube videos, and even handwritten images into viral-ready, high-quality content. It acts as an elite ghostwriter, instantly generating structured outputs ranging from multi-tone LinkedIn posts to OneNote-ready notebooks.
 
-## 🌟 Features
-- **One-Click Enhancement**: Transform rough drafts into polished content.
-- **Tone Selection**: Choose from Professional, Conversational, Storytelling, or Bold.
-- **Hook Scoring**: Get feedback on your opening line from 1-10.
-- **Engagement Optimized**: Structured for readability with whitespace and bullet points.
-- **Hashtag Suggestions**: Relevant tags automatically selected.
+## 🚀 Features
 
-## 🛠️ Stack
-- **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
-- **Backend**: Node.js, Express, TypeScript, Zod, Pino.
-- **AI**: OpenAI GPT-4o Integration.
-- **DevOps**: Docker & Docker Compose (Ready for local scaling).
+- **Multi-Tone Generation**: Generates 4 distinct variations (Professional, Conversational, Storytelling, and Bold/Contrarian) of your post concurrently.
+- **Web Article Extraction**: Paste a URL, and the app automatically scrapes and parses the article text layout.
+- **YouTube Transcript Extraction**: Paste a YouTube video link, and the app automatically fetches the raw closed-caption transcript to summarize/enhance.
+- **Handwritten Notes to Markdown**: Drag and drop images of handwritten notes, and GhostPost uses GPT-4o Vision to convert them into structured Microsoft OneNote-ready Markdown/HTML.
+- **Security First**: Enforces SSRF blocks on URL fetching, robust in-memory file handling (no persistent storage), and rate-limiting.
 
-## 🚀 Getting Started
+---
 
-### 1. Prerequisite Fix (Windows PowerShell)
-If you see an error about `npm.ps1` not being loaded, run this in your terminal:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+## 🏗 Architectural Diagram
 
-### 2. Set Up Environment Variables
-Update the `backend/.env` with your OpenAI API Key:
-```env
-OPENAI_API_KEY=your_key_here
-```
+The application follows a robust client-server architecture with separation of concerns via a service-oriented backend.
 
-### 3. Run Locally (Option A: Direct)
-**Backend:**
-```bash
-cd backend
-npm install
-npm run dev
-```
+![Architectural Diagram](architecture.png)
+
+---
+
+## 🔀 Data Flow Diagram
+
+Visualizes the lifecycle of a user request from input to the final UI rendering. 
+
+![Data Flow Diagram](data_flow.png)
+
+---
+
+## 🤖 Agentic Diagram (Internal Logic Flow)
+
+This diagram shows how the backend routes inputs dynamically and utilizes agentic design patterns to build the resulting outputs asynchronously.
+
+![Agentic Diagram](agent_logic.png)
+
+---
+
+## 🛠 Tech Stack
 
 **Frontend:**
-```bash
-cd frontend
-npm install
-npm run dev
-```
+- **React.js (v18)** + **Vite**: Blazing fast UI rendering and hot module reloading.
+- **Tailwind CSS**: Utility-first CSS framework for a premium, glassmorphism design.
+- **React Hook Form** & **Zod**: Form validation and type safety.
+- **React Query**: Asynchronous state management and caching.
+- **Lucide React**: Clean, modern icons.
 
-### 4. Run Locally (Option B: Docker)
-If you have Docker installed:
-```bash
-docker compose up --build
-```
+**Backend:**
+- **Node.js** + **Express.js**: Lightweight HTTP server.
+- **TypeScript**: End-to-end type safety.
+- **OpenAI (GPT-4o)**: Powers the LLM tone generation and the Vision OCR engine.
+- **Axios & Cheerio**: Headless HTML scraping and parsing.
+- **Multer**: In-memory file buffer processing for image uploads.
+- **Pino**: High-performance JSON logging and request tracing.
 
-## 🏗️ Folder Structure
-- `/frontend`: React application.
-- `/backend`: Node.js API and AI logic.
-- `/docker`: Infrastructure orchestration.
+---
 
-## 🤝 Project Status
-LinkEnhance AI is currently in **MVP Phase**.
-- [x] Core Enhancement Logic
-- [x] Premium Dashboard UI
-- [x] Hook Strength Engine
-- [x] Multi-tone support
+## 📖 Complete Walkthrough
+
+### 1. The Enhance Post Feature
+- **Goal:** Turn messy thoughts or external links into structured LinkedIn posts.
+- **Usage:** 
+  1. Open the **Enhance Post** tab.
+  2. Select your Input Type (Raw Text, Web Article URL, or YouTube Video URL).
+  3. Paste the content or URL.
+  4. Click `Enhance Post`.
+  5. The backend parses the data (extracting website text or YouTube captions) and fans out the generation to OpenAI, requesting 4 separate stylistic variants simultaneously.
+  6. Review the results in the 4 animated tabs (Professional, Conversational, Story, Bold) with individual Hook Scores and Tips. Click the "Copy" icon to copy the generated post directly to your clipboard.
+
+### 2. The Notes Feature
+- **Goal:** Quickly digitize handwritten notes, mind maps, or screenshots into editable Microsoft OneNote text.
+- **Usage:**
+  1. Open the **Notes** tab from the left sidebar.
+  2. Drag and drop a valid image file (JPEG, PNG, WebP — max 5MB).
+  3. The image is uploaded securely into backend memory (no hard drive storage) and pushed to GPT-4o Vision.
+  4. The AI transcribes the image and intelligently structures it using bold headers, bullet points, and proper spacing.
+  5. The UI renders the result in a clean Markdown area, ready to be copy-pasted directly into OneNote.
+
+---
+
+## 🔐 Security & Optimization Principles applied
+
+1. **SOLID Principles:** The `enhance.controller` utilizes the Open-Closed Principle via a Strategy map dictionary for dynamically choosing extraction methods based on the `inputType`.
+2. **DRY (Don't Repeat Yourself):** Replaced 4 repetitive block requests to OpenAI with a clean `.map()` over a `tones` array using `Promise.all` mapping.
+3. **In-Memory Buffering:** Uploaded pictures are never written to the disk. They are held in memory streams and garbage collected, minimizing disk IO and security footprints.
+4. **SSRF Protections:** Web scraping endpoints strictly parse and block internal, local, or AWS metadata domains (e.g., `localhost`, `169.254.169.254`). 
+5. **Observability:** Centralized `requestTracer.ts` and `Pino` logging track latency, durations, and asynchronous errors to make scaling and debugging seamless.
