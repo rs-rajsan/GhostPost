@@ -1,7 +1,9 @@
 import OpenAI from 'openai';
 import logger from '../utils/logger';
+import { ARTICLE_PROMPT, POST_PROMPT } from '../utils/prompts';
 
 // --- Configuration & Singleton ---
+// ... (rest of the imports and singleton logic remains the same)
 const getApiKey = () => process.env.OPENAI_API_KEY;
 const isMockMode = () => {
     const key = getApiKey();
@@ -23,54 +25,42 @@ export interface ToneResponse {
     hookScore: number;
     hookTip: string;
     hashtags: string[];
+    visualSuggestion: string | null;
+    imageUrl?: string | null;
 }
 
 export type EnhancePostResponse = Record<'Professional' | 'Conversational' | 'Storytelling' | 'Bold/Contrarian', ToneResponse>;
 
-// --- Logic & Generators ---
-const buildPrompt = (text: string, tone: string): string => `
-    You are a world-class LinkedIn ghostwriter for TOP 1% creators. 
-    Your mission: Transform raw, messy thoughts into a viral-ready post that stops the scroll and builds authority.
-    
-    TONE: ${tone}
-    
-    INPUT MATERIAL:
-    """
-    ${text}
-    """
-    
-    GUIDELINES:
-    1. THE HOOK: The first sentence must be a digital "stop sign." Use curiosity gaps, bold claims, or relatable pain points.
-    2. THE RE-HOOK: The second sentence must justify the hook and pull them deeper.
-    3. THE BODY: 
-       - Use lots of whitespace (one sentence or short paragraph per block).
-       - Transform complex ideas into simple bullet points or analogies.
-       - Ensure every line adds value or moves the story forward.
-    4. THE CTA: End with a high-friction engagement question that forces a thoughtful comment.
-    5. THE HASHTAGS: 3-5 high-relevance tags. No generic spam.
-    
-    OUTPUT REQUIREMENTS:
-    - Return valid JSON.
-    - hookScore: A brutal but fair rating (1-10).
-    - hookTip: One specific, actionable way to make the opening even stronger.
-    - enhancedPost: The complete, formatted post content.
-    
-    RESPONSE FORMAT:
-    {
-      "enhancedPost": "...",
-      "hookScore": 9,
-      "hookTip": "...",
-      "hashtags": ["#tag1", "#tag2"]
-    }
-`;
+export type EnhancementMode = 'post' | 'article';
 
-const getMockResponse = (text: string): EnhancePostResponse => {
+interface EnhanceOptions {
+    mode?: EnhancementMode;
+    targetPages?: number;
+    researchData?: string;
+}
+
+// --- Logic & Generators ---
+const buildPrompt = (text: string, tone: string, options: EnhanceOptions): string => {
+    const { mode = 'post', targetPages = 2, researchData } = options;
+    const promptOptions = { tone, text, targetPages, researchData };
+
+    return mode === 'article' 
+        ? ARTICLE_PROMPT(promptOptions)
+        : POST_PROMPT(promptOptions);
+};
+
+const getMockResponse = (text: string, options: EnhanceOptions): EnhancePostResponse => {
     logger.warn('OPENAI_API_KEY not set or invalid. Returning mock data.');
+    const { mode = 'post', targetPages = 2 } = options;
+    
     const makeMock = (t: string) => ({
-        enhancedPost: `(MOCK RESULT) This is a polished version of your post in a ${t} tone.\n\nYour original thoughts: "${text}"\n\nI've restructured this to be more engaging for LinkedIn.`,
+        enhancedPost: mode === 'article' 
+            ? `# Mock ${t} Article\n\nThis is a simulated ${targetPages}-page article about "${text.substring(0, 30)}...".\n\n## Section 1\nIt contains multiple sections and research-backed data simulator. Lorem ipsum...`
+            : `(MOCK RESULT) This is a polished version of your post in a ${t} tone.\n\nYour original thoughts: "${text}"\n\nI've restructured this to be more engaging for LinkedIn.`,
         hookScore: 8,
         hookTip: "This is a mock tip: try making the first sentence even more punchy!",
-        hashtags: ["#mock", "#linkedin", "#ai"]
+        hashtags: ["#mock", "#linkedin", "#ai"],
+        visualSuggestion: null
     });
 
     return {
@@ -81,15 +71,16 @@ const getMockResponse = (text: string): EnhancePostResponse => {
     };
 };
 
-const generateSingleTone = async (openai: OpenAI, text: string, tone: string): Promise<ToneResponse> => {
-    const prompt = buildPrompt(text, tone);
+const generateSingleTone = async (openai: OpenAI, text: string, tone: string, options: EnhanceOptions): Promise<ToneResponse> => {
+    const prompt = buildPrompt(text, tone, options);
     const response = await openai.chat.completions.create({
         model: 'gpt-4o',
         messages: [
-            { role: 'system', content: 'You are an elite LinkedIn copywriter. You specialize in viral growth and personal branding.' },
+            { role: 'system', content: 'You are an elite copywriter and ghostwriter. You specialize in high-impact content across LinkedIn and long-form articles.' },
             { role: 'user', content: prompt }
         ],
         response_format: { type: 'json_object' },
+        max_tokens: options.mode === 'article' ? 4096 : 1000,
     });
 
     const content = response.choices[0].message.content;
@@ -98,11 +89,11 @@ const generateSingleTone = async (openai: OpenAI, text: string, tone: string): P
     return JSON.parse(content) as ToneResponse;
 };
 
-export const enhancePost = async (text: string): Promise<EnhancePostResponse> => {
-    logger.info({ textLength: text.length }, 'Enhancing post started for all 4 tones');
+export const enhancePost = async (text: string, options: EnhanceOptions = {}): Promise<EnhancePostResponse> => {
+    logger.info({ textLength: text.length, mode: options.mode }, 'Enhancing post started for all 4 tones');
 
     if (isMockMode()) {
-        return getMockResponse(text);
+        return getMockResponse(text, options);
     }
 
     try {
@@ -112,7 +103,7 @@ export const enhancePost = async (text: string): Promise<EnhancePostResponse> =>
         
         // Run all inferences concurrently (DRY approach)
         const results = await Promise.all(
-            tones.map(tone => generateSingleTone(openai, text, tone))
+            tones.map(tone => generateSingleTone(openai, text, tone, options))
         );
 
         logger.info('Successfully enhanced post from OpenAI across all tones');

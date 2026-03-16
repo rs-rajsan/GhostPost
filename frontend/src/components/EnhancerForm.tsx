@@ -7,7 +7,10 @@ import { useEnhance } from '../hooks/useEnhance';
 
 const schema = z.object({
     inputType: z.enum(['text', 'article', 'youtube']),
-    text: z.string().min(10, 'Input should be at least 10 characters').max(50000)
+    text: z.string().min(10, 'Input should be at least 10 characters').max(50000),
+    mode: z.enum(['post', 'article']),
+    targetPages: z.number().min(1).max(10),
+    deepResearch: z.boolean()
 });
 
 type FormData = z.infer<typeof schema>;
@@ -20,6 +23,9 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
         defaultValues: {
             inputType: 'text',
             text: '',
+            mode: 'post',
+            targetPages: 2,
+            deepResearch: false
         }
     });
 
@@ -42,8 +48,9 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
         }
     };
 
-    // Input Type Selection
+    // Form Watchers
     const currentInputType = watch('inputType');
+    const currentMode = watch('mode');
 
     const inputOptions = [
         { id: 'text', icon: FileText, label: 'Raw Text' },
@@ -105,6 +112,73 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
                     )}
                 </div>
                 {errors.text && <p className="mt-2 text-sm text-red-500">{errors.text.message}</p>}
+            </div>
+
+            {/* Advanced Options */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-6 rounded-3xl border border-white/10">
+                <div className="space-y-4">
+                    <label className="block text-sm font-medium text-gray-300">Output Mode</label>
+                    <div className="flex gap-2">
+                        {['post', 'article'].map((m) => (
+                            <button
+                                key={m}
+                                type="button"
+                                onClick={() => setValue('mode', m as any)}
+                                className={`
+                                    flex-1 py-2 px-4 rounded-xl text-xs font-semibold border transition-all
+                                    ${currentMode === m 
+                                        ? 'bg-primary/20 border-primary text-white' 
+                                        : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'}
+                                `}
+                            >
+                                {m === 'post' ? 'LinkedIn Post' : 'Detailed Article'}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {currentMode === 'article' && (
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                            <label className="block text-sm font-medium text-gray-300">Target Length</label>
+                            <span className="text-xs font-bold text-primary">{watch('targetPages')} Pages</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            {...register('targetPages', { valueAsNumber: true })}
+                            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
+                        />
+                    </div>
+                )}
+
+                <div className="flex items-center justify-between col-span-full md:col-span-1 pt-2">
+                    <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${watch('deepResearch') ? 'bg-primary/20 text-primary' : 'bg-white/5 text-gray-500'}`}>
+                            <Sparkles size={18} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-200">Deep Research</p>
+                            <p className="text-[10px] text-gray-500">Gather facts & proven statistics</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setValue('deepResearch', !watch('deepResearch'))}
+                        className={`
+                            relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none
+                            ${watch('deepResearch') ? 'bg-primary' : 'bg-white/10'}
+                        `}
+                    >
+                        <span
+                            className={`
+                                inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+                                ${watch('deepResearch') ? 'translate-x-6' : 'translate-x-1'}
+                            `}
+                        />
+                    </button>
+                </div>
             </div>
 
 

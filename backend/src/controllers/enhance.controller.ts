@@ -2,24 +2,29 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import * as llmService from '../services/llm.service';
 import * as extractionService from '../services/extraction.service';
+import * as searchService from '../services/search.service';
+import * as imageService from '../services/image.service';
 import logger from '../utils/logger';
 
 const enhanceSchema = z.object({
     inputType: z.enum(['text', 'article', 'youtube']).default('text'),
-    text: z.string().min(10).max(50000)
+    text: z.string().min(10).max(50000),
+    mode: z.enum(['post', 'article']).default('post'),
+    targetPages: z.number().min(1).max(10).default(2),
+    deepResearch: z.boolean().default(false)
 });
 
 export const enhance = async (req: Request, res: Response) => {
     try {
-        const { text, inputType } = enhanceSchema.parse(req.body);
+        const { text, inputType, mode, targetPages, deepResearch } = enhanceSchema.parse(req.body);
 
-        logger.info({ inputType, textLength: text.length }, 'Processing enhance request');
+        logger.info({ inputType, textLength: text.length, mode, targetPages, deepResearch }, 'Processing enhance request');
 
         // Strategy Pattern for Open-Closed Principle compliance
         type ExtractorFunction = (input: string) => Promise<string> | string;
         
         const extractionStrategies: Record<string, ExtractorFunction> = {
-            'text': (input: string) => input, // Raw text passes through
+            'text': (input: string) => input, 
             'article': extractionService.extractArticleContent,
             'youtube': extractionService.extractYoutubeTranscript
         };
@@ -31,7 +36,27 @@ export const enhance = async (req: Request, res: Response) => {
 
         const contentToEnhance = await extractor(text);
 
-        const result = await llmService.enhancePost(contentToEnhance);
+        let researchData = '';
+        if (deepResearch) {
+            researchData = await searchService.performResearch(text);
+        }
+
+        const result = await llmService.enhancePost(contentToEnhance, {
+            mode,
+            targetPages,
+            researchData
+        });
+
+        // Generate images concurrently for each tone if a visual suggestion exists
+        const tones = Object.keys(result) as (keyof llmService.EnhancePostResponse)[];
+        await Promise.all(
+            tones.map(async (tone) => {
+                const toneData = result[tone];
+                if (toneData.visualSuggestion) {
+                    toneData.imageUrl = await imageService.generateImage(toneData.visualSuggestion);
+                }
+            })
+        );
 
         res.status(200).json(result);
     } catch (error: any) {

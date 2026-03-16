@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { Copy, Check, Info, RefreshCcw, Loader2, Briefcase, MessageSquare, BookOpen, Zap } from 'lucide-react';
+import { Copy, Check, Info, RefreshCcw, Loader2, Briefcase, MessageSquare, BookOpen, Zap, Download } from 'lucide-react';
 import type { EnhanceResponse } from '../hooks/useEnhance';
+import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType } from 'docx';
+import { saveAs } from 'file-saver';
 
 interface OutputDisplayProps {
     data: EnhanceResponse;
@@ -28,6 +31,170 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
         navigator.clipboard.writeText(fullText);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const urlToBase64 = async (url: string): Promise<string> => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result === 'string') {
+                    resolve(reader.result);
+                } else {
+                    reject(new Error('Failed to convert image to Base64'));
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    };
+
+    const downloadWord = async () => {
+        try {
+            console.log('Starting Word document generation...');
+            
+            let imageSection: Paragraph[] = [];
+            if (currentData.imageUrl) {
+                const response = await fetch(currentData.imageUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                imageSection = [
+                    new Paragraph({
+                        children: [
+                            new ImageRun({
+                                data: uint8Array,
+                                transformation: { width: 600, height: 337 },
+                            } as any),
+                        ],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 400 },
+                    }),
+                ];
+            }
+
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new Paragraph({
+                            text: "GhostPost: Enhanced Content",
+                            heading: HeadingLevel.HEADING_1,
+                            alignment: AlignmentType.CENTER,
+                            spacing: { after: 400 },
+                        }),
+                        new Paragraph({
+                            children: [
+                                new TextRun({ text: `Tone: ${activeTab}`, bold: true }),
+                                new TextRun({ text: ` | Generated on: ${new Date().toLocaleDateString()}`, color: "666666" }),
+                            ],
+                            spacing: { after: 400 },
+                        }),
+                        ...imageSection,
+                        ...currentData.enhancedPost.split('\n').map(line => 
+                            new Paragraph({
+                                children: [new TextRun(line)],
+                                spacing: { after: 200 },
+                            })
+                        ),
+                        new Paragraph({
+                            children: [
+                                new TextRun({ 
+                                    text: currentData.hashtags.join(' '), 
+                                    color: "0066CC",
+                                    italics: true 
+                                }),
+                            ],
+                            spacing: { before: 400 },
+                        }),
+                    ],
+                }],
+            });
+
+            const blob = await Packer.toBlob(doc);
+            saveAs(blob, `GhostPost_${activeTab}_${new Date().getTime()}.docx`);
+            console.log('Word document saved.');
+        } catch (error) {
+            console.error('Error generating Word doc:', error);
+            alert('Failed to generate Word document.');
+        }
+    };
+
+    const downloadPDF = async () => {
+        try {
+            console.log('Starting PDF generation...');
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            const maxWidth = pageWidth - (margin * 2);
+            let cursorY = 55;
+
+            const addHeader = (pageNum: number) => {
+                doc.setFontSize(22);
+                doc.setTextColor(40, 40, 40);
+                doc.text('GhostPost: Enhanced Content', margin, 30);
+                
+                doc.setFontSize(10);
+                doc.setTextColor(150, 150, 150);
+                doc.text(`Tone: ${activeTab} | Page ${pageNum}`, pageWidth - margin - 20, 30);
+                
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(200, 200, 200);
+                doc.line(margin, 35, pageWidth - margin, 35);
+            };
+
+            addHeader(1);
+
+            // Content
+            doc.setFontSize(12);
+            doc.setTextColor(60, 60, 60);
+
+            // Add Image if exists
+            if (currentData.imageUrl) {
+                try {
+                    const base64Img = await urlToBase64(currentData.imageUrl);
+                    const imgWidth = maxWidth;
+                    const imgHeight = (imgWidth * 9) / 16;
+                    doc.addImage(base64Img, 'JPEG', margin, cursorY, imgWidth, imgHeight);
+                    cursorY += imgHeight + 10;
+                } catch (imgError) {
+                    console.error('Failed to add image to PDF:', imgError);
+                }
+            }
+            
+            const lines = doc.splitTextToSize(currentData.enhancedPost, maxWidth);
+            
+            lines.forEach((line: string) => {
+                if (cursorY > pageHeight - margin) {
+                    doc.addPage();
+                    addHeader(doc.internal.pages.length - 1);
+                    cursorY = 45; // Reset Y for new page
+                    doc.setFontSize(12);
+                    doc.setTextColor(60, 60, 60);
+                }
+                doc.text(line, margin, cursorY);
+                cursorY += 7;
+            });
+
+            // Hashtags
+            if (cursorY > pageHeight - margin - 15) {
+                doc.addPage();
+                addHeader(doc.internal.pages.length - 1);
+                cursorY = 45;
+            }
+            
+            doc.setFontSize(10);
+            doc.setTextColor(0, 102, 204);
+            const hashtagLines = doc.splitTextToSize(currentData.hashtags.join(' '), maxWidth);
+            doc.text(hashtagLines, margin, cursorY + 5);
+
+            const filename = `GhostPost_${activeTab}_${new Date().getTime()}.pdf`;
+            doc.save(filename);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF.');
+        }
     };
 
     return (
@@ -96,6 +263,21 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                     </button>
                 </div>
                 <div className="p-6 bg-black/20 min-h-[300px] text-gray-200 whitespace-pre-wrap leading-relaxed">
+                    {currentData.imageUrl && (
+                        <div className="mb-8 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                            <img 
+                                src={currentData.imageUrl} 
+                                alt="Generated visual context" 
+                                className="w-full h-auto object-cover max-h-[500px]"
+                            />
+                            {currentData.visualSuggestion && (
+                                <div className="bg-white/5 p-3 text-xs text-gray-400 italic border-t border-white/5">
+                                    Visual: {currentData.visualSuggestion}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    
                     {currentData.enhancedPost}
 
                     <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap gap-2">
@@ -108,21 +290,36 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                 </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex gap-4">
+            {/* Export Options */}
+            <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                    onClick={onRegenerate}
-                    disabled={isPending}
-                    className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium py-3 rounded-2xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                    onClick={downloadPDF}
+                    className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium py-3 rounded-2xl flex items-center justify-center gap-2 transition-all"
                 >
-                    {isPending ? (
-                        <Loader2 className="animate-spin" size={18} />
-                    ) : (
-                        <RefreshCcw size={18} />
-                    )}
-                    Regenerate All Variants
+                    <Download size={18} className="text-primary" />
+                    Download PDF
+                </button>
+                <button
+                    onClick={downloadWord}
+                    className="flex-1 premium-gradient hover:opacity-90 text-white font-medium py-3 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20"
+                >
+                    <Download size={18} />
+                    Download Word (Recommended)
                 </button>
             </div>
+
+            <button
+                onClick={onRegenerate}
+                disabled={isPending}
+                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 text-sm py-3 rounded-2xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+            >
+                {isPending ? (
+                    <Loader2 className="animate-spin" size={16} />
+                ) : (
+                    <RefreshCcw size={16} />
+                )}
+                Regenerate All Variants
+            </button>
         </div>
     );
 }
