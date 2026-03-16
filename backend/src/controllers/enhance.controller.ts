@@ -3,7 +3,6 @@ import { z } from 'zod';
 import * as llmService from '../services/llm.service';
 import * as extractionService from '../services/extraction.service';
 import * as searchService from '../services/search.service';
-import * as imageService from '../services/image.service';
 import logger from '../utils/logger';
 
 const enhanceSchema = z.object({
@@ -46,17 +45,6 @@ export const enhance = async (req: Request, res: Response) => {
             targetPages,
             researchData
         });
-
-        // Generate images concurrently for each tone if a visual suggestion exists
-        const tones = Object.keys(result) as (keyof llmService.EnhancePostResponse)[];
-        await Promise.all(
-            tones.map(async (tone) => {
-                const toneData = result[tone];
-                if (toneData.visualSuggestion) {
-                    toneData.imageUrl = await imageService.generateImage(toneData.visualSuggestion);
-                }
-            })
-        );
 
         res.status(200).json(result);
     } catch (error: any) {

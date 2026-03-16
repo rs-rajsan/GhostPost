@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Copy, Check, Info, RefreshCcw, Loader2, Briefcase, MessageSquare, BookOpen, Zap, Download } from 'lucide-react';
 import type { EnhanceResponse } from '../hooks/useEnhance';
 import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
 
 interface OutputDisplayProps {
@@ -33,46 +33,11 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const urlToBase64 = async (url: string): Promise<string> => {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (typeof reader.result === 'string') {
-                    resolve(reader.result);
-                } else {
-                    reject(new Error('Failed to convert image to Base64'));
-                }
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    };
 
     const downloadWord = async () => {
         try {
             console.log('Starting Word document generation...');
             
-            let imageSection: Paragraph[] = [];
-            if (currentData.imageUrl) {
-                const response = await fetch(currentData.imageUrl);
-                const arrayBuffer = await response.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                imageSection = [
-                    new Paragraph({
-                        children: [
-                            new ImageRun({
-                                data: uint8Array,
-                                transformation: { width: 600, height: 337 },
-                            } as any),
-                        ],
-                        alignment: AlignmentType.CENTER,
-                        spacing: { after: 400 },
-                    }),
-                ];
-            }
-
             const doc = new Document({
                 sections: [{
                     properties: {},
@@ -90,7 +55,6 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                             ],
                             spacing: { after: 400 },
                         }),
-                        ...imageSection,
                         ...currentData.enhancedPost.split('\n').map(line => 
                             new Paragraph({
                                 children: [new TextRun(line)],
@@ -111,12 +75,14 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                 }],
             });
 
+            console.log('Packing Word document...');
             const blob = await Packer.toBlob(doc);
+            console.log('Word document blob generated, saving file...');
             saveAs(blob, `GhostPost_${activeTab}_${new Date().getTime()}.docx`);
-            console.log('Word document saved.');
+            console.log('Word document download initiated.');
         } catch (error) {
-            console.error('Error generating Word doc:', error);
-            alert('Failed to generate Word document.');
+            console.error('Critical error generating Word doc:', error);
+            alert(`Failed to generate Word document: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     };
 
@@ -150,19 +116,6 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
             doc.setFontSize(12);
             doc.setTextColor(60, 60, 60);
 
-            // Add Image if exists
-            if (currentData.imageUrl) {
-                try {
-                    const base64Img = await urlToBase64(currentData.imageUrl);
-                    const imgWidth = maxWidth;
-                    const imgHeight = (imgWidth * 9) / 16;
-                    doc.addImage(base64Img, 'JPEG', margin, cursorY, imgWidth, imgHeight);
-                    cursorY += imgHeight + 10;
-                } catch (imgError) {
-                    console.error('Failed to add image to PDF:', imgError);
-                }
-            }
-            
             const lines = doc.splitTextToSize(currentData.enhancedPost, maxWidth);
             
             lines.forEach((line: string) => {
@@ -263,21 +216,6 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                     </button>
                 </div>
                 <div className="p-6 bg-black/20 min-h-[300px] text-gray-200 whitespace-pre-wrap leading-relaxed">
-                    {currentData.imageUrl && (
-                        <div className="mb-8 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                            <img 
-                                src={currentData.imageUrl} 
-                                alt="Generated visual context" 
-                                className="w-full h-auto object-cover max-h-[500px]"
-                            />
-                            {currentData.visualSuggestion && (
-                                <div className="bg-white/5 p-3 text-xs text-gray-400 italic border-t border-white/5">
-                                    Visual: {currentData.visualSuggestion}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                    
                     {currentData.enhancedPost}
 
                     <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap gap-2">

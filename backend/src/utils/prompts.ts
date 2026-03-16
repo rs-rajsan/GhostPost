@@ -35,15 +35,13 @@ OUTPUT REQUIREMENTS:
 - hookScore: A rating of the article's title and introduction (1-10).
 - hookTip: One specific way to make the opening hook even more engaging.
 - enhancedPost: The complete, formatted article content (in Markdown).
-- visualSuggestion: A brief description (prompt) for an image or diagram that would help visualize the content. If not needed, return null.
 
 RESPONSE FORMAT:
 {
   "enhancedPost": "...",
   "hookScore": 9,
   "hookTip": "...",
-  "hashtags": ["#tag1", "#tag2"],
-  "visualSuggestion": "..."
+  "hashtags": ["#tag1", "#tag2"]
 }
 `;
 };
@@ -80,15 +78,13 @@ OUTPUT REQUIREMENTS:
 - hookScore: A brutal but fair rating (1-10).
 - hookTip: One specific, actionable way to make the opening even stronger.
 - enhancedPost: The complete, formatted post content.
-- visualSuggestion: A brief description (prompt) for a LinkedIn-style square image or diagram. If not needed, return null.
 
 RESPONSE FORMAT:
 {
   "enhancedPost": "...",
   "hookScore": 9,
   "hookTip": "...",
-  "hashtags": ["#tag1", "#tag2"],
-  "visualSuggestion": "..."
+  "hashtags": ["#tag1", "#tag2"]
 }
 `;
 };

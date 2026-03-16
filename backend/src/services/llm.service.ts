@@ -25,8 +25,6 @@ export interface ToneResponse {
     hookScore: number;
     hookTip: string;
     hashtags: string[];
-    visualSuggestion: string | null;
-    imageUrl?: string | null;
 }
 
 export type EnhancePostResponse = Record<'Professional' | 'Conversational' | 'Storytelling' | 'Bold/Contrarian', ToneResponse>;
@@ -59,8 +57,7 @@ const getMockResponse = (text: string, options: EnhanceOptions): EnhancePostResp
             : `(MOCK RESULT) This is a polished version of your post in a ${t} tone.\n\nYour original thoughts: "${text}"\n\nI've restructured this to be more engaging for LinkedIn.`,
         hookScore: 8,
         hookTip: "This is a mock tip: try making the first sentence even more punchy!",
-        hashtags: ["#mock", "#linkedin", "#ai"],
-        visualSuggestion: null
+        hashtags: ["#mock", "#linkedin", "#ai"]
     });
 
     return {

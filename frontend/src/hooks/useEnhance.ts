@@ -14,8 +14,6 @@ export interface ToneResponse {
     hookScore: number;
     hookTip: string;
     hashtags: string[];
-    visualSuggestion: string | null;
-    imageUrl?: string | null;
 }
 
 export type EnhanceResponse = Record<'Professional' | 'Conversational' | 'Storytelling' | 'Bold/Contrarian', ToneResponse>;
