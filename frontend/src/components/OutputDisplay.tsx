@@ -34,44 +34,91 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
     };
 
 
+
     const downloadWord = async () => {
         try {
             console.log('Starting Word document generation...');
             
+            // Helper to parse line and return formatted children
+            const parseLineToTextRuns = (line: string): TextRun[] => {
+                const cleaned = line.replace(/^\s*[-*]\s+/, '').replace(/^\s*#+\s+/, '').replace(/^\d+\.\s+/, '');
+                const segments = cleaned.split(/(\*\*.*?\*\*)/g);
+                
+                return segments.map(seg => {
+                    if (seg.startsWith('**') && seg.endsWith('**')) {
+                        return new TextRun({ text: seg.slice(2, -2), bold: true });
+                    }
+                    return new TextRun(seg);
+                });
+            };
+
+
+            const children = [
+                new Paragraph({
+                    text: "GhostPost: Enhanced Content",
+                    heading: HeadingLevel.HEADING_1,
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 400 },
+                }),
+                new Paragraph({
+                    children: [
+                        new TextRun({ text: `Tone: ${activeTab}`, bold: true }),
+                        new TextRun({ text: ` | Generated on: ${new Date().toLocaleDateString()}`, color: "666666" }),
+                    ],
+                    spacing: { after: 400 },
+                }),
+            ];
+
+            currentData.enhancedPost.split('\n').forEach(line => {
+                if (!line.trim()) return;
+
+                if (line.startsWith('# ')) {
+                    children.push(new Paragraph({ 
+                        text: line.replace('# ', ''), 
+                        heading: HeadingLevel.HEADING_2,
+                        spacing: { before: 240, after: 120 }
+                    }));
+                } else if (line.startsWith('## ')) {
+                    children.push(new Paragraph({ 
+                        text: line.replace('## ', ''), 
+                        heading: HeadingLevel.HEADING_3,
+                        spacing: { before: 200, after: 100 }
+                    }));
+                } else if (line.startsWith('### ')) {
+                    children.push(new Paragraph({ 
+                        text: line.replace('### ', ''), 
+                        heading: HeadingLevel.HEADING_4,
+                        spacing: { before: 160, after: 80 }
+                    }));
+                } else if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+                    children.push(new Paragraph({ 
+                        children: parseLineToTextRuns(line),
+                        bullet: { level: 0 },
+                        spacing: { after: 120 }
+                    }));
+                } else {
+                    children.push(new Paragraph({ 
+                        children: parseLineToTextRuns(line),
+                        spacing: { after: 200 }
+                    }));
+                }
+            });
+
+            children.push(new Paragraph({
+                children: [
+                    new TextRun({ 
+                        text: currentData.hashtags.join(' '), 
+                        color: "0066CC",
+                        italics: true 
+                    }),
+                ],
+                spacing: { before: 400 },
+            }));
+
             const doc = new Document({
                 sections: [{
                     properties: {},
-                    children: [
-                        new Paragraph({
-                            text: "GhostPost: Enhanced Content",
-                            heading: HeadingLevel.HEADING_1,
-                            alignment: AlignmentType.CENTER,
-                            spacing: { after: 400 },
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({ text: `Tone: ${activeTab}`, bold: true }),
-                                new TextRun({ text: ` | Generated on: ${new Date().toLocaleDateString()}`, color: "666666" }),
-                            ],
-                            spacing: { after: 400 },
-                        }),
-                        ...currentData.enhancedPost.split('\n').map(line => 
-                            new Paragraph({
-                                children: [new TextRun(line)],
-                                spacing: { after: 200 },
-                            })
-                        ),
-                        new Paragraph({
-                            children: [
-                                new TextRun({ 
-                                    text: currentData.hashtags.join(' '), 
-                                    color: "0066CC",
-                                    italics: true 
-                                }),
-                            ],
-                            spacing: { before: 400 },
-                        }),
-                    ],
+                    children: children,
                 }],
             });
 
@@ -98,10 +145,12 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
 
             const addHeader = (pageNum: number) => {
                 doc.setFontSize(22);
+                doc.setFont("helvetica", "bold");
                 doc.setTextColor(40, 40, 40);
                 doc.text('GhostPost: Enhanced Content', margin, 30);
                 
                 doc.setFontSize(10);
+                doc.setFont("helvetica", "normal");
                 doc.setTextColor(150, 150, 150);
                 doc.text(`Tone: ${activeTab} | Page ${pageNum}`, pageWidth - margin - 20, 30);
                 
@@ -112,22 +161,54 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
 
             addHeader(1);
 
-            // Content
-            doc.setFontSize(12);
-            doc.setTextColor(60, 60, 60);
 
-            const lines = doc.splitTextToSize(currentData.enhancedPost, maxWidth);
+            const lines = currentData.enhancedPost.split('\n');
             
             lines.forEach((line: string) => {
+                if (!line.trim()) {
+                    cursorY += 5;
+                    return;
+                }
+
                 if (cursorY > pageHeight - margin) {
                     doc.addPage();
                     addHeader(doc.internal.pages.length - 1);
-                    cursorY = 45; // Reset Y for new page
-                    doc.setFontSize(12);
-                    doc.setTextColor(60, 60, 60);
+                    cursorY = 45;
                 }
-                doc.text(line, margin, cursorY);
-                cursorY += 7;
+
+                let cleanLine = line;
+                let fontSize = 11;
+                let fontStyle = "normal";
+
+                if (line.startsWith('# ')) {
+                    cleanLine = line.replace('# ', '');
+                    fontSize = 18;
+                    fontStyle = "bold";
+                    cursorY += 5;
+                } else if (line.startsWith('## ')) {
+                    cleanLine = line.replace('## ', '');
+                    fontSize = 14;
+                    fontStyle = "bold";
+                    cursorY += 3;
+                } else if (line.startsWith('### ')) {
+                    cleanLine = line.replace('### ', '');
+                    fontSize = 12;
+                    fontStyle = "bold";
+                    cursorY += 2;
+                } else if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+                    cleanLine = "• " + line.trim().substring(2);
+                }
+
+                // Strip bold tags for PDF rendering (simplified as jsPDF doesn't natively support mix inline)
+                cleanLine = cleanLine.replace(/\*\*/g, '');
+
+                doc.setFontSize(fontSize);
+                doc.setFont("helvetica", fontStyle);
+                doc.setTextColor(60, 60, 60);
+
+                const wrappedLines = doc.splitTextToSize(cleanLine, maxWidth);
+                doc.text(wrappedLines, margin, cursorY);
+                cursorY += (wrappedLines.length * (fontSize / 2)) + 2;
             });
 
             // Hashtags
@@ -138,6 +219,7 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
             }
             
             doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
             doc.setTextColor(0, 102, 204);
             const hashtagLines = doc.splitTextToSize(currentData.hashtags.join(' '), maxWidth);
             doc.text(hashtagLines, margin, cursorY + 5);
@@ -216,6 +298,7 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                     </button>
                 </div>
                 <div className="p-6 bg-black/20 min-h-[300px] text-gray-200 whitespace-pre-wrap leading-relaxed">
+                    
                     {currentData.enhancedPost}
 
                     <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap gap-2">

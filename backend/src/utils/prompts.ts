@@ -41,7 +41,8 @@ RESPONSE FORMAT:
   "enhancedPost": "...",
   "hookScore": 9,
   "hookTip": "...",
-  "hashtags": ["#tag1", "#tag2"]
+  "hashtags": ["#tag1", "#tag2"],
+  "visualSuggestion": "..."
 }
 `;
 };
@@ -84,7 +85,8 @@ RESPONSE FORMAT:
   "enhancedPost": "...",
   "hookScore": 9,
   "hookTip": "...",
-  "hashtags": ["#tag1", "#tag2"]
+  "hashtags": ["#tag1", "#tag2"],
+  "visualSuggestion": "..."
 }
 `;
 };
