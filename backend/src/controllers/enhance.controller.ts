@@ -7,7 +7,7 @@ import logger from '../utils/logger';
 
 const enhanceSchema = z.object({
     inputType: z.enum(['text', 'article', 'youtube']).default('text'),
-    text: z.string().min(10).max(50000),
+    text: z.string().min(10).max(200000),
     mode: z.enum(['post', 'article']).default('post'),
     targetPages: z.number().min(1).max(10).default(2),
     deepResearch: z.boolean().default(false)

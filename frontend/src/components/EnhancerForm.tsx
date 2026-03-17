@@ -7,7 +7,7 @@ import { useEnhance } from '../hooks/useEnhance';
 
 const schema = z.object({
     inputType: z.enum(['text', 'article', 'youtube']),
-    text: z.string().min(10, 'Input should be at least 10 characters').max(50000),
+    text: z.string().min(10, 'Input should be at least 10 characters').max(200000),
     mode: z.enum(['post', 'article']),
     targetPages: z.number().min(1).max(10),
     deepResearch: z.boolean()
@@ -107,7 +107,7 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
                     
                     {currentInputType === 'text' && (
                         <div className="absolute bottom-3 right-3 text-xs text-gray-500">
-                            {watch('text').length.toLocaleString()} / 50,000
+                            {watch('text').length.toLocaleString()} / 200,000
                         </div>
                     )}
                 </div>

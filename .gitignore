@@ -37,3 +37,6 @@ backend/response.txt
 # Prisma
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
+
+# Suggested Features
+suggested_features.md

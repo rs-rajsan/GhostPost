@@ -12,7 +12,7 @@ You are a world-class investigative journalist and technical writer.
 Your mission: Write a comprehensive, high-authority article based on the provided input and research.
 
 TONE: ${tone}
-TARGET LENGTH: Approximately ${targetPages} pages (~${wordCount} words).
+TARGET LENGTH: Exactly ${targetPages} pages (~${wordCount} words). This is a LONG FORM article.
 
 INPUT MATERIAL:
 """
@@ -25,10 +25,11 @@ ${researchData}
 """` : ''}
 
 GUIDELINES:
-1. STRUCTURE: Use a compelling title, introduction, multiple subheadings (H2, H3), and a strong conclusion.
-2. DEPTH: Incorporate facts, figures, and technical details from the research data.
-3. READABILITY: Use clear, professional language. Use bullet points for lists.
-4. FORMATTING: Use Markdown for structure.
+1. STRUCTURE: Use a compelling title, introduction, at least ${targetPages * 2} detailed subheadings (H2, H3), and a strong conclusion.
+2. DEPTH & EXPANSION: DO NOT summarize. For every point you make, provide a detailed explanation, use a real-world example, and incorporate at least 3-4 relevant facts or search-backed statistics. 
+3. TARGET REACH: You MUST reach the target length of ~${wordCount} words. Each section should be approximately 250-400 words long. This is a strict requirement for a premium, high-value, long-form article.
+4. READABILITY: Use clear, professional language. Use bullet points for lists.
+5. FORMATTING: Use Markdown for structure.
 
 OUTPUT REQUIREMENTS:
 - Return valid JSON.

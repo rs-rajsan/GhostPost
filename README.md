@@ -4,11 +4,13 @@ GhostPost is an AI-powered content enhancement platform designed to transform ra
 
 ## 🚀 Features
 
+- **Detailed Article Mode**: Generate comprehensive, multi-page articles (up to 10 pages) with structured headers and deep insights.
+- **Deep Research Capability**: Integrated with **Tavily** for real-time web research, fact-gathering, and statistical integration into your articles.
+- **Professional Exports**: One-click downloads as **Word (DOCX)** or **PDF**. Our custom parser strips raw markdown tags and applies premium typography for a "publish-ready" look.
 - **Multi-Tone Generation**: Generates 4 distinct variations (Professional, Conversational, Storytelling, and Bold/Contrarian) of your post concurrently.
 - **Web Article Extraction**: Paste a URL, and the app automatically scrapes and parses the article text layout.
 - **YouTube Transcript Extraction**: Paste a YouTube video link, and the app automatically fetches the raw closed-caption transcript to summarize/enhance.
-- **Handwritten Notes to Markdown**: Drag and drop images of handwritten notes, and GhostPost uses GPT-4o Vision to convert them into structured Microsoft OneNote-ready Markdown/HTML.
-- **Security First**: Enforces SSRF blocks on URL fetching, robust in-memory file handling (no persistent storage), and rate-limiting.
+- **Security First**: Enforces SSRF blocks on URL fetching, robust in-memory file handling, and rate-limiting.
 
 ---
 
@@ -43,14 +45,15 @@ This diagram shows how the backend routes inputs dynamically and utilizes agenti
 - **Tailwind CSS**: Utility-first CSS framework for a premium, glassmorphism design.
 - **React Hook Form** & **Zod**: Form validation and type safety.
 - **React Query**: Asynchronous state management and caching.
+- **docx**, **jspdf** & **file-saver**: Powering professional document exports with markdown-to-styling conversion.
 - **Lucide React**: Clean, modern icons.
 
 **Backend:**
 - **Node.js** + **Express.js**: Lightweight HTTP server.
 - **TypeScript**: End-to-end type safety.
-- **OpenAI (GPT-4o)**: Powers the LLM tone generation and the Vision OCR engine.
+- **OpenAI (gpt-4o)**: Powers the LLM tone generation and the Vision OCR engine.
+- **Tavily API**: Powers real-time web research and fact-gathering.
 - **Axios & Cheerio**: Headless HTML scraping and parsing.
-- **Multer**: In-memory file buffer processing for image uploads.
 - **Pino**: High-performance JSON logging and request tracing.
 
 ---
@@ -65,7 +68,7 @@ This diagram shows how the backend routes inputs dynamically and utilizes agenti
   3. Paste the content or URL.
   4. Click `Enhance Post`.
   5. The backend parses the data (extracting website text or YouTube captions) and fans out the generation to OpenAI, requesting 4 separate stylistic variants simultaneously.
-  6. Review the results in the 4 animated tabs (Professional, Conversational, Story, Bold) with individual Hook Scores and Tips. Click the "Copy" icon to copy the generated post directly to your clipboard.
+  6. **Pro Exports**: Download your favorite variant as a **Professional Word Document** or **Modern PDF**. No more copying raw markdown — our system delivers clean, formatted files instantly.
 
 ### 2. The Notes Feature
 - **Goal:** Quickly digitize handwritten notes, mind maps, or screenshots into editable Microsoft OneNote text.
