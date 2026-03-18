@@ -261,56 +261,64 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
             </div>
 
             {/* Metrics Row */}
-            <div className="grid grid-cols-2 gap-4">
-                <div className="glass p-4 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Hook Score</p>
-                        <p className="text-2xl font-bold text-green-400">{currentData.hookScore}/10</p>
+            <div className="glass p-5 rounded-3xl relative overflow-hidden">
+                {/* Hook Score Badge - Top Right */}
+                <div className="absolute top-4 right-4 flex items-center gap-3 bg-white/5 py-2 px-3 rounded-xl border border-white/10 border-l-4 border-l-primary shadow-xl shadow-black/40 group-hover:bg-white/10 transition-colors">
+                    <div className="text-right">
+                        <p className="text-[9px] text-gray-500 uppercase tracking-wider leading-none mb-1.5 font-bold">Hook Score</p>
+                        <p className="text-xl font-black text-green-400 leading-none">{currentData.hookScore}<span className="text-[10px] text-gray-600 ml-0.5">/10</span></p>
                     </div>
-                    <div className="w-12 h-12 rounded-full border-4 border-white/5 flex items-center justify-center relative">
+                    <div className="w-10 h-10 rounded-full border-2 border-white/5 flex items-center justify-center relative">
                         <div
-                            className="absolute inset-0 rounded-full border-4 border-green-500 transition-all duration-500"
+                            className="absolute inset-0 rounded-full border-2 border-green-500 transition-all duration-500"
                             style={{ clipPath: `inset(0 ${100 - (currentData.hookScore * 10)}% 0 0)` }}
                         />
                     </div>
                 </div>
-                <div className="glass p-4 rounded-2xl space-y-3">
-                    <div className="flex items-start gap-3">
-                        <Info className="text-primary mt-1 shrink-0" size={16} />
-                        <div className="flex-1">
-                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Hook Tip</p>
-                            <p className="text-xs text-gray-300 leading-tight mb-2">{currentData.hookTip}</p>
-                            
-                            {!generatedHooks[activeTab] ? (
-                                <button
-                                    onClick={handleGenerateHook}
-                                    disabled={generateHookMutation.isPending}
-                                    className="flex items-center gap-1.5 text-[10px] font-bold text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
-                                >
-                                    {generateHookMutation.isPending ? (
-                                        <Loader2 size={12} className="animate-spin" />
-                                    ) : (
-                                        <Wand2 size={12} />
-                                    )}
-                                    Generate Custom Hook
-                                </button>
-                            ) : (
-                                <div className="mt-2 p-2 bg-primary/10 border border-primary/20 rounded-xl relative group">
-                                    <p className="text-[11px] text-white font-medium leading-relaxed pr-6 italic">
-                                        "{generatedHooks[activeTab]}"
-                                    </p>
-                                    <button 
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(generatedHooks[activeTab]);
-                                        }}
-                                        className="absolute top-2 right-2 text-primary/60 hover:text-primary transition-opacity"
-                                        title="Copy Hook"
-                                    >
-                                        <Copy size={12} />
-                                    </button>
+
+                <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                        <Info className="text-primary" size={20} />
+                    </div>
+                    <div className="flex-1 pt-0.5">
+                        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5 font-bold">Optimization Tip</p>
+                        <p className="text-sm text-gray-100 leading-relaxed mb-4 pr-32 font-medium">{currentData.hookTip}</p>
+                        
+                        {!generatedHooks[activeTab] ? (
+                            <button
+                                onClick={handleGenerateHook}
+                                disabled={generateHookMutation.isPending}
+                                className="premium-gradient text-[11px] font-bold text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 border-t border-white/10"
+                            >
+                                {generateHookMutation.isPending ? (
+                                    <Loader2 size={16} className="animate-spin" />
+                                ) : (
+                                    <Wand2 size={16} />
+                                )}
+                                Generate Custom Hook
+                            </button>
+                        ) : (
+                            <div className="mt-2 p-4 bg-white/5 border border-white/10 rounded-2xl relative group w-full border-l-4 border-l-primary shadow-xl shadow-black/40">
+                                <div className="flex items-center gap-2 mb-2 text-gray-200/90">
+                                    <Sparkles size={14} />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Enhanced Hook</span>
                                 </div>
-                            )}
-                        </div>
+                                <p className="text-base text-gray-200 leading-relaxed pr-10">
+                                    "{generatedHooks[activeTab]}"
+                                </p>
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(generatedHooks[activeTab]);
+                                        setCopied(true);
+                                        setTimeout(() => setCopied(false), 2000);
+                                    }}
+                                    className="absolute bottom-3 right-3 p-2 bg-primary/10 hover:bg-primary/30 rounded-lg text-primary transition-all border border-primary/10 hover:scale-110 active:scale-95"
+                                    title="Copy Hook"
+                                >
+                                    {copied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
