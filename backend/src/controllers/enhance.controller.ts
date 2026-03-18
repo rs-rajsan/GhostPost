@@ -56,3 +56,28 @@ export const enhance = async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message || 'Internal server error' });
     }
 };
+
+const generateHookSchema = z.object({
+    text: z.string().min(10).max(200000),
+    tone: z.string(),
+    hookTip: z.string()
+});
+
+export const generateHook = async (req: Request, res: Response) => {
+    try {
+        const { text, tone, hookTip } = generateHookSchema.parse(req.body);
+        
+        logger.info({ tone, textLength: text.length }, 'Processing hook generation request');
+
+        const hook = await llmService.generateHook(text, tone, hookTip);
+        
+        res.status(200).json({ hook });
+    } catch (error: any) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ error: 'Validation error', details: error.issues });
+        }
+
+        logger.error({ error }, 'Unexpected error in hook generation controller');
+        res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+};

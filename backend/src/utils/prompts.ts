@@ -6,7 +6,7 @@ export interface PromptOptions {
 }
 
 export const ARTICLE_PROMPT = ({ tone, text, targetPages = 2, researchData }: PromptOptions) => {
-    const wordCount = targetPages * 500;
+    const wordCount = targetPages * 650;
     return `
 You are a world-class investigative journalist and technical writer.
 Your mission: Write a comprehensive, high-authority article based on the provided input and research.
@@ -26,8 +26,8 @@ ${researchData}
 
 GUIDELINES:
 1. STRUCTURE: Use a compelling title, introduction, at least ${targetPages * 2} detailed subheadings (H2, H3), and a strong conclusion.
-2. DEPTH & EXPANSION: DO NOT summarize. For every point you make, provide a detailed explanation, use a real-world example, and incorporate at least 3-4 relevant facts or search-backed statistics. 
-3. TARGET REACH: You MUST reach the target length of ~${wordCount} words. Each section should be approximately 250-400 words long. This is a strict requirement for a premium, high-value, long-form article.
+2. DEPTH & SUBSTANCE: DO NOT summarize. For every point you make, provide a detailed explanation, a real-world case study or example, and incorporate at least 4-5 relevant facts, technical details, or search-backed statistics. Add historical context or future predictions where relevant to increase authority.
+3. TARGET REACH: You MUST reach the target length of ~${wordCount} words through dense, high-value information. Each section should be approximately 300-450 words long. This is a strict requirement for a premium, long-form investigative piece.
 4. READABILITY: Use clear, professional language. Use bullet points for lists.
 5. FORMATTING: Use Markdown for structure.
 
@@ -54,6 +54,7 @@ You are a world-class LinkedIn ghostwriter for TOP 1% creators.
 Your mission: Transform raw, messy thoughts into a viral-ready post that stops the scroll and builds authority.
 
 TONE: ${tone}
+TARGET LENGTH: Half to 1 page maximum (~250-400 words). LESS IS MORE.
 
 INPUT MATERIAL:
 """
@@ -68,12 +69,12 @@ ${researchData}
 GUIDELINES:
 1. THE HOOK: The first sentence must be a digital "stop sign." Use curiosity gaps, bold claims, or relatable pain points.
 2. THE RE-HOOK: The second sentence must justify the hook and pull them deeper.
-3. THE BODY: 
-   - Use lots of whitespace (one sentence or short paragraph per block).
+3. CONCISENESS & IMPACT: Keep it tight. Every word must earn its place. Use lots of whitespace (one sentence or short paragraph per block).
+4. THE BODY: 
    - Transform complex ideas into simple bullet points or analogies.
    - Ensure every line adds value or moves the story forward.
-4. THE CTA: End with a high-friction engagement question that forces a thoughtful comment.
-5. THE HASHTAGS: 3-5 high-relevance tags. No generic spam.
+5. THE CTA: End with a high-friction engagement question that forces a thoughtful comment.
+6. THE HASHTAGS: 3-5 high-relevance tags. No generic spam.
 
 OUTPUT REQUIREMENTS:
 - Return valid JSON.
@@ -89,5 +90,32 @@ RESPONSE FORMAT:
   "hashtags": ["#tag1", "#tag2"],
   "visualSuggestion": "..."
 }
+`;
+};
+ 
+export const HOOK_PROMPT = (tone: string, hookTip: string, content: string) => {
+    return `
+You are a world-class Headline and Hook specialist.
+Your mission: Generate a powerful, attention-grabbing "Hook" (1-3 sentences) specifically for a LinkedIn post or Article.
+
+TONE: ${tone}
+HOOK STRATEGY: ${hookTip}
+
+CONTEXT (The content this hook is for):
+"""
+${content}
+"""
+
+GUIDELINES:
+1. SPECIFICITY: The hook MUST be tailored to the ${tone} tone. 
+   - Professional: Data-driven, authoritative, high-value.
+   - Conversational: Friendly, relatable, "common-sense" but professional.
+   - Story: Narrative-driven, emotional, "I was there" feel.
+   - Bold: Contrarian, provocative, pattern-interrupting.
+2. ACTIONABLE: Follow the "Hook Tip" strategy provided above exactly.
+3. CONCISE: Keep it to 1-3 sentences maximum.
+
+OUTPUT:
+Return ONLY the hook text. No preamble, no quotes.
 `;
 };

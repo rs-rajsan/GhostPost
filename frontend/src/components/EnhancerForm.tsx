@@ -137,7 +137,7 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
                     </div>
                 </div>
 
-                {currentMode === 'article' && (
+                {currentMode === 'article' ? (
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
                             <label className="block text-sm font-medium text-gray-300">Target Length</label>
@@ -150,6 +150,14 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
                             {...register('targetPages', { valueAsNumber: true })}
                             className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
                         />
+                    </div>
+                ) : (
+                    <div className="space-y-4 opacity-50 cursor-not-allowed">
+                        <div className="flex justify-between items-center">
+                            <label className="block text-sm font-medium text-gray-500">Target Length</label>
+                            <span className="text-xs font-bold text-gray-600">N/A for Posts</span>
+                        </div>
+                        <div className="w-full h-2 bg-white/5 rounded-lg" />
                     </div>
                 )}
 

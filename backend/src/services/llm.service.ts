@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import logger from '../utils/logger';
-import { ARTICLE_PROMPT, POST_PROMPT } from '../utils/prompts';
+import { ARTICLE_PROMPT, POST_PROMPT, HOOK_PROMPT } from '../utils/prompts';
 
 // --- Configuration & Singleton ---
 // ... (rest of the imports and singleton logic remains the same)
@@ -72,10 +72,10 @@ const generateSingleTone = async (openai: OpenAI, text: string, tone: string, op
     const prompt = buildPrompt(text, tone, options);
     
     // Dynamic token calculation based on target pages
-    // Approx 1200 tokens per page + 1000 for JSON/formatting overhead
+    // Approx 1500 tokens per page + 1000 for JSON/formatting overhead
     const targetPages = options.targetPages || 2;
     const calculatedMaxTokens = options.mode === 'article' 
-        ? Math.min((targetPages * 1200) + 1000, 16000) 
+        ? Math.min((targetPages * 1500) + 1000, 16000) 
         : 1000;
 
     const response = await openai.chat.completions.create({
@@ -122,6 +122,35 @@ export const enhancePost = async (text: string, options: EnhanceOptions = {}): P
         return responsePayload;
     } catch (error) {
         logger.error({ error }, 'Error enhancing post with OpenAI in parallel');
+        throw error;
+    }
+};
+export const generateHook = async (text: string, tone: string, hookTip: string): Promise<string> => {
+    logger.info({ tone, hookTipLength: hookTip.length }, 'Generating custom hook');
+
+    if (isMockMode()) {
+        return `(MOCK HOOK) This is a ${tone} hook based on: ${hookTip}`;
+    }
+
+    try {
+        const openai = getOpenAIClient();
+        const prompt = HOOK_PROMPT(tone, hookTip, text);
+
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o-2024-08-06',
+            messages: [
+                { role: 'system', content: 'You are a world-class Headline and Hook specialist.' },
+                { role: 'user', content: prompt }
+            ],
+            max_tokens: 300,
+        });
+
+        const content = response.choices[0].message.content;
+        if (!content) throw new Error('No content received from OpenAI for hook');
+
+        return content.trim();
+    } catch (error) {
+        logger.error({ error }, 'Error generating hook with OpenAI');
         throw error;
     }
 };

@@ -35,6 +35,7 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
+console.log('Registering routes: /api/enhance and /api/notes');
 app.use('/api/enhance', enhanceRouter);
 app.use('/api/notes', notesRouter);
 

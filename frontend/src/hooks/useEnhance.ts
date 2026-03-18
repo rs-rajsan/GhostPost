@@ -26,3 +26,18 @@ export const useEnhance = () => {
         },
     });
 };
+
+export interface GenerateHookRequest {
+    text: string;
+    tone: string;
+    hookTip: string;
+}
+
+export const useGenerateHook = () => {
+    return useMutation({
+        mutationFn: async (data: GenerateHookRequest) => {
+            const response = await api.post<{ hook: string }>('/enhance/generate-hook', data);
+            return response.data;
+        },
+    });
+};
