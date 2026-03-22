@@ -44,7 +44,7 @@ export class AgentOrchestrator {
 
         try {
             // --- STEP 1: Inbound Security ---
-            const inboundScan = await this.securityAgent.scanInbound(input);
+            const inboundScan = await this.securityAgent.validateInbound(input);
             trace.push({ agent: 'SecurityAgent', status: 'inbound_complete' });
             if (!inboundScan.success) throw new Error(inboundScan.error || 'Inbound security violation');
             const sanitizedInput = inboundScan.data;
@@ -85,7 +85,7 @@ export class AgentOrchestrator {
             }
 
             // --- STEP 6: Outbound Security ---
-            const outboundScan = await this.securityAgent.scanOutbound(currentContent);
+            const outboundScan = await this.securityAgent.validateOutbound(currentContent);
             trace.push({ agent: 'SecurityAgent', status: 'outbound_complete' });
             if (!outboundScan.success) throw new Error(outboundScan.error || 'Outbound security violation');
 

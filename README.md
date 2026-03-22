@@ -1,91 +1,163 @@
 # GhostPost 👻
 
-GhostPost is an AI-powered content enhancement platform designed to transform raw thoughts, messy notes, web articles, YouTube videos, and even handwritten images into viral-ready, high-quality content. It acts as an elite ghostwriter, instantly generating structured outputs ranging from multi-tone LinkedIn posts to OneNote-ready notebooks.
+GhostPost is an **Agentic AI** content enhancement platform. It transforms raw thoughts, messy notes, web articles, and YouTube transcripts into high-authority, viral-ready content through a coordinated **Multi-Agent Orchestration** system.
 
-## 🚀 Features
-
-- **Detailed Article Mode**: Generate comprehensive, multi-page articles (up to 10 pages) with structured headers and deep insights.
-- **Deep Research Capability**: Integrated with **Perplexity Sonar** for real-time web research, fact-gathering, and statistical integration into your articles.
-- **Professional Exports**: One-click downloads as **Word (DOCX)** or **PDF**. Our custom parser strips raw markdown tags and applies premium typography for a "publish-ready" look.
-- **Multi-Tone Generation**: Generates 4 distinct variations (Professional, Conversational, Storytelling, and Bold/Contrarian) of your post concurrently.
-- **Web Article Extraction**: Paste a URL, and the app automatically scrapes and parses the article text layout.
-- **YouTube Transcript Extraction**: Paste a YouTube video link, and the app automatically fetches the raw closed-caption transcript to summarize/enhance.
-- **Security First**: Enforces SSRF blocks on URL fetching, robust in-memory file handling, and rate-limiting.
+Built with a **provider-agnostic**, **whitelabeled** architecture, GhostPost ensures elite-level content generation with built-in security guardrails and deep observability.
 
 ---
 
-## 🏗 Architectural Diagram
+## 🚀 Key Features
 
-The application follows a robust client-server architecture with separation of concerns via a service-oriented backend.
-
-![Architectural Diagram](architecture.png)
-
----
-
-## 🔀 Data Flow Diagram
-
-Visualizes the lifecycle of a user request from input to the final UI rendering. 
-
-![Data Flow Diagram](data_flow.png)
+- **Multi-Agent Orchestration**: A sophisticated pipeline involving specialized agents for Security, Drafting, Validation, and Refinement.
+- **Self-Correcting Content Loop**: The system automatically fact-checks and polishes drafts through a reflection (Validation -> Refining) cycle.
+- **Deep Research capability**: Integrated real-time web search for grounding content in current data and statistics.
+- **Helicone Observability**: Native integration with self-hosted Helicone for granular request tracing, latency monitoring, and token tracking.
+- **Security Guardrails**: Multi-layered security scanning (Inbound & Outbound) for PII redaction, toxicity filtering, and prompt injection protection.
+- **Professional Exports**: One-click downloads as **Word (DOCX)** or **PDF** with high-premium typography.
 
 ---
 
-## 🤖 Agentic Diagram (Internal Logic Flow)
+## 🏗 System Architecture
 
-This diagram shows how the backend routes inputs dynamically and utilizes agentic design patterns to build the resulting outputs asynchronously.
+GhostPost utilizes a modular, role-based architecture designed for flexibility and scalability.
 
-![Agentic Diagram](agent_logic.png)
+```mermaid
+graph TD
+    subgraph Client_Layer["Client Layer (React + Vite)"]
+        UI["User Interface"]
+        API["API Client (RQ)"]
+    end
+    
+    subgraph Execution_Layer["Orchestration Layer (Node.js)"]
+        Orch["Agent Orchestrator"]
+        SecAgent["Security Agent (Guardian)"]
+        DraftAgent["Drafting Agent (Writer)"]
+        AuditAgent["Validation Agent (Auditor)"]
+        RefAgent["Refining Agent (Editor)"]
+    end
+    
+    subgraph Observability_Layer["Observability (Helicone)"]
+        Proxy["Valhalla Proxy"]
+        Dash["Metrics Dashboard"]
+    end
+    
+    UI --> API
+    API --> Orch
+    
+    Orch --> SecAgent
+    Orch --> DraftAgent
+    Orch --> AuditAgent
+    Orch --> RefAgent
+    
+    SecAgent & DraftAgent & AuditAgent & RefAgent -.-> Proxy
+    Proxy --> Dash
+```
+
+---
+
+## 🔀 Multi-Agent Pipeline
+
+Every content enhancement request passes through a strictly coordinated sequence of specialized AI workers.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant O as Orchestrator
+    participant S as Security Agent
+    participant D as Drafting Agent
+    participant V as Validation Agent
+    participant R as Refining Agent
+
+    U->>O: Enhancement Request
+    O->>S: Inbound Scan
+    Note right of S: PII Redaction & Prompt Guard
+    S-->>O: { sanitized: "..." }
+    
+    O->>D: Research & Drafting
+    Note right of D: Deep Web Grounding (Sonar)
+    D-->>O: { draft: "...", context: "..." }
+    
+    O->>V: Validation Audit
+    Note right of V: Hallucination Detection (Gemini)
+    V-->>O: { isValid: false, scoring: 6/10, hallucinations: [...] }
+    
+    rect rgb(230, 240, 255)
+    Note over O,R: REFLECTION LOOP
+    O->>R: Content Refinement
+    Note right of R: Self-Correction (OpenAI)
+    R-->>O: { refined: "..." }
+    end
+    
+    O->>S: Outbound Scan
+    S-->>O: { safeContent: "..." }
+    O->>U: Final Delivered Content
+```
+
+## 🕵️ Agent Handoff Trace Protocol
+
+Every enhancement request generates a granular `trace` object for observability.
+
+| Step | Agent | Status Token | Data Responsibility |
+| :--- | :--- | :--- | :--- |
+| 1 | `SecurityAgent` | `inbound_complete` | Sanitizes user input and detects injections. |
+| 2 | `DraftingAgent` | `drafting_complete` | Generates research-backed content via Perplexity. |
+| 3 | `ValidationAgent` | `validation_complete` | Audits for hallucinations and structural quality. |
+| 4 | `RefiningAgent` | `refinement_complete` | Corrects unverified claims (if triggered by low score). |
+| 5 | `SecurityAgent` | `outbound_complete` | Final safety check and PII redaction of output. |
 
 ---
 
 ## 🛠 Tech Stack
 
-**Frontend:**
-- **React.js (v18)** + **Vite**: Blazing fast UI rendering and hot module reloading.
-- **Tailwind CSS**: Utility-first CSS framework for a premium, glassmorphism design.
-- **React Hook Form** & **Zod**: Form validation and type safety.
-- **React Query**: Asynchronous state management and caching.
-- **docx**, **jspdf** & **file-saver**: Powering professional document exports with markdown-to-styling conversion.
-- **Lucide React**: Clean, modern icons.
+### Frontend
+- **React 18 & Vite**: For high-performance UI.
+- **Tailwind CSS**: Modern, premium design tokens and utilities.
+- **React Query**: Robust server-side state management.
+- **DOCX / JSPDF**: Professional document generation.
 
-**Backend:**
-- **Node.js** + **Express.js**: Lightweight HTTP server.
-- **TypeScript**: End-to-end type safety.
-- **OpenAI (GPT-4o)**: Powers the professional LLM tone generation.
-- **Gemini (2.0 Flash)**: High-speed, cost-effective Vision OCR engine for notes digitizing.
-- **Perplexity (Sonar)**: Powers real-time search-grounded research and fact-gathering.
-- **Axios & Cheerio**: Headless HTML scraping and parsing.
-- **Pino**: High-performance JSON logging and request tracing.
+### Backend
+- **Node.js & Express**: Specialized service-oriented architecture.
+- **Multi-Agent System**: Provider-agnostic agent worker classes.
+- **Standard LLM Provider**: High-performance generation.
+- **Audit LLM Provider**: Fact-checking and grounding.
+- **Research Engine**: Real-time web-grounded data retrieval.
+- **Helicone**: Integrated observability proxy.
+- **ClickHouse & PostgreSQL**: Advanced analytics and storage.
 
 ---
 
-## 📖 Complete Walkthrough
+## 🚀 Getting Started
 
-### 1. The Enhance Post Feature
-- **Goal:** Turn messy thoughts or external links into structured LinkedIn posts.
-- **Usage:** 
-  1. Open the **Enhance Post** tab.
-  2. Select your Input Type (Raw Text, Web Article URL, or YouTube Video URL).
-  3. Paste the content or URL.
-  4. Click `Enhance Post`.
-  5. The backend parses the data (extracting website text or YouTube captions) and fans out the generation to OpenAI, requesting 4 separate stylistic variants simultaneously.
-  6. **Pro Exports**: Download your favorite variant as a **Professional Word Document** or **Modern PDF**. No more copying raw markdown — our system delivers clean, formatted files instantly.
+### 1. Configure Environment
+Update `backend/.env` with your role-based API keys:
+```env
+SECURITY_API_KEY=...
+DRAFTING_API_KEY=...
+VALIDATION_API_KEY=...
+```
 
-### 2. The Notes Feature
-- **Goal:** Quickly digitize handwritten notes, mind maps, or screenshots into editable Microsoft OneNote text.
-- **Usage:**
-  1. Open the **Notes** tab from the left sidebar.
-  2. Drag and drop a valid image file (JPEG, PNG, WebP — max 5MB).
-  3. The image is uploaded securely into backend memory and pushed to **Gemini 2.0 Flash Vision**.
-  4. The AI (transcribed by Google's latest multimodal models) intelligently structures the text using bold headers, bullet points, and proper spacing.
-  5. The UI renders the result in a clean Markdown area, ready to be copy-pasted directly into OneNote.
+### 2. Start Observability (Optional)
+Launch the self-hosted Helicone stack:
+```bash
+docker-compose -f helicone-compose.yml up -d
+```
+Access the dashboard at `http://localhost:3000`.
+
+### 3. Start Application
+```bash
+# In backend/
+npm run dev
+
+# In frontend/
+npm run dev
+```
 
 ---
 
-## 🔐 Security & Optimization Principles applied
+## 🔐 Engineering Principles
 
-1. **SOLID Principles:** The `enhance.controller` utilizes the Open-Closed Principle via a Strategy map dictionary for dynamically choosing extraction methods based on the `inputType`.
-2. **DRY (Don't Repeat Yourself):** Replaced 4 repetitive block requests to OpenAI with a clean `.map()` over a `tones` array using `Promise.all` mapping.
-3. **In-Memory Buffering:** Uploaded pictures are never written to the disk. They are held in memory streams and garbage collected, minimizing disk IO and security footprints.
-4. **SSRF Protections:** Web scraping endpoints strictly parse and block internal, local, or AWS metadata domains (e.g., `localhost`, `169.254.169.254`). 
-5. **Observability:** Centralized `requestTracer.ts` and `Pino` logging track latency, durations, and asynchronous errors to make scaling and debugging seamless.
+1. **SOLID Architecture**: Strict separation between Agent logic (prompts/state) and Provider infrastructure (API clients).
+2. **Provider Agnostic**: The system is entirely whitelabeled. Switching AI models involves zero changes to core business logic.
+3. **Agentic AI Patterns**: Implements Reflection, Self-Correction, and Tool-use (Research) patterns.
+4. **DRY & Modular**: Centralized prompt hub and role-based configuration.
+5. **Zero-Leak Policy**: Strictly no `console.log` statements in production/UI paths for enhanced security and clean debugging.

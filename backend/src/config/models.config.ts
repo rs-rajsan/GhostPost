@@ -3,14 +3,17 @@
  */
 export const MODELS = {
     SECURITY: {
-        DEFAULT: process.env.SECURITY_MODEL || 'gpt-4o-2024-08-06',
-        GUARD: process.env.GUARD_MODEL || 'gpt-4o-mini',
-        VISION: process.env.VISION_MODEL || 'gpt-4o',
+        DEFAULT: process.env.SECURITY_MODEL || '',
+        GUARD: process.env.GUARD_MODEL || '',
+        VISION: process.env.VISION_MODEL || '',
     },
     DRAFTING: {
-        DEFAULT: process.env.DRAFTING_MODEL || 'sonar',
+        DEFAULT: process.env.DRAFTING_MODEL || '',
     },
     VALIDATION: {
-        DEFAULT: process.env.VALIDATION_MODEL || 'gemini-2.5-flash',
+        DEFAULT: process.env.VALIDATION_MODEL || '',
+    },
+    REFINEMENT: {
+        DEFAULT: process.env.REFINEMENT_MODEL || '',
     }
 };

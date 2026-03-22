@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
-import { MODELS } from './models.config';
-
-// Load environment variables from .env file
+// Load environment variables immediately
 dotenv.config();
+
+import { MODELS } from './models.config';
 
 /**
  * Interface for the application configuration (Provider-agnostic)
@@ -25,6 +25,11 @@ export interface Config {
         isMockMode: boolean;
     };
     validation: {
+        apiKey: string;
+        model: string;
+        isMockMode: boolean;
+    };
+    refinement: {
         apiKey: string;
         model: string;
         isMockMode: boolean;
@@ -63,9 +68,10 @@ export interface PromptOptions {
 }
 
 const env = process.env.NODE_ENV || 'development';
-const securityApiKey = process.env.SECURITY_API_KEY || process.env.OPENAI_API_KEY || '';
-const draftingApiKey = process.env.DRAFTING_API_KEY || process.env.PERPLEXITY_API_KEY || '';
-const validationApiKey = process.env.VALIDATION_API_KEY || process.env.GEMINI_API_KEY || '';
+const securityApiKey = process.env.SECURITY_API_KEY || '';
+const draftingApiKey = process.env.DRAFTING_API_KEY || '';
+const validationApiKey = process.env.VALIDATION_API_KEY || '';
+const refinementApiKey = process.env.REFINEMENT_API_KEY || '';
 
 const config: Config = {
     env,
@@ -81,13 +87,18 @@ const config: Config = {
     drafting: {
         apiKey: draftingApiKey,
         model: MODELS.DRAFTING.DEFAULT,
-        url: process.env.DRAFTING_URL || 'https://api.perplexity.ai/chat/completions',
+        url: process.env.DRAFTING_URL || '',
         isMockMode: !draftingApiKey || draftingApiKey.includes('your_'),
     },
     validation: {
         apiKey: validationApiKey,
         model: MODELS.VALIDATION.DEFAULT,
         isMockMode: !validationApiKey || validationApiKey.includes('your_'),
+    },
+    refinement: {
+        apiKey: refinementApiKey,
+        model: MODELS.REFINEMENT?.DEFAULT || 'gpt-4o',
+        isMockMode: !refinementApiKey || refinementApiKey.includes('your_'),
     },
     rateLimit: {
         windowMs: 15 * 60 * 1000, // 15 minutes
@@ -103,7 +114,7 @@ const config: Config = {
         baseUrl: process.env.HELICONE_URL || 'http://localhost:8787/v1',
     },
     guard: {
-        enabled: process.env.GUARD_ENABLED === 'true' || true,
+        enabled: process.env.GUARD_ENABLED !== 'false',
         redactPii: true,
         filterToxicity: true,
         promptProtection: true,
@@ -136,9 +147,8 @@ GUIDELINES:
 5. FORMATTING: Use Markdown for structure.
 
 OUTPUT REQUIREMENTS:
-- Return valid JSON.
-- hookScore: A rating of the article's title and introduction (1-10).
-- hookTip: One specific way to make the opening hook even more engaging.
+- Return ONLY a valid JSON object. No conversational preamble.
+- JSON structure must include:
 - enhancedPost: The complete, formatted article content (in Markdown).
 
 RESPONSE FORMAT:
@@ -180,9 +190,8 @@ GUIDELINES:
 6. THE HASHTAGS: 3-5 high-relevance tags. No generic spam.
 
 OUTPUT REQUIREMENTS:
-- Return valid JSON.
-- hookScore: A brutal but fair rating (1-10).
-- hookTip: One specific, actionable way to make the opening even stronger.
+- Return ONLY a valid JSON object. No conversational preamble.
+- JSON structure must include:
 - enhancedPost: The complete, formatted post content.
 
 RESPONSE FORMAT:

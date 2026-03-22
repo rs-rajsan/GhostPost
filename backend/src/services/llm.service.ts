@@ -1,5 +1,6 @@
 import logger from '../utils/logger';
 import { AgentOrchestrator } from './orchestrator.service';
+import { extractAndParseJson } from '../utils/json.util';
 
 const orchestrator = new AgentOrchestrator();
 
@@ -41,9 +42,15 @@ export const enhancePost = async (text: string, options: EnhanceOptions = {}): P
                     researchTopic: options.deepResearch ? text : undefined 
                 });
 
+                if (!result.success) {
+                    const failTrace = result.trace.find(t => t.status === 'failed' || t.status.includes('violation'));
+                    const errorMsg = failTrace?.data || 'Pipeline failed';
+                    logger.error({ tone, errorMsg }, 'Orchestrator pipeline failed for tone');
+                    throw new Error(`Orchestration failed for tone "${tone}": ${errorMsg}`);
+                }
+
                 try {
-                    const cleanContent = result.finalContent.replace(/```json\n?|\n?```/g, '').trim();
-                    return JSON.parse(cleanContent) as ToneResponse;
+                    return extractAndParseJson<ToneResponse>(result.finalContent);
                 } catch (e) {
                     logger.error({ tone, raw: result.finalContent }, 'Failed to parse orchestrator output as JSON');
                     throw new Error(`Agent failed to produce valid JSON for tone: ${tone}`);

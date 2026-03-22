@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { BaseAgent, AgentResponse } from './base.agent';
 import config, { PromptOptions } from '../../config';
+import { extractJsonString } from '../../utils/json.util';
 
 export class DraftingAgent extends BaseAgent {
     constructor() {
@@ -82,7 +83,7 @@ export class DraftingAgent extends BaseAgent {
 
         try {
             const baseUrl = config.helicone.enabled ? config.helicone.baseUrl : config.drafting.url;
-            const response = await axios.post(baseUrl, {
+            const requestBody = {
                 model: config.drafting.model,
                 messages: [
                     {
@@ -95,8 +96,9 @@ export class DraftingAgent extends BaseAgent {
                     }
                 ],
                 max_tokens: options.mode === 'article' ? 4000 : 1000,
-                response_format: { type: 'json_object' }
-            }, {
+            };
+
+            const response = await axios.post(baseUrl, requestBody, {
                 headers: {
                     'Authorization': `Bearer ${config.drafting.apiKey}`,
                     'Content-Type': 'application/json',
@@ -107,13 +109,17 @@ export class DraftingAgent extends BaseAgent {
             let content = response.data.choices[0].message.content;
             if (!content) throw new Error('No content returned from Drafting Agent');
 
-            // Cleanup potential markdown fences if returned erroneously
-            content = content.replace(/```json\n?|\n?```/g, '').trim();
+            const cleaned = extractJsonString(content);
 
-            return { success: true, data: content };
+            return { success: true, data: cleaned };
         } catch (error: any) {
-            this.logError('Drafting failed', error);
-            return { success: false, data: '', error: error.message };
+            const errorMsg = error.response?.data?.error?.message || error.message;
+            this.logError('Drafting failed detail', { 
+                data: error.response?.data, 
+                status: error.response?.status,
+                headers: error.response?.headers 
+            });
+            return { success: false, data: '', error: errorMsg };
         }
     }
 

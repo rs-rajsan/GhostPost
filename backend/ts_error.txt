@@ -1,2 +1,0 @@
-﻿src/services/extraction.service.ts(1,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
-src/services/extraction.service.ts(2,26): error TS2307: Cannot find module 'cheerio' or its corresponding type declarations.

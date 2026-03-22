@@ -1,7 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-// @ts-ignore
-import { YoutubeTranscript } from 'youtube-transcript';
+// YouTube extraction removed per user request
 import logger from '../utils/logger';
 import config from '../config';
 
@@ -61,36 +60,4 @@ export const extractArticleContent = async (url: string): Promise<string> => {
     }
 };
 
-export const extractYoutubeTranscript = async (url: string): Promise<string> => {
-    try {
-        const parsedUrl = new URL(url);
-        if (!['youtube.com', 'www.youtube.com', 'youtu.be'].includes(parsedUrl.hostname)) {
-            throw new Error('Not a valid YouTube URL');
-        }
-
-        const transcriptItems = await YoutubeTranscript.fetchTranscript(url);
-        if (!transcriptItems || transcriptItems.length === 0) {
-            throw new Error('No transcript available for this video');
-        }
-
-        const fullText = transcriptItems.map((item: any) => item.text).join(' ');
-        
-        return fullText;
-    } catch (error: any) {
-        logger.error({ error: error.message, url }, 'Failed to extract YouTube transcript');
-        
-        let userFriendlyError = 'We could not extract the transcript from this YouTube video.';
-        
-        const errorMessage = error.message?.toLowerCase() || '';
-
-        if (errorMessage.includes('not a valid youtube url')) {
-            userFriendlyError = 'This does not look like a standard YouTube video link. Please make sure it is a full video (e.g., youtube.com/watch?v=...).';
-        } else if (errorMessage.includes('no transcript available') || errorMessage.includes('transcript is disabled')) {
-            userFriendlyError = 'The creator has disabled closed captions for this video, or it does not have a transcript available to read. Please try a different video.';
-        } else if (errorMessage.includes('timeout') || error.code === 'ECONNABORTED') {
-            userFriendlyError = 'YouTube took too long to respond. Please try again in a moment.';
-        }
-
-        throw new Error(userFriendlyError);
-    }
-};
+// YouTube extraction functionality removed.

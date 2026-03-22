@@ -1,14 +1,15 @@
 import { BaseAgent, AgentResponse } from './base.agent';
 import config from '../../config';
 import { ValidationResult } from './validation.agent';
-import { AuditProvider } from '../llm/audit.provider';
+import { RefinementProvider } from '../llm/refinement.provider';
+import { extractAndParseJson, extractJsonString } from '../../utils/json.util';
 
 export class RefiningAgent extends BaseAgent {
-    private provider: AuditProvider;
+    private provider: RefinementProvider;
 
     constructor() {
         super('RefiningAgent');
-        this.provider = new AuditProvider();
+        this.provider = new RefinementProvider();
     }
 
     /**
@@ -46,9 +47,8 @@ export class RefiningAgent extends BaseAgent {
                 { role: 'user', content: prompt }
             ]);
 
-            text = text.replace(/```json\n?|\n?```/g, '').trim();
-
-            return { success: true, data: text };
+            const cleaned = extractJsonString(text);
+            return { success: true, data: cleaned };
         } catch (error: any) {
             this.logError('Refinement failed', error);
             return { success: false, data: content, error: error.message };

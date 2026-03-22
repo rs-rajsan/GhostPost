@@ -1,14 +1,14 @@
-import OpenAI from 'openai';
+import { OpenAI as StandardClient } from 'openai';
 import logger from './logger';
 import config from '../config';
 import { MODELS } from '../config/models.config';
 
 export class SecurityService {
-    private static client: OpenAI | null = null;
+    private static client: StandardClient | null = null;
 
-    private static getClient(): OpenAI | null {
+    private static getClient(): StandardClient | null {
         if (!this.client && config.security.apiKey && !config.security.isMockMode) {
-            this.client = new OpenAI({ apiKey: config.security.apiKey });
+            this.client = new StandardClient({ apiKey: config.security.apiKey });
         }
         return this.client;
     }

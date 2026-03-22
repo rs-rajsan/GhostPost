@@ -5,7 +5,7 @@ import * as extractionService from '../services/extraction.service';
 import logger from '../utils/logger';
 
 const enhanceSchema = z.object({
-    inputType: z.enum(['text', 'article', 'youtube']).default('text'),
+    inputType: z.enum(['text', 'article']).default('text'),
     text: z.string().min(10).max(200000),
     mode: z.enum(['post', 'article']).default('post'),
     targetPages: z.number().min(1).max(10).default(2),
@@ -23,8 +23,7 @@ export const enhance = async (req: Request, res: Response) => {
         
         const extractionStrategies: Record<string, ExtractorFunction> = {
             'text': (input: string) => input, 
-            'article': extractionService.extractArticleContent,
-            'youtube': extractionService.extractYoutubeTranscript
+            'article': extractionService.extractArticleContent
         };
 
         const extractor = extractionStrategies[inputType];

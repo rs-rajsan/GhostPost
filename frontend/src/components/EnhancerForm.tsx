@@ -2,11 +2,11 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Sparkles, Loader2, Link2, FileText, Youtube } from 'lucide-react';
+import { Sparkles, Loader2, Link2, FileText } from 'lucide-react';
 import { useEnhance } from '../hooks/useEnhance';
 
 const schema = z.object({
-    inputType: z.enum(['text', 'article', 'youtube']),
+    inputType: z.enum(['text', 'article']),
     text: z.string().min(10, 'Input should be at least 10 characters').max(200000),
     mode: z.enum(['post', 'article']),
     targetPages: z.number().min(1).max(10),
@@ -54,7 +54,6 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
     const inputOptions = [
         { id: 'text', icon: FileText, label: 'Raw Text' },
         { id: 'article', icon: Link2, label: 'Web Article URL' },
-        { id: 'youtube', icon: Youtube, label: 'YouTube Video URL' },
     ];
 
     return (
@@ -86,7 +85,6 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
                 <label className="block text-sm font-medium text-gray-400 mb-2">
                     {currentInputType === 'text' && "Your Raw Thoughts"}
                     {currentInputType === 'article' && "Paste Web Article URL"}
-                    {currentInputType === 'youtube' && "Paste YouTube Video URL"}
                 </label>
                 <div className="relative">
                     {currentInputType === 'text' ? (
@@ -99,7 +97,7 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
                          <input
                             type="url"
                             {...register('text')}
-                            placeholder={currentInputType === 'youtube' ? "https://youtube.com/watch?v=..." : "https://example.com/article"}
+                            placeholder="https://example.com/article"
                             className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-gray-200 placeholder:text-gray-600"
                         />
                     )}

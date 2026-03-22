@@ -1,6 +1,7 @@
 import { BaseAgent, AgentResponse } from './base.agent';
 import config from '../../config';
 import { AuditProvider } from '../llm/audit.provider';
+import { extractAndParseJson } from '../../utils/json.util';
 
 export interface ValidationResult {
     isValid: boolean;
@@ -57,9 +58,7 @@ export class ValidationAgent extends BaseAgent {
                 { role: 'user', content: prompt }
             ]);
 
-            // Cleanup
-            text = text.replace(/```json\n?|\n?```/g, '').trim();
-            const parsed = JSON.parse(text) as ValidationResult;
+            const parsed = extractAndParseJson<ValidationResult>(text);
 
             return {
                 success: true,
