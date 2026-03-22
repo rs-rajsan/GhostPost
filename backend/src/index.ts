@@ -6,7 +6,6 @@ import config from './config';
 import { requestTracer } from './middleware/requestTracer';
 import logger from './utils/logger';
 import enhanceRouter from './routes/enhance.routes';
-import notesRouter from './routes/notes.routes';
 
 const app = express();
 const port = config.port;
@@ -33,12 +32,11 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-logger.info('Registering routes: /api/enhance and /api/notes');
+logger.info('Registering routes: /api/enhance');
 app.use('/api/enhance', enhanceRouter);
-app.use('/api/notes', notesRouter);
 
-const server = app.listen(port, () => {
-    logger.info(`Server is running on port ${port}`);
+const server = app.listen(port, '0.0.0.0', () => {
+    logger.info(`Server is running on port ${port} and listening on 0.0.0.0`);
 });
 
 server.on('error', (error: NodeJS.ErrnoException) => {

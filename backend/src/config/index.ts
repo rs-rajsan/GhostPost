@@ -15,7 +15,6 @@ export interface Config {
     security: {
         apiKey: string;
         model: string;
-        visionModel: string;
         isMockMode: boolean;
     };
     drafting: {
@@ -81,7 +80,6 @@ const config: Config = {
     security: {
         apiKey: securityApiKey,
         model: MODELS.SECURITY.DEFAULT,
-        visionModel: MODELS.SECURITY.VISION,
         isMockMode: !securityApiKey || securityApiKey.includes('your_'),
     },
     drafting: {

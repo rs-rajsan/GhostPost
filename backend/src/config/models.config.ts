@@ -5,7 +5,6 @@ export const MODELS = {
     SECURITY: {
         DEFAULT: process.env.SECURITY_MODEL || '',
         GUARD: process.env.GUARD_MODEL || '',
-        VISION: process.env.VISION_MODEL || '',
     },
     DRAFTING: {
         DEFAULT: process.env.DRAFTING_MODEL || '',

@@ -3,7 +3,7 @@ import api from '../lib/api';
 
 interface EnhanceRequest {
     text: string;
-    inputType: 'text' | 'article' | 'youtube';
+    inputType: 'text' | 'article';
     mode?: 'post' | 'article';
     targetPages?: number;
     deepResearch?: boolean;

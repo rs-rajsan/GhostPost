@@ -12,11 +12,17 @@ services:
       - '5432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d linkedin_enhancer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    restart: always
     ports:
       - '5000:5000'
     environment:
@@ -24,22 +30,32 @@ services:
       - DATABASE_URL=postgresql://user:password@db:5432/linkedin_enhancer?schema=public
       - PORT=5000
     depends_on:
-      - db
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+      db:
+        condition: service_healthy
+    x-develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore:
+            - node_modules/
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    restart: always
     ports:
       - '5173:5173'
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+    x-develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
 
 volumes:
   db_data:

@@ -1,6 +1,6 @@
 # GhostPost 👻
 
-GhostPost is an **Agentic AI** content enhancement platform. It transforms raw thoughts, messy notes, web articles, and YouTube transcripts into high-authority, viral-ready content through a coordinated **Multi-Agent Orchestration** system.
+GhostPost is an **Agentic AI** content enhancement platform. It transforms raw thoughts and web articles into high-authority, viral-ready content through a coordinated **Multi-Agent Orchestration** system.
 
 Built with a **provider-agnostic**, **whitelabeled** architecture, GhostPost ensures elite-level content generation with built-in security guardrails and deep observability.
 

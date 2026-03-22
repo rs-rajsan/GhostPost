@@ -1,14 +1,12 @@
 import { useState, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Sparkles, Linkedin, LayoutDashboard, FileText, Settings, UserCircle } from 'lucide-react';
+import { Sparkles, Linkedin, LayoutDashboard, Settings, UserCircle } from 'lucide-react';
 import EnhancerForm from './components/EnhancerForm';
 import OutputDisplay from './components/OutputDisplay';
-import NotesUploadArea from './components/NotesUploadArea';
 
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const [currentView, setCurrentView] = useState<'enhance' | 'notes'>('enhance');
   const [result, setResult] = useState<any>(null);
   const formRef = useRef<any>(null);
 
@@ -43,18 +41,10 @@ function AppContent() {
 
                 <nav className="flex-1 px-4 space-y-2 text-sm font-medium text-gray-400">
                     <button 
-                        onClick={() => setCurrentView('enhance')}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${currentView === 'enhance' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors bg-white/10 text-white"
                     >
                         <LayoutDashboard size={18} />
                         Enhance Post
-                    </button>
-                    <button 
-                        onClick={() => setCurrentView('notes')}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${currentView === 'notes' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
-                    >
-                        <FileText size={18} />
-                        Notes <span className="ml-auto text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase tracking-wider">New</span>
                     </button>
                     <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors">
                         <Settings size={18} />
@@ -94,38 +84,32 @@ function AppContent() {
                             </p>
                         </div>
 
-                        {currentView === 'enhance' ? (
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
-                                {/* Input Form Section */}
-                                <section className="glass p-6 md:p-8 rounded-3xl z-10 relative">
-                                    <EnhancerForm onEnhance={handleEnhance} ref={formRef} />
-                                </section>
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+                            {/* Input Form Section */}
+                            <section className="glass p-6 md:p-8 rounded-3xl z-10 relative">
+                                <EnhancerForm onEnhance={handleEnhance} ref={formRef} />
+                            </section>
 
-                                {/* Output Results Section */}
-                                <section className="relative z-10 xl:sticky xl:top-8">
-                                    {result ? (
-                                        <OutputDisplay
-                                            data={result}
-                                            onRegenerate={handleRegenerate}
-                                        />
-                                    ) : (
-                                        <div className="glass p-12 rounded-3xl flex flex-col items-center justify-center text-center opacity-50 border-dashed h-full min-h-[400px]">
-                                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-                                                <Linkedin className="text-gray-500" size={32} />
-                                            </div>
-                                            <h3 className="text-xl font-semibold mb-2">Ready to Shine?</h3>
-                                            <p className="text-gray-400 text-sm">
-                                                Paste your thoughts on the left and click "Enhance Post" to see the magic happen.
-                                            </p>
+                            {/* Output Results Section */}
+                            <section className="relative z-10 xl:sticky xl:top-8">
+                                {result ? (
+                                    <OutputDisplay
+                                        data={result}
+                                        onRegenerate={handleRegenerate}
+                                    />
+                                ) : (
+                                    <div className="glass p-12 rounded-3xl flex flex-col items-center justify-center text-center opacity-50 border-dashed h-full min-h-[400px]">
+                                        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                                            <Linkedin className="text-gray-500" size={32} />
                                         </div>
-                                    )}
-                                </section>
-                            </div>
-                        ) : (
-                            <div className="max-w-4xl mx-auto">
-                                <NotesUploadArea />
-                            </div>
-                        )}
+                                        <h3 className="text-xl font-semibold mb-2">Ready to Shine?</h3>
+                                        <p className="text-gray-400 text-sm">
+                                            Paste your thoughts on the left and click "Enhance Post" to see the magic happen.
+                                        </p>
+                                    </div>
+                                )}
+                            </section>
+                        </div>
                     </div>
                 </div>
 
