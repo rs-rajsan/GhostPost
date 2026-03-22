@@ -3,9 +3,7 @@ import * as cheerio from 'cheerio';
 // @ts-ignore
 import { YoutubeTranscript } from 'youtube-transcript';
 import logger from '../utils/logger';
-
-// 5 seconds timeout to prevent hanging connections
-const HTTP_TIMEOUT = 5000;
+import config from '../config';
 
 export const extractArticleContent = async (url: string): Promise<string> => {
     try {
@@ -16,9 +14,9 @@ export const extractArticleContent = async (url: string): Promise<string> => {
         }
 
         const response = await axios.get(url, {
-            timeout: HTTP_TIMEOUT,
+            timeout: config.extraction.httpTimeout,
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'User-Agent': config.extraction.userAgent,
                 'Accept': 'text/html'
             }
         });

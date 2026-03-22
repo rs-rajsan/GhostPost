@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import * as llmService from '../services/llm.service';
 import * as extractionService from '../services/extraction.service';
-import * as searchService from '../services/search.service';
 import logger from '../utils/logger';
 
 const enhanceSchema = z.object({
@@ -17,9 +16,9 @@ export const enhance = async (req: Request, res: Response) => {
     try {
         const { text, inputType, mode, targetPages, deepResearch } = enhanceSchema.parse(req.body);
 
-        logger.info({ inputType, textLength: text.length, mode, targetPages, deepResearch }, 'Processing enhance request');
+        logger.info({ inputType, textLength: text.length, mode, targetPages, deepResearch }, 'Processing enhance request via Multi-Agent System');
 
-        // Strategy Pattern for Open-Closed Principle compliance
+        // Strategy Pattern for Extraction
         type ExtractorFunction = (input: string) => Promise<string> | string;
         
         const extractionStrategies: Record<string, ExtractorFunction> = {
@@ -35,15 +34,11 @@ export const enhance = async (req: Request, res: Response) => {
 
         const contentToEnhance = await extractor(text);
 
-        let researchData = '';
-        if (deepResearch) {
-            researchData = await searchService.performResearch(text);
-        }
-
+        // Core Pipeline Delegation
         const result = await llmService.enhancePost(contentToEnhance, {
             mode,
             targetPages,
-            researchData
+            deepResearch // Pass the flag directly to the multi-agent orchestrator
         });
 
         res.status(200).json(result);
@@ -52,7 +47,7 @@ export const enhance = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Validation error', details: error.issues });
         }
 
-        logger.error({ error }, 'Unexpected error in enhance controller');
+        logger.error({ error }, 'Unexpected error in content enhancement');
         res.status(500).json({ error: error.message || 'Internal server error' });
     }
 };
@@ -67,7 +62,7 @@ export const generateHook = async (req: Request, res: Response) => {
     try {
         const { text, tone, hookTip } = generateHookSchema.parse(req.body);
         
-        logger.info({ tone, textLength: text.length }, 'Processing hook generation request');
+        logger.info({ tone, textLength: text.length }, 'Processing hook generation via Security & Drafting Agents');
 
         const hook = await llmService.generateHook(text, tone, hookTip);
         
@@ -77,7 +72,7 @@ export const generateHook = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Validation error', details: error.issues });
         }
 
-        logger.error({ error }, 'Unexpected error in hook generation controller');
+        logger.error({ error }, 'Unexpected error in hook generation');
         res.status(500).json({ error: error.message || 'Internal server error' });
     }
 };

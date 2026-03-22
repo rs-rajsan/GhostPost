@@ -1,10 +1,11 @@
 import pino from 'pino';
 import { AsyncLocalStorage } from 'async_hooks';
+import config from '../config';
 
 export const asyncLocalStorage = new AsyncLocalStorage<Map<string, string>>();
 
 const logger = pino({
-    level: process.env.LOG_LEVEL || 'info',
+    level: config.logLevel,
     transport: {
         target: 'pino-pretty',
         options: {

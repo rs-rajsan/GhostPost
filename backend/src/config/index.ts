@@ -1,3 +1,60 @@
+import dotenv from 'dotenv';
+import { MODELS } from './models.config';
+
+// Load environment variables from .env file
+dotenv.config();
+
+/**
+ * Interface for the application configuration (Provider-agnostic)
+ */
+export interface Config {
+    env: string;
+    port: number;
+    logLevel: string;
+    databaseUrl: string;
+    security: {
+        apiKey: string;
+        model: string;
+        visionModel: string;
+        isMockMode: boolean;
+    };
+    drafting: {
+        apiKey: string;
+        model: string;
+        url: string; // Generic URL property
+        isMockMode: boolean;
+    };
+    validation: {
+        apiKey: string;
+        model: string;
+        isMockMode: boolean;
+    };
+    rateLimit: {
+        windowMs: number;
+        max: number;
+    };
+    extraction: {
+        httpTimeout: number;
+        userAgent: string;
+    };
+    prompts: {
+        article: (options: PromptOptions) => string;
+        post: (options: PromptOptions) => string;
+        hook: (tone: string, hookTip: string, content: string) => string;
+    };
+    helicone: {
+        enabled: boolean;
+        apiKey: string;
+        baseUrl: string;
+    };
+    guard: {
+        enabled: boolean;
+        redactPii: boolean;
+        filterToxicity: boolean;
+        promptProtection: boolean;
+    };
+}
+
 export interface PromptOptions {
     tone: string;
     text: string;
@@ -5,9 +62,56 @@ export interface PromptOptions {
     researchData?: string;
 }
 
-export const ARTICLE_PROMPT = ({ tone, text, targetPages = 2, researchData }: PromptOptions) => {
-    const wordCount = targetPages * 650;
-    return `
+const env = process.env.NODE_ENV || 'development';
+const securityApiKey = process.env.SECURITY_API_KEY || process.env.OPENAI_API_KEY || '';
+const draftingApiKey = process.env.DRAFTING_API_KEY || process.env.PERPLEXITY_API_KEY || '';
+const validationApiKey = process.env.VALIDATION_API_KEY || process.env.GEMINI_API_KEY || '';
+
+const config: Config = {
+    env,
+    port: parseInt(process.env.PORT || '5000', 10),
+    logLevel: process.env.LOG_LEVEL || 'info',
+    databaseUrl: process.env.DATABASE_URL || '',
+    security: {
+        apiKey: securityApiKey,
+        model: MODELS.SECURITY.DEFAULT,
+        visionModel: MODELS.SECURITY.VISION,
+        isMockMode: !securityApiKey || securityApiKey.includes('your_'),
+    },
+    drafting: {
+        apiKey: draftingApiKey,
+        model: MODELS.DRAFTING.DEFAULT,
+        url: process.env.DRAFTING_URL || 'https://api.perplexity.ai/chat/completions',
+        isMockMode: !draftingApiKey || draftingApiKey.includes('your_'),
+    },
+    validation: {
+        apiKey: validationApiKey,
+        model: MODELS.VALIDATION.DEFAULT,
+        isMockMode: !validationApiKey || validationApiKey.includes('your_'),
+    },
+    rateLimit: {
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100, // limit each IP to 100 requests per windowMs
+    },
+    extraction: {
+        httpTimeout: 5000,
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    },
+    helicone: {
+        enabled: process.env.HELICONE_ENABLED === 'true',
+        apiKey: process.env.HELICONE_API_KEY || 'sk-helicone-dummy',
+        baseUrl: process.env.HELICONE_URL || 'http://localhost:8787/v1',
+    },
+    guard: {
+        enabled: process.env.GUARD_ENABLED === 'true' || true,
+        redactPii: true,
+        filterToxicity: true,
+        promptProtection: true,
+    },
+    prompts: {
+        article: ({ tone, text, targetPages = 2, researchData }: PromptOptions) => {
+            const wordCount = targetPages * 650;
+            return `
 You are a world-class investigative journalist and technical writer.
 Your mission: Write a comprehensive, high-authority article based on the provided input and research.
 
@@ -46,11 +150,10 @@ RESPONSE FORMAT:
   "visualSuggestion": "..."
 }
 `;
-};
-
-export const POST_PROMPT = ({ tone, text, researchData }: PromptOptions) => {
-    return `
-You are a world-class LinkedIn ghostwriter for TOP 1% creators. 
+        },
+        post: ({ tone, text, researchData }: PromptOptions) => {
+            return `
+You are a world-class Ghostwriter for TOP 1% creators. 
 Your mission: Transform raw, messy thoughts into a viral-ready post that stops the scroll and builds authority.
 
 TONE: ${tone}
@@ -91,10 +194,9 @@ RESPONSE FORMAT:
   "visualSuggestion": "..."
 }
 `;
-};
- 
-export const HOOK_PROMPT = (tone: string, hookTip: string, content: string) => {
-    return `
+        },
+        hook: (tone: string, hookTip: string, content: string) => {
+            return `
 You are a world-class Headline and Hook specialist.
 Your mission: Generate a powerful, attention-grabbing "Hook" (1-3 sentences) specifically for a LinkedIn post or Article.
 
@@ -118,4 +220,8 @@ GUIDELINES:
 OUTPUT:
 Return ONLY the hook text. No preamble, no quotes.
 `;
+        }
+    }
 };
+
+export default config;

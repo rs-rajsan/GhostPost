@@ -1,0 +1,69 @@
+# Helicone Self-Hosted Stack (Authorized-Free for Local Development)
+# Ports: 
+# - 8787: Valhalla Proxy
+# - 3000: Helicone Web UI
+# - 8123: ClickHouse
+# - 5433: Helicone Postgres (Isolated from main app 5432)
+
+version: '3.8'
+
+services:
+  helicone-postgres:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=helicone
+      - POSTGRES_PASSWORD=helicone
+      - POSTGRES_DB=helicone
+    ports:
+      - '5433:5432'
+    volumes:
+      - helicone_postgres_data:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    restart: always
+    ports:
+      - '8123:8123'
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+  valhalla:
+    image: helicone/valhalla:latest
+    restart: always
+    environment:
+      - PORT=8787
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=8123
+      - POSTGRES_HOST=helicone-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=helicone
+      - POSTGRES_PASSWORD=helicone
+      - POSTGRES_DB=helicone
+      - REQUIRE_AUTH=false
+    ports:
+      - '8787:8787'
+    depends_on:
+      - helicone-postgres
+      - clickhouse
+
+  helicone-web:
+    image: helicone/helicone-web:latest
+    restart: always
+    environment:
+      - PORT=3000
+      - VALHALLA_URL=http://valhalla:8787
+      - POSTGRES_HOST=helicone-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=helicone
+      - POSTGRES_PASSWORD=helicone
+      - POSTGRES_DB=helicone
+      - REQUIRE_AUTH=false
+    ports:
+      - '3000:3000'
+    depends_on:
+      - valhalla
+
+volumes:
+  helicone_postgres_data:
+  clickhouse_data:

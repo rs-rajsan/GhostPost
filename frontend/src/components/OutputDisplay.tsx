@@ -48,13 +48,12 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
                 [activeTab]: result.hook
             }));
         } catch (error) {
-            console.error('Failed to generate hook:', error);
+            // Error is handled silently or could be shown via UI
         }
     };
 
     const downloadWord = async () => {
         try {
-            console.log('Starting Word document generation...');
             
             const parseLineToTextRuns = (line: string): TextRun[] => {
                 const cleaned = line.replace(/^\s*[-*]\s+/, '').replace(/^\s*#+\s+/, '').replace(/^\d+\.\s+/, '');
@@ -141,7 +140,6 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
             const blob = await Packer.toBlob(doc);
             saveAs(blob, `GhostPost_${activeTab}_${new Date().getTime()}.docx`);
         } catch (error) {
-            console.error('Error generating Word doc:', error);
             alert(`Failed to generate Word document.`);
         }
     };
@@ -234,7 +232,6 @@ export default function OutputDisplay({ data, onRegenerate, isPending }: OutputD
 
             doc.save(`GhostPost_${activeTab}_${new Date().getTime()}.pdf`);
         } catch (error) {
-            console.error('Error generating PDF:', error);
             alert('Failed to generate PDF.');
         }
     };

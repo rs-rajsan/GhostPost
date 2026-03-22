@@ -2,16 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
+import config from './config';
 import { requestTracer } from './middleware/requestTracer';
 import logger from './utils/logger';
 import enhanceRouter from './routes/enhance.routes';
 import notesRouter from './routes/notes.routes';
 
-dotenv.config();
-
 const app = express();
-const port = process.env.PORT || 5000;
+const port = config.port;
 
 // Security Middleware
 app.use(helmet());
@@ -23,8 +21,8 @@ app.use(requestTracer);
 
 // Rate Limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: config.rateLimit.windowMs,
+    max: config.rateLimit.max,
     message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 app.use('/api/', limiter);
@@ -35,7 +33,7 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-console.log('Registering routes: /api/enhance and /api/notes');
+logger.info('Registering routes: /api/enhance and /api/notes');
 app.use('/api/enhance', enhanceRouter);
 app.use('/api/notes', notesRouter);
 

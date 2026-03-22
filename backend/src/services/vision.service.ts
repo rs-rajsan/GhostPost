@@ -1,82 +1,75 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import logger from '../utils/logger';
+import config from '../config';
+import { SecurityService } from '../utils/security.util';
 
-const getApiKey = () => process.env.OPENAI_API_KEY;
-
-let openAIClientInstance: OpenAI | null = null;
-const getOpenAIClient = (): OpenAI => {
-    if (!openAIClientInstance) {
-        const apiKey = getApiKey();
-        if (!apiKey) throw new Error('OpenAI API key is missing');
-        openAIClientInstance = new OpenAI({ apiKey });
+let genAI: GoogleGenerativeAI | null = null;
+const getValidationClient = (): GoogleGenerativeAI => {
+    if (!genAI) {
+        const apiKey = config.validation.apiKey;
+        if (!config.validation.isMockMode && apiKey) {
+            genAI = new GoogleGenerativeAI(apiKey);
+        } else if (!config.validation.isMockMode && !apiKey) {
+            throw new Error('Validation API key is missing');
+        }
     }
-    return openAIClientInstance;
+    return genAI as GoogleGenerativeAI;
 };
 
 export const synthesizeImageToNotes = async (base64Image: string, mimeType: string): Promise<string> => {
-    logger.info('Starting image synthesis to OneNote layout');
+    logger.info('Synthesizing image to notes...');
 
-    // MOCK MODE FALLBACK for Missing Key
-    if (!getApiKey() || getApiKey() === 'your_openai_api_key_here') {
-        logger.warn('OPENAI_API_KEY not set or invalid. Returning mock vision data.');
+    // MOCK MODE FALLBACK
+    if (config.validation.isMockMode || !config.validation.apiKey) {
+        logger.warn('Validation API key not set or invalid. Returning mock vision data.');
         return `
-# Mock OneNote Output
-        
-*This is a fallback response because no valid OpenAI key was found.*
-        
-## Key Extracted Points
-- Point 1 from image handwriting
-- Point 2 from diagram
-        
-**Summary:** The image contained mock architectural blocks.
-        `.trim();
+# Mock Notes Output
+- Key Point 1: Extracted from image handwriting.
+- Key Point 2: Analysis of diagram.
+- Summary: The image contained mock architectural blocks.
+        `;
     }
 
     try {
-        const openai = getOpenAIClient();
+        const genAIClient = getValidationClient();
+        const model = genAIClient.getGenerativeModel({ model: config.validation.model });
         
         const prompt = `
         You are an expert digital archivist and note-taker. 
-        I am giving you an image (which could be handwriting, a diagram, or a screenshot of an article).
+        I am giving you an image which could be handwriting, a diagram, or a screenshot of an article.
+        Your job is to transcribe, synthesize and format the image content into a clean, structured set of OneNote-style notes.
         
-        Your job is to transcribe, synthesize, and format this image's content into highly structured Markdown that mimics a clean Microsoft OneNote page.
-        
-        INSTRUCTIONS FOR ONENOTE COMPATIBILITY:
-        1. Always start with a Title (Heading 1).
-        2. Use Bullet Points for lists of items or fragmented thoughts.
+        INSTRUCTIONS:
+        1. Always start with a # Main Title (if obvious, otherwise "Extracted Notes").
+        2. Use Bullet Points for lists, fragmented thoughts, or items.
         3. Use Bold text for emphasis or key terms.
-        4. Organize content hierarchically (H2 for sections, H3 for sub-sections).
+        4. Organize content hierarchically (H2 sections, H3 sub-sections).
         5. If there is a diagram, describe it clearly in a fenced text block.
-        6. Do not wrap the final output in \`\`\`markdown tags. Just return the raw markdown string.
+        
+        Do not wrap the final output in code blocks unless they were in the image.
         `;
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                {
-                    role: "user",
-                    content: [
-                        { type: "text", text: prompt },
-                        {
-                            type: "image_url",
-                            image_url: {
-                                url: `data:${mimeType};base64,${base64Image}`,
-                                detail: "high"
-                            },
-                        },
-                    ],
-                },
-            ],
-            max_tokens: 1500,
-        });
+        const result = await model.generateContent([
+            prompt,
+            {
+                inlineData: {
+                    data: base64Image,
+                    mimeType
+                }
+            }
+        ]);
 
-        const content = response.choices[0].message.content;
-        if (!content) throw new Error('No content received from OpenAI Vision');
+        const response = await result.response;
+        const text = response.text();
+        
+        if (!text) throw new Error('No content received from Vision API');
+
+        const safeText = await SecurityService.scanOutput(text);
 
         logger.info('Successfully synthesized image via Vision API');
-        return content;
+        return safeText;
     } catch (error: any) {
-        logger.error({ error: error.message }, 'Failed to synthesize image to Notes');
+        logger.error({ error: error.message }, 'Vision synthesis failed');
         throw new Error(`Vision synthesis failed: ${error.message}`);
     }
 };

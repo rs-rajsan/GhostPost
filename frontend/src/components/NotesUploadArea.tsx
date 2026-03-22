@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, FileImage, FileText, Loader2, Copy, Check } from 'lucide-react';
 import api from '../lib/api';
+import config from '../config';
 
 export default function NotesUploadArea() {
     const [dragActive, setDragActive] = useState(false);
@@ -67,7 +68,7 @@ export default function NotesUploadArea() {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                timeout: 30000 // Allow up to 30s for vision processing
+                timeout: config.visionTimeout // Use centralized config
             });
             setNotes(response.data.notes);
         } catch (err: any) {

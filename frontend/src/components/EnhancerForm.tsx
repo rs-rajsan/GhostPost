@@ -43,7 +43,6 @@ const EnhancerForm = forwardRef(({ onEnhance }: { onEnhance: (data: any) => void
             const result = await mutation.mutateAsync(data);
             onEnhance(result);
         } catch (error: any) {
-            console.error('Failed to enhance post:', error);
             setApiError(error.response?.data?.error || error.message || 'Failed to enhance post');
         }
     };
