@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { BaseAgent, AgentResponse } from './base.agent';
 import config, { PromptOptions } from '../../config';
-import { extractJsonString } from '../../utils/json.util';
+import { extractJsonString, extractAndParseJson } from '../../utils/json.util';
 
 export class DraftingAgent extends BaseAgent {
     constructor() {
@@ -23,25 +23,24 @@ export class DraftingAgent extends BaseAgent {
         }
 
         try {
-            const baseUrl = config.helicone.enabled ? config.helicone.baseUrl : config.drafting.url;
+            const baseUrl = config.research.url;
             const response = await axios.post(baseUrl, {
-                model: config.drafting.model,
+                model: config.research.model,
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are a research assistant. Provide concise, factual information with statistics.'
+                        content: 'You are a research assistant. Provide concise, factual information with statistics. ALWAYS include the source URLs for every fact in markdown link format [Source Name](URL).'
                     },
                     {
                         role: 'user',
-                        content: `Research the following topic and provide key facts and statistics: ${topic}`
+                        content: `Research the following topic and provide key facts and statistics with their source URLs: ${topic}`
                     }
                 ],
                 max_tokens: 1000,
             }, {
                 headers: {
-                    'Authorization': `Bearer ${config.drafting.apiKey}`,
+                    'Authorization': `Bearer ${config.research.apiKey}`,
                     'Content-Type': 'application/json',
-                    ...this.getHeliconeHeaders('research')
                 }
             });
 
@@ -51,10 +50,10 @@ export class DraftingAgent extends BaseAgent {
             return { success: true, data: content, metadata: { model: config.drafting.model } };
         } catch (error: any) {
             this.logError('Research failed', error);
-            return { 
-                success: false, 
-                data: `Research unavailable: ${error.message}`, 
-                error: error.message 
+            return {
+                success: false,
+                data: `Research unavailable: ${error.message}`,
+                error: error.message
             };
         }
     }
@@ -65,7 +64,7 @@ export class DraftingAgent extends BaseAgent {
     public async draft(options: PromptOptions & { mode: 'article' | 'post' }): Promise<AgentResponse> {
         this.log('Generating draft...', { mode: options.mode, tone: options.tone });
 
-        const prompt = options.mode === 'article' 
+        const prompt = options.mode === 'article'
             ? config.prompts.article(options)
             : config.prompts.post(options);
 
@@ -109,15 +108,30 @@ export class DraftingAgent extends BaseAgent {
             let content = response.data.choices[0].message.content;
             if (!content) throw new Error('No content returned from Drafting Agent');
 
-            const cleaned = extractJsonString(content);
+            // Post-processing to ensure clean output as requested by USER
+            let finalData = content;
+            try {
+                const parsedData = extractAndParseJson<any>(content);
+                if (parsedData.enhancedPost) {
+                    parsedData.enhancedPost = parsedData.enhancedPost
+                        .replace(/\[\d+\]/g, '') // Remove [1], [2], etc.
+                        .replace(/\(Word count.*?\)/gi, '') // Remove word count artifacts
+                        .replace(/\n{3,}/g, '\n\n') // Normalize spacing
+                        .trim();
+                    finalData = JSON.stringify(parsedData);
+                }
+            } catch (e) {
+                // If parsing fails, extractAndParseJson already logged it.
+                // We fallback to the raw content which the orchestrator will try to handle.
+            }
 
-            return { success: true, data: cleaned };
+            return { success: true, data: finalData };
         } catch (error: any) {
             const errorMsg = error.response?.data?.error?.message || error.message;
-            this.logError('Drafting failed detail', { 
-                data: error.response?.data, 
+            this.logError('Drafting failed detail', {
+                data: error.response?.data,
                 status: error.response?.status,
-                headers: error.response?.headers 
+                headers: error.response?.headers
             });
             return { success: false, data: '', error: errorMsg };
         }

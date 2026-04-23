@@ -40,3 +40,6 @@ backend/prisma/dev.db-journal
 
 # Suggested Features
 suggested_features.md
+
+# Change Tracking Scratchpad
+CHANGELOG_SCRATCHPAD.md

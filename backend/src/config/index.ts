@@ -17,6 +17,11 @@ export interface Config {
         model: string;
         isMockMode: boolean;
     };
+    research: {
+        apiKey: string;
+        model: string;
+        url: string;
+    };
     drafting: {
         apiKey: string;
         model: string;
@@ -64,6 +69,7 @@ export interface PromptOptions {
     text: string;
     targetPages?: number;
     researchData?: string;
+    isTopic?: boolean;
 }
 
 const env = process.env.NODE_ENV || 'development';
@@ -81,6 +87,11 @@ const config: Config = {
         apiKey: securityApiKey,
         model: MODELS.SECURITY.DEFAULT,
         isMockMode: !securityApiKey || securityApiKey.includes('your_'),
+    },
+    research: {
+        apiKey: process.env.PERPLEXITY_API_KEY || '',
+        model: 'sonar',
+        url: 'https://api.perplexity.ai/chat/completions',
     },
     drafting: {
         apiKey: draftingApiKey,
@@ -118,16 +129,18 @@ const config: Config = {
         promptProtection: true,
     },
     prompts: {
-        article: ({ tone, text, targetPages = 2, researchData }: PromptOptions) => {
-            const wordCount = targetPages * 650;
+        article: (options: PromptOptions) => {
+            const { tone, text, targetPages = 2, researchData, isTopic } = options;
+            const wordCount = targetPages * 1500;
             return `
 You are a world-class investigative journalist and technical writer.
 Your mission: Write a comprehensive, high-authority article based on the provided input and research.
 
 TONE: ${tone}
-TARGET LENGTH: Exactly ${targetPages} pages (~${wordCount} words). This is a LONG FORM article.
+TARGET LENGTH: Maximum ${targetPages} page (~${wordCount} words). 
+STRICT RULE: Your response must be 1,500 words or less. DO NOT exceed this limit.
 
-INPUT MATERIAL:
+${isTopic ? 'CORE TOPIC/THEME' : 'INPUT MATERIAL'}:
 """
 ${text}
 """
@@ -137,37 +150,47 @@ ${researchData ? `RESEARCH DATA & STATISTICS:
 ${researchData}
 """` : ''}
 
-GUIDELINES:
-1. STRUCTURE: Use a compelling title, introduction, at least ${targetPages * 2} detailed subheadings (H2, H3), and a strong conclusion.
-2. DEPTH & SUBSTANCE: DO NOT summarize. For every point you make, provide a detailed explanation, a real-world case study or example, and incorporate at least 4-5 relevant facts, technical details, or search-backed statistics. Add historical context or future predictions where relevant to increase authority.
-3. TARGET REACH: You MUST reach the target length of ~${wordCount} words through dense, high-value information. Each section should be approximately 300-450 words long. This is a strict requirement for a premium, long-form investigative piece.
-4. READABILITY: Use clear, professional language. Use bullet points for lists.
-5. FORMATTING: Use Markdown for structure.
+You are an elite, highly-efficient Content Generation Engine. 
+Your ONLY task is to return a valid JSON object containing a deep-dive article based on the provided data.
 
-OUTPUT REQUIREMENTS:
-- Return ONLY a valid JSON object. No conversational preamble.
-- JSON structure must include:
-- enhancedPost: The complete, formatted article content (in Markdown).
-
-RESPONSE FORMAT:
+OUTPUT FORMAT (MANDATORY):
+Return ONLY a valid JSON object with this structure:
 {
-  "enhancedPost": "...",
+  "title": "A compelling, catchy title for the article",
+  "enhancedPost": "The full article text starting with the TITLE in ALL CAPS",
   "hookScore": 9,
-  "hookTip": "...",
-  "hashtags": ["#tag1", "#tag2"],
-  "visualSuggestion": "..."
+  "hookTip": "Optimization advice",
+  "hashtags": ["#AgentAISchool", "#tag1", "#tag2"],
+  "visualSuggestion": "Image description"
 }
+
+GUIDELINES:
+1. FORMATTING: Use PLAIN TEXT for the "enhancedPost" value. NO Markdown, NO bolding (**), NO special headers (##). Use simple capitalized titles and blank lines for structure.
+2. CITATIONS: List all source URLs in a "SOURCES & CITATIONS" section at the very bottom of the article text.
+3. CONTENT: Provide detailed explanations and at least 5-7 relevant facts or statistics.
+4. NO META-COMMENTARY: DO NOT include word counts or section notes.
 `;
         },
-        post: ({ tone, text, researchData }: PromptOptions) => {
+        post: (options: PromptOptions) => {
+            const { tone, text, researchData, isTopic } = options;
             return `
-You are a world-class Ghostwriter for TOP 1% creators. 
-Your mission: Transform raw, messy thoughts into a viral-ready post that stops the scroll and builds authority.
+You are an elite Social Media Copywriter. 
+Return ONLY a JSON object.
+
+OUTPUT FORMAT (MANDATORY):
+{
+  "title": "A short, punchy title",
+  "enhancedPost": "The post text starting with the TITLE",
+  "hookScore": 9,
+  "hookTip": "...",
+  "hashtags": ["#AgentAISchool", "#tag1"],
+  "visualSuggestion": "..."
+}
 
 TONE: ${tone}
-TARGET LENGTH: Half to 1 page maximum (~250-400 words). LESS IS MORE.
+STRICT RULE: Your response must be 300 words or less. DO NOT exceed this limit.
 
-INPUT MATERIAL:
+${isTopic ? 'CORE TOPIC/THEME' : 'INPUT MATERIAL'}:
 """
 ${text}
 """
@@ -178,14 +201,10 @@ ${researchData}
 """` : ''}
 
 GUIDELINES:
-1. THE HOOK: The first sentence must be a digital "stop sign." Use curiosity gaps, bold claims, or relatable pain points.
-2. THE RE-HOOK: The second sentence must justify the hook and pull them deeper.
-3. CONCISENESS & IMPACT: Keep it tight. Every word must earn its place. Use lots of whitespace (one sentence or short paragraph per block).
-4. THE BODY: 
-   - Transform complex ideas into simple bullet points or analogies.
-   - Ensure every line adds value or moves the story forward.
-5. THE CTA: End with a high-friction engagement question that forces a thoughtful comment.
-6. THE HASHTAGS: 3-5 high-relevance tags. No generic spam.
+1. FORMATTING: PLAIN TEXT only. No markdown.
+2. CITATIONS: List source links only at the very bottom of the post.
+3. HASHTAGS: Always include #AgentAISchool as the first hashtag.
+4. NO META-COMMENTARY: No word counts.
 
 OUTPUT REQUIREMENTS:
 - Return ONLY a valid JSON object. No conversational preamble.

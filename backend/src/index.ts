@@ -35,6 +35,24 @@ app.get('/health', (req, res) => {
 logger.info('Registering routes: /api/enhance');
 app.use('/api/enhance', enhanceRouter);
 
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const requestId = req.headers['x-request-id'];
+    logger.error({ 
+        requestId,
+        err: {
+            message: err.message,
+            stack: err.stack,
+            ...err
+        }
+    }, 'Unhandled Error in Express Pipeline');
+
+    res.status(err.status || 500).json({
+        error: err.message || 'Internal Server Error',
+        requestId
+    });
+});
+
 const server = app.listen(port, '0.0.0.0', () => {
     logger.info(`Server is running on port ${port} and listening on 0.0.0.0`);
 });

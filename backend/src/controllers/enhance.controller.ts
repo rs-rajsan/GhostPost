@@ -3,26 +3,32 @@ import { z } from 'zod';
 import * as llmService from '../services/llm.service';
 import * as extractionService from '../services/extraction.service';
 import logger from '../utils/logger';
+import { statusService } from '../services/status.service';
+import { v4 as uuidv4 } from 'uuid';
 
 const enhanceSchema = z.object({
-    inputType: z.enum(['text', 'article']).default('text'),
+    inputType: z.enum(['text', 'article', 'topic']).default('text'),
     text: z.string().min(10).max(200000),
     mode: z.enum(['post', 'article']).default('post'),
-    targetPages: z.number().min(1).max(10).default(2),
-    deepResearch: z.boolean().default(false)
+    targetPages: z.number().min(1).max(10).default(1),
+    deepResearch: z.boolean().default(false),
+    requestId: z.string().optional(),
+    tone: z.string().optional()
 });
 
 export const enhance = async (req: Request, res: Response) => {
     try {
-        const { text, inputType, mode, targetPages, deepResearch } = enhanceSchema.parse(req.body);
+        const { text, inputType, mode, targetPages, deepResearch, requestId: clientRequestId, tone } = enhanceSchema.parse(req.body);
+        const requestId = clientRequestId || uuidv4();
 
-        logger.info({ inputType, textLength: text.length, mode, targetPages, deepResearch }, 'Processing enhance request via Multi-Agent System');
+        logger.info({ requestId, inputType, textLength: text.length, mode, targetPages, deepResearch, tone }, 'Processing enhance request via Multi-Agent System');
 
         // Strategy Pattern for Extraction
         type ExtractorFunction = (input: string) => Promise<string> | string;
         
         const extractionStrategies: Record<string, ExtractorFunction> = {
             'text': (input: string) => input, 
+            'topic': (input: string) => input, // For topics, we use the input directly as the core theme
             'article': extractionService.extractArticleContent
         };
 
@@ -37,7 +43,10 @@ export const enhance = async (req: Request, res: Response) => {
         const result = await llmService.enhancePost(contentToEnhance, {
             mode,
             targetPages,
-            deepResearch // Pass the flag directly to the multi-agent orchestrator
+            deepResearch,
+            isTopic: inputType === 'topic',
+            requestId,
+            tone
         });
 
         res.status(200).json(result);
@@ -47,8 +56,37 @@ export const enhance = async (req: Request, res: Response) => {
         }
 
         logger.error({ error }, 'Unexpected error in content enhancement');
-        res.status(500).json({ error: error.message || 'Internal server error' });
+        
+        let errorMessage = error.message || 'Internal server error';
+        
+        // Specific check for Token Limit errors as requested by USER
+        const lowerError = errorMessage.toLowerCase();
+        if (lowerError.includes('token limit') || lowerError.includes('max_tokens') || lowerError.includes('context_length')) {
+            errorMessage = 'LLM token limit has been reached. Please try with a shorter topic or reduce the target length.';
+        }
+
+        res.status(500).json({ error: errorMessage });
     }
+};
+
+export const streamStatus = (req: Request, res: Response) => {
+    const { requestId } = req.params;
+
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+    });
+
+    const onStatus = (message: string) => {
+        res.write(`data: ${JSON.stringify({ message })}\n\n`);
+    };
+
+    statusService.on(`status:${requestId}`, onStatus);
+
+    req.on('close', () => {
+        statusService.off(`status:${requestId}`, onStatus);
+    });
 };
 
 const generateHookSchema = z.object({

@@ -4,6 +4,7 @@ import { DraftingAgent } from './agents/drafting.agent';
 import { ValidationAgent } from './agents/validation.agent';
 import { RefiningAgent } from './agents/refining.agent';
 import { PromptOptions } from '../config';
+import { statusService } from './status.service';
 
 export interface OrchestrationResult {
     success: boolean;
@@ -36,14 +37,22 @@ export class AgentOrchestrator {
      * 5. Refinement (Conditional)
      * 6. Outbound Security Scan
      */
-    public async runEnhancementPipeline(input: string, options: PromptOptions & { mode: 'article' | 'post'; researchTopic?: string }): Promise<OrchestrationResult> {
-        const { mode, tone, targetPages = 2, researchTopic } = options;
+    public async runEnhancementPipeline(input: string, options: PromptOptions & { mode: 'article' | 'post'; researchTopic?: string; isTopic?: boolean; requestId?: string }): Promise<OrchestrationResult> {
+        const { mode, tone, targetPages = 2, researchTopic, isTopic, requestId } = options;
         const trace: OrchestrationResult['trace'] = [];
 
-        logger.info({ mode, tone, researchTopic }, 'Starting Agent Orchestration Pipeline');
+        const publishStatus = (msg: string) => {
+            if (requestId) {
+                const prefixedMsg = tone ? `[${tone}] ${msg}` : msg;
+                statusService.publish(requestId, prefixedMsg);
+            }
+        };
+
+        logger.info({ mode, tone, researchTopic, requestId }, 'Starting Agent Orchestration Pipeline');
 
         try {
             // --- STEP 1: Inbound Security ---
+            publishStatus('Scanning inbound content...');
             const inboundScan = await this.securityAgent.validateInbound(input);
             trace.push({ agent: 'SecurityAgent', status: 'inbound_complete' });
             if (!inboundScan.success) throw new Error(inboundScan.error || 'Inbound security violation');
@@ -52,24 +61,28 @@ export class AgentOrchestrator {
             // --- STEP 2: Research ---
             let researchData = '';
             if (researchTopic) {
+                publishStatus('Performing web research...');
                 const researchResult = await this.draftingAgent.research(researchTopic);
                 researchData = researchResult.success ? researchResult.data : '';
                 trace.push({ agent: 'DraftingAgent', status: 'research_complete' });
             }
 
             // --- STEP 3: Drafting ---
+            publishStatus('Generating draft content...');
             const draftingResult = await this.draftingAgent.draft({
                 mode,
                 tone,
                 text: sanitizedInput,
                 targetPages,
-                researchData
+                researchData,
+                isTopic
             });
             trace.push({ agent: 'DraftingAgent', status: 'drafting_complete' });
             if (!draftingResult.success) throw new Error(draftingResult.error || 'Drafting failed');
             let currentContent = draftingResult.data;
 
             // --- STEP 4: Validation (Audit) ---
+            publishStatus('Performing factual validation...');
             const validationResult = await this.validationAgent.validate(currentContent, researchData);
             trace.push({ agent: 'ValidationAgent', status: 'validation_complete', data: validationResult.data });
             
@@ -77,6 +90,7 @@ export class AgentOrchestrator {
             const audit = validationResult.data;
             if (audit && (!audit.isValid || audit.qualityScore < 7)) {
                 logger.info({ score: audit.qualityScore }, 'Quality below threshold, triggering Refinement Agent');
+                publishStatus('Refining content for higher quality...');
                 const refinementResult = await this.refiningAgent.refine(currentContent, audit);
                 trace.push({ agent: 'RefiningAgent', status: 'refinement_complete' });
                 if (refinementResult.success) {
@@ -85,10 +99,12 @@ export class AgentOrchestrator {
             }
 
             // --- STEP 6: Outbound Security ---
+            publishStatus('Final security check...');
             const outboundScan = await this.securityAgent.validateOutbound(currentContent);
             trace.push({ agent: 'SecurityAgent', status: 'outbound_complete' });
             if (!outboundScan.success) throw new Error(outboundScan.error || 'Outbound security violation');
 
+            publishStatus('Successfully enhanced content');
             return {
                 success: true,
                 finalContent: outboundScan.data,

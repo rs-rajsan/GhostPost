@@ -3,17 +3,22 @@ import api from '../lib/api';
 
 interface EnhanceRequest {
     text: string;
-    inputType: 'text' | 'article';
+    inputType: 'text' | 'article' | 'topic';
     mode?: 'post' | 'article';
     targetPages?: number;
     deepResearch?: boolean;
+    requestId?: string;
+    tone?: string;
 }
 
 export interface ToneResponse {
+    title: string;
     enhancedPost: string;
     hookScore: number;
     hookTip: string;
+    confidenceScore: number;
     hashtags: string[];
+    visualSuggestion?: string;
 }
 
 export type EnhanceResponse = Record<'Professional' | 'Conversational' | 'Storytelling' | 'Bold/Contrarian', ToneResponse>;

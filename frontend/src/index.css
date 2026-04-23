@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 
+  CRITICAL: SYSTEM TYPOGRAPHY SOURCE OF TRUTH
+  NEVER CHANGE THESE FONT SIZES.
+  Titles: 14pt | Headings: 12pt | Body/Inputs: 11pt
+*/
+h1, .text-title { font-size: 14pt !important; line-height: 1.4; }
+h2, h3, h4, .text-heading { font-size: 12pt !important; line-height: 1.4; }
+body, p, span, div, label, input, textarea, button, .text-body { font-size: 11pt !important; line-height: 1.6; }
+
 :root {
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;

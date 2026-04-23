@@ -1,0 +1,6 @@
+# Docker Ignore List
+CHANGELOG_SCRATCHPAD.md
+node_modules
+.git
+.agents
+*.md
