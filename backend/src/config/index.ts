@@ -1,5 +1,9 @@
 import dotenv from 'dotenv';
-// Load environment variables immediately
+import path from 'path';
+
+// Load environment variables from root directory
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
+// Also load local .env if it exists for fallback/backwards compatibility
 dotenv.config();
 
 import { MODELS } from './models.config';
@@ -73,10 +77,21 @@ export interface PromptOptions {
 }
 
 const env = process.env.NODE_ENV || 'development';
-const securityApiKey = process.env.SECURITY_API_KEY || '';
-const draftingApiKey = process.env.DRAFTING_API_KEY || '';
-const validationApiKey = process.env.VALIDATION_API_KEY || '';
-const refinementApiKey = process.env.REFINEMENT_API_KEY || '';
+
+/**
+ * Resolves an API key string. If the string matches an existing environment variable name,
+ * it returns the value of that environment variable. Otherwise, it returns the string itself.
+ */
+const resolveKey = (key: string | undefined): string => {
+    if (!key) return '';
+    if (process.env[key]) return process.env[key] as string;
+    return key;
+};
+
+const securityApiKey = resolveKey(process.env.SECURITY_API_KEY);
+const draftingApiKey = resolveKey(process.env.DRAFTING_API_KEY);
+const validationApiKey = resolveKey(process.env.VALIDATION_API_KEY);
+const refinementApiKey = resolveKey(process.env.REFINEMENT_API_KEY);
 
 const config: Config = {
     env,
@@ -89,7 +104,7 @@ const config: Config = {
         isMockMode: !securityApiKey || securityApiKey.includes('your_'),
     },
     research: {
-        apiKey: process.env.PERPLEXITY_API_KEY || '',
+        apiKey: resolveKey(process.env.PERPLEXITY_API_KEY),
         model: 'sonar',
         url: 'https://api.perplexity.ai/chat/completions',
     },
@@ -131,14 +146,22 @@ const config: Config = {
     prompts: {
         article: (options: PromptOptions) => {
             const { tone, text, targetPages = 2, researchData, isTopic } = options;
-            const wordCount = targetPages * 1500;
+            const wordCount = Math.round(targetPages * 1600);
             return `
 You are a world-class investigative journalist and technical writer.
 Your mission: Write a comprehensive, high-authority article based on the provided input and research.
 
 TONE: ${tone}
-TARGET LENGTH: Maximum ${targetPages} page (~${wordCount} words). 
-STRICT RULE: Your response must be 1,500 words or less. DO NOT exceed this limit.
+TARGET LENGTH: Exactly ${targetPages} pages.
+STRICT WORD LIMIT: Your response MUST be approximately ${wordCount} words. DO NOT exceed ${wordCount + 100} words.
+
+${tone.toLowerCase() === 'conversational' ? `
+STYLE GUIDE (CONVERSATIONAL - TWO FRIENDS CHATTING):
+- STYLE: Write like two friends or peers talking over coffee. USE CONTRACTIONS (don't, it's, you're).
+- VIBE: Casual, informal, and relaxed. Avoid "corporate speak" or "interview mode".
+- STRUCTURE: A natural back-and-forth flow. DO NOT use labels like "Question:" or "Answer:".
+- PHRASING: Use fillers and transitions like "Honestly," "You know?", "Wait, check this out," or "Right?".
+- INTERACTION: Address the reader as a peer. "I was thinking about this...", "Did you hear about...?"` : ''}
 
 ${isTopic ? 'CORE TOPIC/THEME' : 'INPUT MATERIAL'}:
 """

@@ -8,9 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 const enhanceSchema = z.object({
     inputType: z.enum(['text', 'article', 'topic']).default('text'),
-    text: z.string().min(10).max(200000),
+    text: z.string().min(10).max(10000),
     mode: z.enum(['post', 'article']).default('post'),
-    targetPages: z.number().min(1).max(10).default(1),
+    targetPages: z.number().min(0.25).max(10).default(1),
     deepResearch: z.boolean().default(false),
     requestId: z.string().optional(),
     tone: z.string().optional()
@@ -90,7 +90,7 @@ export const streamStatus = (req: Request, res: Response) => {
 };
 
 const generateHookSchema = z.object({
-    text: z.string().min(10).max(200000),
+    text: z.string().min(10).max(10000),
     tone: z.string(),
     hookTip: z.string()
 });

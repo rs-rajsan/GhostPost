@@ -49,7 +49,8 @@ export class SecurityAgent extends BaseAgent {
         if (!config.guard.redactPii) return text;
         
         const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-        const phoneRegex = /(\+?\d{1,3}[- ]?)?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}/g;
+        // Captures 10-digit, 7-digit, and international formats with various delimiters
+        const phoneRegex = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}|\b\d{3}[-.\s]\d{4}\b/g;
 
         return text.replace(emailRegex, '[EMAIL_REDACTED]')
             .replace(phoneRegex, '[PHONE_REDACTED]');

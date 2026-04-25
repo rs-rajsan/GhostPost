@@ -9,6 +9,7 @@ interface EnhanceRequest {
     deepResearch?: boolean;
     requestId?: string;
     tone?: string;
+    signal?: AbortSignal;
 }
 
 export interface ToneResponse {
@@ -25,8 +26,8 @@ export type EnhanceResponse = Record<'Professional' | 'Conversational' | 'Storyt
 
 export const useEnhance = () => {
     return useMutation({
-        mutationFn: async (data: EnhanceRequest) => {
-            const response = await api.post<EnhanceResponse>('/enhance', data);
+        mutationFn: async ({ signal, ...data }: EnhanceRequest) => {
+            const response = await api.post<EnhanceResponse>('/enhance', data, { signal });
             return response.data;
         },
     });

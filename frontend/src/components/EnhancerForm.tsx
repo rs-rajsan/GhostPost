@@ -1,183 +1,259 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Sparkles, Link2, FileText, Lightbulb } from 'lucide-react';
+import { Link2, FileText, ChevronUp, ArrowRight, Octagon } from 'lucide-react';
 
 interface EnhancerFormProps {
-    statusMessage: string | null;
     isPending: boolean;
     apiError?: string | null;
+    onGenerate: () => void;
+    onStop: () => void;
 }
 
-export default function EnhancerForm({ statusMessage, isPending, apiError }: EnhancerFormProps) {
+export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }: EnhancerFormProps) {
     const { register, formState: { errors }, watch, setValue } = useFormContext();
+    const [showToneMenu, setShowToneMenu] = useState(false);
+    const [showModeMenu, setShowModeMenu] = useState(false);
 
-    // Form Watchers
     const currentInputType = watch('inputType');
     const currentMode = watch('mode');
+    const isArticle = currentMode === 'article';
+    const deepResearch = watch('deepResearch');
 
-    // Auto-enable Deep Research for Topic mode
-    useEffect(() => {
-        if (currentInputType === 'topic') {
-            setValue('deepResearch', true);
-        }
-    }, [currentInputType, setValue]);
+    const targetPages = watch('targetPages');
+    const currentTone = watch('tone');
+
+    const tones = ['Professional', 'Conversational', 'Story', 'Bold'];
 
     const inputOptions = [
         { id: 'text', icon: FileText, label: 'Raw Text' },
-        { id: 'topic', icon: Lightbulb, label: 'Topic' },
         { id: 'article', icon: Link2, label: 'Web Article URL' },
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Input Type Selector */}
-            <div className="flex bg-white/5 rounded-2xl p-1 gap-1 border border-white/10 mb-6">
-                {inputOptions.map((option) => (
-                    <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => setValue('inputType', option.id as any)}
-                        className={`
-                            flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold transition-all
-                            ${currentInputType === option.id 
-                                ? 'bg-primary text-white shadow-lg' 
-                                : 'text-gray-500 hover:text-white hover:bg-white/5'}
-                        `}
-                    >
-                        <option.icon size={16} />
-                        <span className="hidden sm:inline">{option.label}</span>
-                    </button>
-                ))}
+        <div className="space-y-1.5 text-[13px] font-normal">
+            {/* Row 1: Header (Input Selection) */}
+            <div className="flex items-center justify-between py-[2px] border-t border-white/5 whitespace-nowrap">
+                <div className="flex gap-6 items-center">
+                    {inputOptions.map((option) => (
+                        <button
+                            key={option.id}
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => setValue('inputType', option.id as any)}
+                            className={`
+                                flex items-center gap-2 py-0 transition-all whitespace-nowrap
+                                ${currentInputType === option.id 
+                                    ? 'text-primary' 
+                                    : 'text-gray-500 hover:text-gray-300'}
+                                ${isPending ? 'opacity-50 cursor-not-allowed' : ''}
+                            `}
+                        >
+                            <option.icon size={14} className="shrink-0" />
+                            <span>{option.label}</span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {/* Content Input Area */}
-            <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <label className="text-heading font-bold text-gray-400 uppercase tracking-widest">
-                        {currentInputType === 'text' ? 'Your Ideas' : 
-                         currentInputType === 'topic' ? 'Focus Topic' : 'Article URL'}
-                    </label>
+            {/* Content Input Area - Simplified */}
+            <div className="space-y-1 pt-1">
+                <div className="flex justify-between items-center text-gray-500 text-[11px]">
+                    <label>{currentInputType === 'text' ? 'Your Ideas' : 'Article URL'}</label>
                     {currentInputType === 'text' && (
-                        <span className="text-body text-[10px] text-gray-600 font-bold">
-                            {watch('text').length}/200,000
+                        <span className="opacity-50">
+                            {watch('text').length.toLocaleString()}/10,000
                         </span>
                     )}
                 </div>
-                <textarea
-                    {...register('text')}
-                    placeholder={
-                        currentInputType === 'text' ? "Paste your raw thoughts, LinkedIn draft, or meeting notes..." : 
-                        currentInputType === 'topic' ? "e.g., The future of AI in content creation..." : 
-                        "https://example.com/article-to-repurpose"
-                    }
-                    className={`
-                        w-full h-48 bg-black/20 border-2 rounded-3xl p-6 text-gray-200 placeholder:text-gray-600 focus:outline-none transition-all resize-none font-medium text-body
-                        ${errors.text ? 'border-red-500/50' : 'border-white/5 focus:border-primary/50 focus:shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)]'}
-                    `}
-                />
-                {errors.text && <p className="mt-2 text-body text-red-500">{errors.text.message as string}</p>}
-            </div>
-
-            {/* Advanced Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-6 rounded-3xl border border-white/10">
-                <div className="space-y-4">
-                    <label className="block text-heading font-bold text-gray-400 uppercase tracking-widest">Output Mode</label>
-                    <div className="flex gap-2">
-                        {['post', 'article'].map((m) => (
+                <div className="relative group">
+                    <textarea
+                        {...register('text')}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                if (!isPending) onGenerate();
+                            }
+                        }}
+                        placeholder={
+                            currentInputType === 'text' ? "Paste your raw thoughts... (Press Enter to Generate)" : "https://example.com/article (Press Enter to Generate)"
+                        }
+                        className={`
+                            w-full h-[500px] bg-white/5 p-2 pr-10 pb-12 text-gray-300 placeholder:text-gray-700 
+                            focus:outline-none transition-all resize-none 
+                            border border-white/10 rounded-[4px] focus:border-primary/30
+                        `}
+                    />
+                    
+                    {/* Bottom-Left Controls Container */}
+                    <div className="absolute bottom-3 left-3 flex items-center gap-4 z-20">
+                        {/* Tone Selection Dropdown */}
+                        <div className="relative flex flex-col items-start">
                             <button
-                                key={m}
                                 type="button"
-                                onClick={() => setValue('mode', m as any)}
+                                disabled={isPending}
+                                onClick={() => {
+                                    if (!isPending) {
+                                        setShowToneMenu(!showToneMenu);
+                                        setShowModeMenu(false);
+                                    }
+                                }}
                                 className={`
-                                    flex-1 py-3 px-4 rounded-xl text-body font-bold border transition-all
-                                    ${currentMode === m 
-                                        ? 'bg-primary/20 border-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]' 
-                                        : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'}
+                                    flex items-center gap-1.5 px-1 py-0.5 text-gray-500 hover:text-primary transition-all text-[11px] font-medium
+                                    ${isPending ? 'opacity-50 cursor-not-allowed' : ''}
                                 `}
                             >
-                                {m === 'post' ? 'Social Post' : 'Full Article'}
+                                <span>Tone: <span className="text-primary capitalize">{currentTone}</span></span>
+                                <ChevronUp size={10} className={`transition-transform ${showToneMenu ? 'rotate-180' : ''}`} />
                             </button>
-                        ))}
-                    </div>
-                </div>
+                            
+                            {showToneMenu && !isPending && (
+                                <div className="absolute bottom-full mb-1 w-28 bg-[#1a1a1a] border border-white/10 rounded-[2px] shadow-xl overflow-hidden flex flex-col">
+                                    {tones.map((t) => (
+                                        <button
+                                            key={t}
+                                            type="button"
+                                            onClick={() => {
+                                                setValue('tone', t.toLowerCase());
+                                                setShowToneMenu(false);
+                                            }}
+                                            className={`
+                                                w-full text-left px-3 py-[1px] hover:bg-white/5 text-[11px] font-medium transition-colors
+                                                ${currentTone === t.toLowerCase() ? 'text-primary' : 'text-gray-400'}
+                                            `}
+                                        >
+                                            {t}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
-                {currentMode === 'article' ? (
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <label className="block text-heading font-bold text-gray-400 uppercase tracking-widest">Target Length</label>
-                            <span className="text-body font-black text-primary uppercase">{watch('targetPages')} Page</span>
-                        </div>
-                        <input
-                            type="range"
-                            min="1"
-                            max="5"
-                            {...register('targetPages', { valueAsNumber: true })}
-                            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                    </div>
-                ) : (
-                    <div className="space-y-4 opacity-30 cursor-not-allowed">
-                        <div className="flex justify-between items-center">
-                            <label className="block text-heading font-bold text-gray-600 uppercase tracking-widest">Target Length</label>
-                            <span className="text-body font-black text-gray-700">NA</span>
-                        </div>
-                        <div className="w-full h-2 bg-white/5 rounded-lg" />
-                    </div>
-                )}
+                        {/* Mode Selection Dropdown */}
+                        <div className="relative flex flex-col items-start">
+                            <button
+                                type="button"
+                                disabled={isPending}
+                                onClick={() => {
+                                    if (!isPending) {
+                                        setShowModeMenu(!showModeMenu);
+                                        setShowToneMenu(false);
+                                    }
+                                }}
+                                className={`
+                                    flex items-center gap-1.5 px-1 py-0.5 text-gray-500 hover:text-primary transition-all text-[11px] font-medium
+                                    ${isPending ? 'opacity-50 cursor-not-allowed' : ''}
+                                `}
+                            >
+                                <span>Mode: <span className="text-primary capitalize">{currentMode === 'post' ? 'Social Post' : 'Full Article'}</span></span>
+                                <ChevronUp size={10} className={`transition-transform ${showModeMenu ? 'rotate-180' : ''}`} />
+                            </button>
+                            
+                            {showModeMenu && !isPending && (
+                                <div className="absolute bottom-full mb-1 w-36 bg-[#1a1a1a] border border-white/10 rounded-[2px] shadow-xl overflow-hidden flex flex-col p-1 gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('mode', 'post')}
+                                        className={`w-full text-left px-2 py-0.5 rounded-[1px] text-[11px] transition-colors ${currentMode === 'post' ? 'bg-primary/20 text-primary' : 'hover:bg-white/5 text-gray-400'}`}
+                                    >
+                                        Social Post
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('mode', 'article')}
+                                        className={`w-full text-left px-2 py-0.5 rounded-[1px] text-[11px] transition-colors ${currentMode === 'article' ? 'bg-primary/20 text-primary' : 'hover:bg-white/5 text-gray-400'}`}
+                                    >
+                                        Full Article
+                                    </button>
+                                    
+                                    <div className="h-[1px] bg-white/5 my-0.5" />
+                                    
+                                    {/* Deep Research Toggle inside Dropdown */}
+                                    <div className="flex items-center justify-between px-2 py-0.5">
+                                        <span className="text-gray-500 text-[10px]">Deep Research</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setValue('deepResearch', !deepResearch)}
+                                            className={`relative inline-flex h-3 w-6 items-center rounded-full transition-colors ${deepResearch ? 'bg-primary' : 'bg-white/10'}`}
+                                        >
+                                            <span className={`inline-block h-2 w-2 transform rounded-full bg-white transition-transform ${deepResearch ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+                                        </button>
+                                    </div>
 
-                <div className={`flex items-center justify-between col-span-full md:col-span-1 pt-2 ${currentInputType === 'topic' ? 'opacity-75' : ''}`}>
-                    <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-xl ${watch('deepResearch') ? 'bg-primary/20 text-primary' : 'bg-white/5 text-gray-500'}`}>
-                            <Sparkles size={18} />
-                        </div>
-                        <div>
-                            <p className="text-heading font-black text-gray-200 uppercase tracking-wider">Deep Research</p>
-                            <p className="text-body text-[10px] text-gray-500 font-medium">
-                                {currentInputType === 'topic' ? 'Enabled for topics' : 'Gather facts & proven statistics'}
-                            </p>
+                                    {/* Pages Stepper inside Dropdown (Conditional) */}
+                                    {isArticle && (
+                                        <div className="flex items-center justify-between px-2 py-0.5">
+                                            <span className="text-gray-500 text-[10px]">Pages</span>
+                                            <div className="flex items-center border border-white/10 rounded-[2px] bg-white/5 overflow-hidden">
+                                                <button type="button" onClick={() => setValue('targetPages', Math.max(0.25, (Number(targetPages) || 1) - 0.25))} className="px-1 hover:text-primary transition-colors border-r border-white/10 text-[10px]">-</button>
+                                                
+                                                <div className="flex items-center px-1">
+                                                    {/* Integer Part */}
+                                                    <input 
+                                                        type="text"
+                                                        value={Math.floor(Number(targetPages) || 1)}
+                                                        onFocus={(e) => e.target.select()}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === '.') {
+                                                                e.preventDefault();
+                                                                (e.currentTarget.nextElementSibling?.nextElementSibling as HTMLInputElement)?.focus();
+                                                            }
+                                                        }}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value.replace(/[^0-9]/g, '');
+                                                            const dec = (Number(targetPages) || 1) % 1;
+                                                            if (val === '') setValue('targetPages', 0 + dec);
+                                                            else setValue('targetPages', Math.min(10, Number(val)) + dec);
+                                                        }}
+                                                        className="w-4 bg-transparent text-right text-primary text-[10px] font-bold outline-none"
+                                                    />
+                                                    
+                                                    {/* Fixed Dot */}
+                                                    <span className="text-primary/40 font-bold text-[10px] select-none mx-[0.5px]">.</span>
+                                                    
+                                                    {/* Decimal Part */}
+                                                    <input 
+                                                        type="text"
+                                                        value={Math.round(((Number(targetPages) || 1) % 1) * 100).toString().padStart(2, '0')}
+                                                        onFocus={(e) => e.target.select()}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === '.') e.preventDefault();
+                                                        }}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value.replace(/[^0-9]/g, '').slice(-2);
+                                                            const int = Math.floor(Number(targetPages) || 1);
+                                                            if (val === '') setValue('targetPages', int + 0);
+                                                            else setValue('targetPages', int + (Number(val) / 100));
+                                                        }}
+                                                        className="w-5 bg-transparent text-left text-primary text-[10px] font-bold outline-none"
+                                                    />
+                                                </div>
+
+                                                <button type="button" onClick={() => setValue('targetPages', Math.min(10, (Number(targetPages) || 1) + 0.25))} className="px-1 hover:text-primary transition-colors border-l border-white/10 text-[10px]">+</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
+
+                    {/* Bottom-Right Action Button */}
                     <button
                         type="button"
-                        disabled={currentInputType === 'topic'}
-                        onClick={() => setValue('deepResearch', !watch('deepResearch'))}
+                        onClick={isPending ? onStop : onGenerate}
                         className={`
-                            relative inline-flex h-6 w-11 items-center rounded-full transition-all focus:outline-none
-                            ${watch('deepResearch') ? 'bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]' : 'bg-white/10'}
-                            ${currentInputType === 'topic' ? 'cursor-not-allowed' : ''}
+                            absolute bottom-3 right-3 p-1.5 rounded-full transition-all
+                            ${isPending ? 'bg-red-500/20 text-red-500 animate-pulse' : 'bg-primary/20 text-primary hover:bg-primary/40'}
                         `}
                     >
-                        <span
-                            className={`
-                                inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                                ${watch('deepResearch') ? 'translate-x-6' : 'translate-x-1'}
-                            `}
-                        />
+                        {isPending ? <Octagon size={14} /> : <ArrowRight size={14} />}
                     </button>
                 </div>
-            </div>
-
-            {/* Simple Status Notification */}
-            <div className="pt-4 border-t border-white/5 min-h-[100px] flex items-center justify-center">
-                {isPending ? (
-                    <div className="flex items-center gap-3 py-4 px-6 bg-white/5 rounded-2xl border border-white/10 animate-pulse">
-                        <Sparkles className="text-primary" size={20} />
-                        <p className="text-body font-bold text-gray-300">
-                            {statusMessage || 'Agents are working on your content...'}
-                        </p>
-                    </div>
-                ) : (
-                    <div className="opacity-30 group flex flex-col items-center">
-                        <Sparkles className="text-gray-500 mb-2 group-hover:text-primary transition-colors" size={24} />
-                        <p className="text-body font-black text-gray-600 uppercase tracking-widest">
-                            System Ready
-                        </p>
-                    </div>
-                )}
+                {errors.text && <p className="text-red-500/70 text-[11px]">{errors.text.message as string}</p>}
             </div>
 
             {apiError && (
-                <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-2xl text-red-400 text-xs text-center font-bold uppercase tracking-widest">
+                <div className="py-2 text-red-400 text-center border-t border-red-500/10">
                     {apiError}
                 </div>
             )}
