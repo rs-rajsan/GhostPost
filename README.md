@@ -9,11 +9,13 @@ Built with a **provider-agnostic**, **whitelabeled** architecture, GhostPost ens
 ## 🚀 Key Features
 
 - **Multi-Agent Orchestration**: A sophisticated pipeline involving specialized agents for Security, Drafting, Validation, and Refinement.
+- **Conversational Q&A Pattern**: A specialized "interactive dialogue" mode that structures content as a 2-person casual chat with a fixed topic and deep-dive discussion.
+- **High-Precision Length Control**: Supports **0.25-page increments** with a surgical density of **400 words per quarter-page**.
 - **Self-Correcting Content Loop**: The system automatically fact-checks and polishes drafts through a reflection (Validation -> Refining) cycle.
-- **Deep Research capability**: Integrated real-time web search for grounding content in current data and statistics.
-- **Helicone Observability**: Native integration with self-hosted Helicone for granular request tracing, latency monitoring, and token tracking.
-- **Security Guardrails**: Multi-layered security scanning (Inbound & Outbound) for PII redaction, toxicity filtering, and prompt injection protection.
-- **Professional Exports**: One-click downloads as **Word (DOCX)** or **PDF** with high-premium typography.
+- **Interruptible Pipeline**: Real-time "Stop Generation" capability using AbortSignal to physically terminate active agent tasks.
+- **Deep Research capability**: Integrated real-time web search (Sonar) for grounding content in current data and statistics.
+- **Helicone Observability**: Native integration for granular request tracing, latency monitoring, and token tracking.
+- **Security Guardrails**: Multi-layered security scanning for PII redaction and prompt injection protection.
 
 ---
 
@@ -24,8 +26,9 @@ GhostPost utilizes a modular, role-based architecture designed for flexibility a
 ```mermaid
 graph TD
     subgraph Client_Layer["Client Layer (React + Vite)"]
-        UI["User Interface"]
-        API["API Client (RQ)"]
+        UI["User Interface (Chat-First)"]
+        SegInput["Segmented High-Precision Input"]
+        API["API Client (RQ + AbortSignal)"]
     end
     
     subgraph Execution_Layer["Orchestration Layer (Node.js)"]
@@ -36,12 +39,18 @@ graph TD
         RefAgent["Refining Agent (Editor)"]
     end
     
+    subgraph Persistence_Layer["Data Layer (PostgreSQL)"]
+        DB[(PostgreSQL DB)]
+        ORM["Prisma ORM"]
+    end
+    
     subgraph Observability_Layer["Observability (Helicone)"]
         Proxy["Valhalla Proxy"]
         Dash["Metrics Dashboard"]
     end
     
-    UI --> API
+    UI --> SegInput
+    SegInput --> API
     API --> Orch
     
     Orch --> SecAgent
@@ -49,115 +58,100 @@ graph TD
     Orch --> AuditAgent
     Orch --> RefAgent
     
+    Orch <--> ORM
+    ORM <--> DB
+    
     SecAgent & DraftAgent & AuditAgent & RefAgent -.-> Proxy
     Proxy --> Dash
 ```
 
 ---
 
-## 🔀 Multi-Agent Pipeline
+## 🔀 Multi-Agent Interaction Flow
 
 Every content enhancement request passes through a strictly coordinated sequence of specialized AI workers.
 
 ```mermaid
 sequenceDiagram
-    participant U as User
+    participant U as User (UI)
     participant O as Orchestrator
     participant S as Security Agent
     participant D as Drafting Agent
     participant V as Validation Agent
     participant R as Refining Agent
 
-    U->>O: Enhancement Request
-    O->>S: Inbound Scan
-    Note right of S: PII Redaction & Prompt Guard
-    S-->>O: { sanitized: "..." }
+    U->>O: Enhancement Request (0.25 - 10.0 Pages)
+    O->>S: Inbound Scan (Security/PII)
+    S-->>O: Sanitized Input
     
-    O->>D: Research & Drafting
-    Note right of D: Deep Web Grounding (Sonar)
-    D-->>O: { draft: "...", context: "..." }
+    Note over O,D: Strategy: Conversational / Q&A / Professional
+    O->>D: Research & Content Drafting
+    Note right of D: 400 words per 0.25 page density
+    D-->>O: Structured JSON Draft
     
-    O->>V: Validation Audit
-    Note right of V: Hallucination Detection (Gemini)
-    V-->>O: { isValid: false, scoring: 6/10, hallucinations: [...] }
+    O->>V: Factual Validation Audit
+    V-->>O: Quality Score & Hallucination Trace
     
-    rect rgb(230, 240, 255)
-    Note over O,R: REFLECTION LOOP
-    O->>R: Content Refinement
-    Note right of R: Self-Correction (OpenAI)
-    R-->>O: { refined: "..." }
+    alt Score < 7/10
+        Note over O,R: REFLECTION LOOP
+        O->>R: Content Refinement & Fact Correction
+        R-->>O: Polished Content
     end
     
-    O->>S: Outbound Scan
-    S-->>O: { safeContent: "..." }
-    O->>U: Final Delivered Content
+    O->>S: Outbound Security Scan
+    S-->>O: Safe/Verified Content
+    O->>U: Final Generation Delivered
+    
+    U-X O: [USER INTERRUPT] - Abort Signal
 ```
+
+---
+
+## 💾 Persistence & Data Strategy
+
+GhostPost uses a robust data layer to ensure observability and persistence of the agentic workflow.
+
+- **PostgreSQL**: Chosen for transactional integrity. Every agent handoff, confidence score, and generated post is stored as a structured record.
+- **Prisma ORM**: Provides a type-safe bridge between the Node.js orchestrator and the database, ensuring that agent traces are strictly validated before storage.
+- **Why Persistence?**: 
+    - **Observability**: Tracking how individual agents (like the Auditor) impact final content quality over time.
+    - **History**: Allowing users to retrieve and export previous generations without re-running the expensive agent pipeline.
+
+---
 
 ## 🕵️ Agent Handoff Trace Protocol
 
-Every enhancement request generates a granular `trace` object for observability.
-
-| Step | Agent | Status Token | Data Responsibility |
+| Step | Agent | Responsibility | Logic Pattern |
 | :--- | :--- | :--- | :--- |
-| 1 | `SecurityAgent` | `inbound_complete` | Sanitizes user input and detects injections. |
-| 2 | `DraftingAgent` | `drafting_complete` | Generates research-backed content via Perplexity. |
-| 3 | `ValidationAgent` | `validation_complete` | Audits for hallucinations and structural quality. |
-| 4 | `RefiningAgent` | `refinement_complete` | Corrects unverified claims (if triggered by low score). |
-| 5 | `SecurityAgent` | `outbound_complete` | Final safety check and PII redaction of output. |
+| 1 | `Security` | PII Redaction & Inbound Shield | Guardrail |
+| 2 | `Drafting` | Research & Content Production | Generation / Tool-Use |
+| 3 | `Validation` | Factual Audit & Hallucination Check | Reflection |
+| 4 | `Refining` | Error Correction & Tone Matching | Self-Correction |
+| 5 | `Security` | Final Output Verification | Guardrail |
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Frontend
-- **React 18 & Vite**: For high-performance UI.
-- **Tailwind CSS**: Modern, premium design tokens and utilities.
-- **React Query**: Robust server-side state management.
-- **DOCX / JSPDF**: Professional document generation.
+- **React 18 & Vite**: Chat-model UI with relative-floating controls.
+- **Tailwind CSS**: High-premium design tokens with no-waste headers.
+- **Segmented Input**: Custom "Int . Dec" logic for surgical formatting.
 
 ### Backend
-- **Node.js & Express**: Specialized service-oriented architecture.
-- **Multi-Agent System**: Provider-agnostic agent worker classes.
-- **Standard LLM Provider**: High-performance generation.
-- **Audit LLM Provider**: Fact-checking and grounding.
-- **Research Engine**: Real-time web-grounded data retrieval.
-- **Helicone**: Integrated observability proxy.
-- **ClickHouse & PostgreSQL**: Advanced analytics and storage.
-
----
-
-## 🚀 Getting Started
-
-### 1. Configure Environment
-Update `backend/.env` with your role-based API keys:
-```env
-SECURITY_API_KEY=...
-DRAFTING_API_KEY=...
-VALIDATION_API_KEY=...
-```
-
-### 2. Start Observability (Optional)
-Launch the self-hosted Helicone stack:
-```bash
-docker-compose -f helicone-compose.yml up -d
-```
-Access the dashboard at `http://localhost:3000`.
-
-### 3. Start Application
-```bash
-# In backend/
-npm run dev
-
-# In frontend/
-npm run dev
-```
+- **Node.js (TypeScript)**: Specialized multi-agent service layer.
+- **Prisma**: Type-safe data modeling.
+- **LLM Orchestration**: Provider-agnostic agent worker classes.
 
 ---
 
 ## 🔐 Engineering Principles
 
-1. **SOLID Architecture**: Strict separation between Agent logic (prompts/state) and Provider infrastructure (API clients).
-2. **Provider Agnostic**: The system is entirely whitelabeled. Switching AI models involves zero changes to core business logic.
-3. **Agentic AI Patterns**: Implements Reflection, Self-Correction, and Tool-use (Research) patterns.
-4. **DRY & Modular**: Centralized prompt hub and role-based configuration.
-5. **Zero-Leak Policy**: Strictly no `console.log` statements in production/UI paths for enhanced security and clean debugging.
+1. **SOLID & DRY**: Strict separation between Agent logic (prompts) and Provider infrastructure.
+2. **Agentic AI Patterns**: Fully implements **Reflection**, **Self-Correction**, and **Multi-Agent Collaboration**.
+3. **Zero-Leak Security**: No `console.log` statements in production; strict PII redaction by the Guardian Agent.
+4. **Network Resilience**: Full support for `AbortSignal` for real-time task termination.
+
+---
+
+*Built with ❤️ by the GhostPost Engineering Team.*
