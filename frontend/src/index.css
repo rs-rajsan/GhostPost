@@ -5,6 +5,7 @@
 @import "tailwindcss/utilities";
 
 :root {
+  /* Default Void Theme (Dark) */
   --void-base: #03050D;
   --void-surface: #080C18;
   --void-surface-2: #0D1220;
@@ -18,11 +19,32 @@
   --text-3: #3A4F63;
   --border: rgba(99, 179, 237, 0.08);
   --border-hover: rgba(99, 179, 237, 0.18);
+  
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+  --info: #0EA5E9;
+}
 
-  /* Existing HSL sync */
-  --primary: 199 89% 60%; /* #38BDF8 */
-  --background: 231 62% 3%; /* #03050D */
-  --foreground: 212 56% 92%; /* #E2EAF4 */
+.theme-atlantic {
+  --void-base: #F5F7FA;
+  --void-surface: #FFFFFF;
+  --void-surface-2: #EEF2F6;
+  --plasma: #2563EB;
+  --plasma-dim: rgba(37, 99, 235, 0.12);
+  --plasma-glow: rgba(37, 99, 235, 0.06);
+  --violet: #F97316; /* Mapping Signal Orange to secondary slot */
+  --violet-dim: rgba(249, 115, 22, 0.12);
+  --text-1: #1F2937;
+  --text-2: #4B5563;
+  --text-3: #6B7280;
+  --border: #D7DEE7;
+  --border-hover: #C1C9D2;
+
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+  --info: #0EA5E9;
 }
 
 body {
@@ -88,12 +110,12 @@ body {
   .btn-secondary {
     border-color: var(--border);
     color: var(--text-2);
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--void-surface-2);
   }
   .btn-secondary:hover {
     color: var(--text-1);
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: rgba(56, 189, 248, 0.3);
+    background-color: var(--plasma-dim);
+    border-color: var(--plasma);
   }
 
   .btn-danger {

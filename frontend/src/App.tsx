@@ -56,7 +56,10 @@ function AppContent() {
                 const settings = res.data;
                 
                 // 1. Theme
-                if (settings.themeHue) {
+                if (settings.themeName === 'atlantic') {
+                    document.documentElement.classList.add('theme-atlantic');
+                } else if (settings.themeHue) {
+                    document.documentElement.classList.remove('theme-atlantic');
                     const hue = settings.themeHue;
                     const hsl = `${hue} 100% 60%`;
                     document.documentElement.style.setProperty('--plasma', `hsl(${hsl})`);

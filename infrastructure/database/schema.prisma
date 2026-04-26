@@ -43,6 +43,7 @@ model PipelineTopic {
   hookScore       Int?
   confidenceScore Int?
   generatedAt     DateTime?
+  postedAt        DateTime?
   deletedAt       DateTime?
   createdAt       DateTime @default(now())
 }
@@ -60,6 +61,7 @@ model Settings {
   id        String   @id @default("global")
   userName  String?
   themeHue  Int      @default(250)
+  themeName String   @default("void")
   updatedAt DateTime @updatedAt
 }
 

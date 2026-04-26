@@ -108,27 +108,41 @@ function ProfileSettings() {
 
 function ThemeSettings() {
     const [hueValue, setHueValue] = useState('245');
+    const [themeName, setThemeName] = useState('void');
 
     useEffect(() => {
         axios.get(`${API_BASE}/settings`).then(res => {
             if (res.data.themeHue) setHueValue(res.data.themeHue.toString());
+            if (res.data.themeName) setThemeName(res.data.themeName);
         });
     }, []);
 
     const themes = [
-        { name: 'Plasma Void', color: '245' },
-        { name: 'Cyber Emerald', color: '150' },
-        { name: 'Midnight Violet', color: '270' },
-        { name: 'Solar Flare', color: '35' }
+        { name: 'Plasma Void', color: '245', id: 'void' },
+        { name: 'Cyber Emerald', color: '150', id: 'void' },
+        { name: 'Midnight Violet', color: '270', id: 'void' },
+        { name: 'Solar Flare', color: '35', id: 'void' },
+        { name: 'Atlantic Signal', color: '221', id: 'atlantic' }
     ];
 
-    const applyTheme = async (hue: string) => {
+    const applyTheme = async (hue: string, id: string = 'void') => {
         setHueValue(hue);
-        const hsl = `${hue} 100% 60%`;
-        document.documentElement.style.setProperty('--plasma', `hsl(${hsl})`);
-        document.documentElement.style.setProperty('--plasma-dim', `hsla(${hsl}, 0.1)`);
-        document.documentElement.style.setProperty('--plasma-glow', `hsla(${hsl}, 0.05)`);
-        await axios.patch(`${API_BASE}/settings`, { themeHue: parseInt(hue) });
+        setThemeName(id);
+
+        if (id === 'atlantic') {
+            document.documentElement.classList.add('theme-atlantic');
+        } else {
+            document.documentElement.classList.remove('theme-atlantic');
+            const hsl = `${hue} 100% 60%`;
+            document.documentElement.style.setProperty('--plasma', `hsl(${hsl})`);
+            document.documentElement.style.setProperty('--plasma-dim', `hsla(${hsl}, 0.1)`);
+            document.documentElement.style.setProperty('--plasma-glow', `hsla(${hsl}, 0.05)`);
+        }
+        
+        await axios.patch(`${API_BASE}/settings`, { 
+            themeHue: parseInt(hue),
+            themeName: id
+        });
     };
 
     return (
@@ -139,11 +153,14 @@ function ThemeSettings() {
                 {themes.map(t => (
                     <div 
                         key={t.name}
-                        onClick={() => applyTheme(t.color)}
-                        className={`p-4 bg-[var(--void-surface-2)] border rounded-[8px] cursor-pointer transition-all group ${hueValue === t.color ? 'border-[var(--plasma)]' : 'border-[var(--border)] hover:border-[var(--plasma)]/40'}`}
+                        onClick={() => applyTheme(t.color, t.id)}
+                        className={`p-4 bg-[var(--void-surface-2)] border rounded-[8px] cursor-pointer transition-all group 
+                            ${(t.id === 'atlantic' ? themeName === 'atlantic' : (themeName === 'void' && hueValue === t.color)) 
+                                ? 'border-[var(--plasma)]' 
+                                : 'border-[var(--border)] hover:border-[var(--plasma)]/40'}`}
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: `hsl(${t.color} 100% 60%)` }} />
+                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: t.id === 'atlantic' ? '#2563EB' : `hsl(${t.color} 100% 60%)` }} />
                             <span className="text-[12px] font-medium text-[var(--text-2)] group-hover:text-[var(--text-1)]">{t.name}</span>
                         </div>
                     </div>

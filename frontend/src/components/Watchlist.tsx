@@ -97,21 +97,21 @@ export default function Watchlist() {
                     <table className="w-full text-left border-collapse text-[11px]">
                         <thead className="sticky top-0 z-10 bg-[var(--void-surface-2)] border-b border-[var(--border)]">
                             <tr className="text-[var(--text-3)] font-geist uppercase tracking-widest">
-                                <th className="p-3 w-16">Rank</th>
-                                <th className="p-3">Company Name</th>
-                                <th className="p-3 text-right">Last Updated</th>
-                                <th className="p-3 w-20 text-center">Status</th>
+                                <th className="py-1 px-3 w-16">Rank</th>
+                                <th className="py-1 px-3">Company Name</th>
+                                <th className="py-1 px-3 text-right">Last Updated</th>
+                                <th className="py-1 px-3 w-20 text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[var(--border)]">
+                        <tbody className="">
                             {currentItems.sort((a, b) => (a.marketRank || 0) - (b.marketRank || 0)).map(item => (
                                 <tr key={item.id} className="hover:bg-white/[0.01] transition-colors group">
-                                    <td className="p-3 text-[var(--plasma)] font-mono font-bold">#{ (item.marketRank || 0).toString().padStart(2, '0')}</td>
-                                    <td className="p-3 text-[var(--text-1)] font-medium">{item.name}</td>
-                                    <td className="p-3 text-right text-[var(--text-3)]">
+                                    <td className="py-[2px] px-3 text-[var(--plasma)] font-mono font-bold text-[10px]">#{ (item.marketRank || 0).toString().padStart(2, '0')}</td>
+                                    <td className="py-[2px] px-3 text-[var(--text-1)] font-medium text-[10px]">{item.name}</td>
+                                    <td className="py-[2px] px-3 text-right text-[var(--text-3)] text-[10px]">
                                         {item.lastUpdate ? new Date(item.lastUpdate).toLocaleDateString() : 'N/A'}
                                     </td>
-                                    <td className="p-3">
+                                    <td className="py-[2px] px-3">
                                         <div className="flex justify-center">
                                             <CheckCircle2 size={14} className="text-[var(--success)] opacity-40 group-hover:opacity-100 transition-opacity" />
                                         </div>
