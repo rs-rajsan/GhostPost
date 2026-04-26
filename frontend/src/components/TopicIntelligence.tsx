@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { type PipelineTopic } from '../db';
-import { Search, Play, Trash2, X, FileText, Loader2, CheckCircle2, AlertCircle, PenLine, Octagon, ChevronRight, Clock, Eye } from 'lucide-react';
+import { Search, CheckCircle2, X, AlertCircle, FileText, Download, Copy, Check, FileDown, Trash2, ArrowUpDown, Play, Loader2, Octagon, ChevronRight, Clock, Eye, ChevronDown } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:5000/api/data';
@@ -17,6 +17,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
     const [pendingDeletions, setPendingDeletions] = useState<number[]>([]);
     const [pendingPosts, setPendingPosts] = useState<number[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [sortConfig, setSortConfig] = useState<{ key: 'generatedAt' | 'postedAt', direction: 'asc' | 'desc' } | null>(null);
 
     const fetchTopics = useCallback(async () => {
         try {
@@ -167,12 +168,12 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
     return (
         <div className="p-6 h-full flex flex-col relative">
             {error && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-[4px] flex items-center justify-between text-[11px] text-red-400 animate-in fade-in slide-in-from-top-2">
+                <div className="mb-4 p-3 bg-[var(--error)]/10 border border-[var(--error)]/20 rounded-[4px] flex items-center justify-between text-[var(--text-sm)] text-[var(--error)] animate-in fade-in slide-in-from-top-2">
                     <div className="flex items-center gap-2">
                         <AlertCircle size={14} />
                         <span>{error}</span>
                     </div>
-                    <button onClick={() => setError(null)} className="hover:text-red-300 transition-colors">
+                    <button onClick={() => setError(null)} className="hover:opacity-70 transition-colors">
                         <X size={14} />
                     </button>
                 </div>
@@ -180,11 +181,11 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
 
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--void-surface)]/50 backdrop-blur-md sticky top-0 z-20">
                 <div className="flex items-center gap-4">
-                    <h2 className="text-[14px] font-bold text-[var(--text-1)] tracking-tight">
+                    <h2 className="text-[var(--text-base)] font-bold text-[var(--text-1)] tracking-tight">
                         {mode === 'pipeline' ? 'Newsroom Assistant' : 'Content Sessions'}
                     </h2>
                     <div className="h-4 w-[1px] bg-[var(--border)]" />
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--plasma-dim)] text-[var(--plasma)] rounded-full text-[10px] font-bold tracking-widest border border-[var(--plasma)]/20">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--plasma-dim)] text-[var(--plasma)] rounded-full text-[var(--text-xs)] font-bold tracking-widest border border-[var(--plasma)]/20">
                         {mode === 'pipeline' ? (
                             <>
                                 <div className="w-1 h-1 bg-[var(--plasma)] rounded-full animate-pulse" />
@@ -224,7 +225,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                     <div className="flex items-center gap-3">
                          <div className="relative">
                             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)]" />
-                            <input type="text" placeholder="Search sessions..." className="bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] pl-9 pr-4 py-2 text-[11px] text-[var(--text-1)] outline-none focus:border-[var(--plasma)] transition-all w-64" />
+                            <input type="text" placeholder="Search sessions..." className="bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] pl-9 pr-4 py-2 text-[var(--text-sm)] text-[var(--text-1)] outline-none focus:border-[var(--plasma)] transition-all w-64" />
                         </div>
                         <div className="w-[1px] h-6 bg-[var(--border)] mx-1" />
                         <button onClick={handleApplyChanges} disabled={(pendingPosts.length === 0 && pendingDeletions.length === 0) || isGenerating} className={`btn-base h-9 px-6 bg-[var(--void-surface-2)] text-[var(--text-1)] border border-[var(--border)] hover:border-[var(--plasma)]/50 hover:bg-white/[0.02] transition-all disabled:opacity-20 ${(pendingPosts.length > 0 || pendingDeletions.length > 0) ? 'border-[var(--plasma)] shadow-lg shadow-[var(--plasma)]/10' : ''}`}>
@@ -250,7 +251,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                 <th className="py-1 px-3 w-[240px]">
                                     <div className="flex flex-col gap-0 w-full">
                                         <span className="">Momentum Breakdown</span>
-                                        <div className="flex items-center justify-between text-[8px] text-[var(--text-2)] font-medium w-full">
+                                        <div className="flex items-center justify-between text-[var(--text-xs)] text-[var(--text-2)] font-medium w-full">
                                             <span className="w-[60px] text-left">Avg</span>
                                             <div className="flex-1 flex items-center justify-between border-l border-[var(--border)] ml-2 pl-4">
                                                 <span className="w-[32px] text-center">Tw</span>
@@ -269,8 +270,25 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                     </>
                                 ) : (
                                     <>
+                                        <th 
+                                            className="py-1 px-3 w-32 cursor-pointer hover:text-[var(--plasma)] transition-colors group/sort"
+                                            onClick={() => setSortConfig({ key: 'generatedAt', direction: sortConfig?.key === 'generatedAt' && sortConfig.direction === 'desc' ? 'asc' : 'desc' })}
+                                        >
+                                            <div className="flex items-center gap-1">
+                                                Generated Date
+                                                <ArrowUpDown size={10} className={`transition-opacity ${sortConfig?.key === 'generatedAt' ? 'opacity-100' : 'opacity-20 group-hover/sort:opacity-50'}`} />
+                                            </div>
+                                        </th>
                                         <th className="py-1 px-3 w-16 text-center">Posted</th>
-                                        <th className="py-1 px-3 w-32">Posted Date</th>
+                                        <th 
+                                            className="py-1 px-3 w-32 cursor-pointer hover:text-[var(--plasma)] transition-colors group/sort"
+                                            onClick={() => setSortConfig({ key: 'postedAt', direction: sortConfig?.key === 'postedAt' && sortConfig.direction === 'desc' ? 'asc' : 'desc' })}
+                                        >
+                                            <div className="flex items-center gap-1">
+                                                Posted Date
+                                                <ArrowUpDown size={10} className={`transition-opacity ${sortConfig?.key === 'postedAt' ? 'opacity-100' : 'opacity-20 group-hover/sort:opacity-50'}`} />
+                                            </div>
+                                        </th>
                                     </>
                                 )}
                                 <th className="py-1 px-3 w-16 text-center">Delete</th>
@@ -284,7 +302,27 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                             {topics?.filter(t => {
                                 const isGenerated = t.status === 'generated' || t.status === 'posted';
                                 return mode === 'sessions' ? isGenerated : !isGenerated;
-                            }).sort((a,b) => b.id! - a.id!).map(topic => (
+                            }).sort((a, b) => {
+                                if (sortConfig) {
+                                    const valA = a[sortConfig.key] || '';
+                                    const valB = b[sortConfig.key] || '';
+                                    if (sortConfig.direction === 'desc') {
+                                        return valB.localeCompare(valA);
+                                    }
+                                    return valA.localeCompare(valB);
+                                }
+                                
+                                // Default Multi-level Sort: Posted Date (Desc) -> Generated Date (Desc) -> ID (Desc)
+                                const postedA = a.postedAt || '';
+                                const postedB = b.postedAt || '';
+                                if (postedA !== postedB) return postedB.localeCompare(postedA);
+                                
+                                const genA = a.generatedAt || '';
+                                const genB = b.generatedAt || '';
+                                if (genA !== genB) return genB.localeCompare(genA);
+                                
+                                return (b.id || 0) - (a.id || 0);
+                            }).map(topic => (
                                     <tr 
                                         key={topic.id} 
                                         className={`group transition-all duration-200 ${topic.status === 'posted' ? 'bg-[var(--text-3)]/5' : 'hover:bg-[var(--plasma-glow)]'}`} 
@@ -309,7 +347,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                         </div>
                                     </td>
                                     <td className="py-[2px] px-3" style={{ paddingBlock: '2px' }}>
-                                        <span className={`px-2 py-0.5 rounded-[2px] text-[9px] font-bold ${topic.status === 'posted' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--text-3)]/10 text-[var(--text-3)]'}`}>
+                                        <span className={`px-2 py-0.5 rounded-[2px] text-[var(--text-xs)] font-bold ${topic.status === 'posted' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--text-3)]/10 text-[var(--text-3)]'}`}>
                                             {topic.status.charAt(0).toUpperCase() + topic.status.slice(1)}
                                         </span>
                                     </td>
@@ -320,11 +358,16 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                                 <button onClick={() => { if (pendingApprovals.includes(topic.id!)) { setPendingApprovals(prev => prev.filter(id => id !== topic.id!)); } else { setPendingApprovals(prev => [...prev, topic.id!]); setPendingDenials(prev => prev.filter(id => id !== topic.id!)); setPendingDeletions(prev => prev.filter(id => id !== topic.id!)); } }} className={`w-[14px] h-[14px] rounded-[2px] border transition-all flex items-center justify-center mx-auto ${pendingApprovals.includes(topic.id!) ? 'bg-[var(--plasma)] border-[var(--plasma)] text-[var(--void-base)]' : 'border-[var(--text-3)]/40 hover:border-[var(--plasma)]'}`}>{pendingApprovals.includes(topic.id!) && <CheckCircle2 size={8} />}</button>
                                             </td>
                                             <td className="py-[2px] px-4 text-center" style={{ paddingBlock: '2px' }}>
-                                                <button onClick={() => { if (pendingDenials.includes(topic.id!)) { setPendingDenials(prev => prev.filter(id => id !== topic.id!)); } else { setPendingDenials(prev => [...prev, topic.id!]); setPendingApprovals(prev => prev.filter(id => id !== topic.id!)); setPendingDeletions(prev => prev.filter(id => id !== topic.id!)); } }} className={`w-[14px] h-[14px] rounded-[2px] border transition-all flex items-center justify-center mx-auto ${pendingDenials.includes(topic.id!) ? 'bg-red-500 border-red-500 text-white' : 'border-[var(--text-3)]/40 hover:border-red-500'}`}>{pendingDenials.includes(topic.id!) && <X size={8} />}</button>
+                                                <button onClick={() => { if (pendingDenials.includes(topic.id!)) { setPendingDenials(prev => prev.filter(id => id !== topic.id!)); } else { setPendingDenials(prev => [...prev, topic.id!]); setPendingApprovals(prev => prev.filter(id => id !== topic.id!)); setPendingDeletions(prev => prev.filter(id => id !== topic.id!)); } }} className={`w-[14px] h-[14px] rounded-[2px] border transition-all flex items-center justify-center mx-auto ${pendingDenials.includes(topic.id!) ? 'bg-[var(--error)] border-[var(--error)] text-white' : 'border-[var(--text-3)]/40 hover:border-[var(--error)]'}`}>{pendingDenials.includes(topic.id!) && <X size={8} />}</button>
                                             </td>
                                         </>
                                     ) : (
                                         <>
+                                            <td className="py-[2px] px-3" style={{ paddingBlock: '2px' }}>
+                                                <span className="text-[10px] text-[var(--text-3)] font-mono whitespace-nowrap">
+                                                    {topic.generatedAt ? new Date(topic.generatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+                                                </span>
+                                            </td>
                                             <td className="py-[2px] px-4 text-center" style={{ paddingBlock: '2px' }}>
                                                 <button 
                                                     disabled={topic.status === 'posted'}
@@ -343,7 +386,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                     )}
 
                                     <td className="py-[2px] px-4 text-center" style={{ paddingBlock: '2px' }}>
-                                        <button onClick={() => { if (pendingDeletions.includes(topic.id!)) { setPendingDeletions(prev => prev.filter(id => id !== topic.id!)); } else { setPendingDeletions(prev => [...prev, topic.id!]); setPendingApprovals(prev => prev.filter(id => id !== topic.id!)); setPendingDenials(prev => prev.filter(id => id !== topic.id!)); setPendingPosts(prev => prev.filter(id => id !== topic.id!)); } }} className={`w-[14px] h-[14px] rounded-[2px] border transition-all flex items-center justify-center mx-auto ${pendingDeletions.includes(topic.id!) ? 'bg-red-500 border-red-500 text-white' : 'border-[var(--text-3)]/40 hover:border-red-500'}`}>{pendingDeletions.includes(topic.id!) && <Trash2 size={8} />}</button>
+                                        <button onClick={() => { if (pendingDeletions.includes(topic.id!)) { setPendingDeletions(prev => prev.filter(id => id !== topic.id!)); } else { setPendingDeletions(prev => [...prev, topic.id!]); setPendingApprovals(prev => prev.filter(id => id !== topic.id!)); setPendingDenials(prev => prev.filter(id => id !== topic.id!)); setPendingPosts(prev => prev.filter(id => id !== topic.id!)); } }} className={`w-[14px] h-[14px] rounded-[2px] border transition-all flex items-center justify-center mx-auto ${pendingDeletions.includes(topic.id!) ? 'bg-[var(--error)] border-[var(--error)] text-white' : 'border-[var(--text-3)]/40 hover:border-[var(--error)]'}`}>{pendingDeletions.includes(topic.id!) && <Trash2 size={8} />}</button>
                                     </td>
                                     <td className="py-[2px] px-3" style={{ paddingBlock: '2px' }}>
                                         {mode === 'pipeline' ? (
@@ -411,16 +454,21 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
     );
 }
 
+
+import { saveAs } from 'file-saver';
+import { Document, Packer, Paragraph, TextRun, AlignmentType } from 'docx';
+import { jsPDF } from 'jspdf';
+
 export function ArticleDetailView({ id }: { id?: number }) {
     const [topic, setTopic] = useState<PipelineTopic | undefined>(undefined);
-    const [isApproved, setIsApproved] = useState(false);
+    const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+    const [copying, setCopying] = useState(false);
 
     useEffect(() => {
         if (id) {
             axios.get(`${API_BASE}/pipeline`).then(res => {
                 const found = res.data.find((t: any) => t.id === id);
                 setTopic(found);
-                if (found?.status === 'posted') setIsApproved(true);
             });
         }
     }, [id]);
@@ -428,42 +476,167 @@ export function ArticleDetailView({ id }: { id?: number }) {
     if (!topic) return null;
 
     const handleCopy = () => {
-        const fullContent = `Hook:\n${topic.hook}\n\nArticle:\n${topic.article}`;
+        const fullContent = `${topic.topic}\n\n${topic.hook}\n\n${topic.article}`;
         navigator.clipboard.writeText(fullContent);
-        alert("Content copied to clipboard!");
+        setCopying(true);
+        setTimeout(() => setCopying(false), 2000);
+    };
+
+    const downloadMarkdown = () => {
+        const content = `# ${topic.topic}\n\n${topic.hook}\n\n${topic.article}`;
+        const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+        saveAs(blob, `${topic.topic.toLowerCase().replace(/\s+/g, '-')}.md`);
+        setShowDownloadMenu(false);
+    };
+
+    const downloadWord = async () => {
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: [
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: topic.topic,
+                                bold: true,
+                                size: 48, // 24pt
+                            }),
+                        ],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 800 }
+                    }),
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: topic.hook || "",
+                                italics: true,
+                                size: 26, // 13pt
+                                color: "333333"
+                            }),
+                        ],
+                        spacing: { after: 400 }
+                    }),
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: topic.article || "",
+                                size: 24, // 12pt
+                            }),
+                        ],
+                        spacing: { after: 200 }
+                    }),
+                ],
+            }],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${topic.topic.toLowerCase().replace(/\s+/g, '-')}.docx`);
+        setShowDownloadMenu(false);
+    };
+
+    const downloadPDF = () => {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const centerX = pageWidth / 2;
+        let currentY = 30;
+
+        // Title (Centered)
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        const splitTitle = doc.splitTextToSize(topic.topic, 170);
+        doc.text(splitTitle, centerX, currentY, { align: 'center' });
+        currentY += (splitTitle.length * 10) + 20;
+
+        // Hook (Italic)
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(60);
+        const splitHook = doc.splitTextToSize(topic.hook || "", 170);
+        doc.text(splitHook, 15, currentY);
+        currentY += (splitHook.length * 7) + 15;
+
+        // Body
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0);
+        const splitContent = doc.splitTextToSize(topic.article || "", 170);
+        
+        splitContent.forEach((line: string) => {
+            if (currentY > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
+            doc.text(line, 15, currentY);
+            currentY += 7;
+        });
+        
+        doc.save(`${topic.topic.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+        setShowDownloadMenu(false);
     };
 
     return (
         <div className="h-full flex flex-col bg-[var(--void-base)] overflow-hidden">
             <div className="p-6 border-b border-[var(--border)] bg-[var(--void-surface)] flex items-center justify-between">
                 <div>
-                    <h2 className="text-[16px] font-bold mb-1">{topic.topic}</h2>
-                    <div className="flex items-center gap-4 text-[11px] text-[var(--text-3)] font-geist">
-                        <div>Hook Score: <span className="text-[var(--text-1)] font-bold">{topic.hookScore || 0}%</span></div>
-                        <div>Confidence: <span className="text-[var(--text-1)] font-bold">{topic.confidenceScore || 0}%</span></div>
+                    <h2 className="text-[var(--text-base)] font-bold mb-1">{topic.topic}</h2>
+                    <div className="flex items-center gap-4 text-[var(--text-sm)] text-[var(--text-3)] font-geist">
+                        <div className="flex items-center gap-1"><FileText size={12} className="text-[var(--plasma)]" /> Analytics Ready</div>
+                        <div className="flex items-center gap-1"><Check size={12} className="text-[var(--success)]" /> Quality Verified</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button onClick={() => setIsApproved(!isApproved)} className={`px-3 py-1.5 rounded-[4px] text-[11px] font-bold border transition-all ${isApproved ? 'bg-[var(--success)]/10 border-[var(--success)] text-[var(--success)]' : 'bg-[var(--void-surface-2)] border-[var(--border)] text-[var(--text-3)]'}`}>
-                        {isApproved ? 'Approved' : 'Approve for Export'}
+                    <button 
+                        onClick={handleCopy} 
+                        className="flex items-center gap-2 px-4 py-2 bg-[var(--void-surface-2)] border border-[var(--border)] text-[var(--text-1)] text-[var(--text-sm)] font-bold rounded-[4px] hover:border-[var(--plasma)] transition-all"
+                    >
+                        {copying ? <Check size={14} className="text-[var(--success)]" /> : <Copy size={14} />}
+                        {copying ? 'Copied' : 'Copy Content'}
                     </button>
-                    {isApproved && (
-                        <div className="flex items-center gap-2">
-                            <button onClick={handleCopy} className="btn-base px-3 py-1.5 bg-white/[0.05] text-[var(--text-1)] text-[11px] font-bold rounded-[4px]">Copy</button>
-                            <button onClick={async () => { await axios.patch(`${API_BASE}/pipeline/${topic.id}`, { status: 'posted', postedAt: new Date().toISOString() }); alert("Posted!"); }} className="btn-base px-3 py-1.5 bg-[var(--plasma)] text-[var(--void-base)] text-[11px] font-bold rounded-[4px]">Mark Posted</button>
-                        </div>
-                    )}
+                    
+                    <div className="relative">
+                        <button 
+                            onClick={() => setShowDownloadMenu(!showDownloadMenu)} 
+                            className="flex items-center gap-2 px-4 py-2 bg-[var(--plasma)] text-[var(--void-base)] text-[11px] font-bold rounded-[4px] hover:opacity-90 transition-all shadow-lg shadow-[var(--plasma)]/20"
+                        >
+                            <Download size={14} />
+                            Download
+                            <ChevronDown size={14} className={`transition-transform duration-200 ${showDownloadMenu ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        {showDownloadMenu && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowDownloadMenu(false)} />
+                                <div className="absolute right-0 mt-2 w-48 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[6px] shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                                    <button onClick={downloadPDF} className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors border-b border-[var(--border)]">
+                                        <FileDown size={16} className="text-[var(--error)]" /> Export as PDF
+                                    </button>
+                                    <button onClick={downloadWord} className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors border-b border-[var(--border)]">
+                                        <FileText size={16} className="text-[var(--info)]" /> Export as Word (.docx)
+                                    </button>
+                                    <button onClick={downloadMarkdown} className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-medium text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors">
+                                        <FileDown size={16} className="text-[var(--plasma)]" /> Export as Markdown
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-8 font-sans leading-relaxed text-[14px]">
-                <div className="max-w-2xl mx-auto space-y-8">
-                    <div className="bg-[var(--plasma-dim)]/20 border border-[var(--plasma)]/20 p-6 rounded-[8px]">
-                        <h4 className="text-[10px] font-bold text-[var(--plasma)] uppercase tracking-widest mb-4">Viral Hook</h4>
-                        <p className="text-[var(--text-1)] italic text-[16px]">"{topic.hook || 'Generating hook...'}"</p>
+            <div className="flex-1 overflow-y-auto p-12 font-sans leading-relaxed text-[14px]">
+                <div className="max-w-3xl mx-auto space-y-10">
+                    <div className="text-center mb-16">
+                        <h1 className="text-[32px] font-bold text-[var(--text-1)] leading-tight mb-4">{topic.topic}</h1>
+                        <div className="w-20 h-1 bg-[var(--plasma)] mx-auto rounded-full opacity-50" />
                     </div>
-                    <div className="prose prose-invert max-w-none">
-                        <h4 className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-widest mb-6">Article Body</h4>
-                        <div className="text-[var(--text-2)] whitespace-pre-wrap leading-loose">{topic.article || 'Generating content...'}</div>
+                    
+                    <div className="space-y-8">
+                        <p className="text-[18px] text-[var(--text-1)] italic leading-relaxed font-medium border-l-4 border-[var(--plasma)]/30 pl-6 py-2">
+                            {topic.hook || 'Generating hook...'}
+                        </p>
+                        
+                        <div className="text-[var(--text-2)] whitespace-pre-wrap text-[16px] leading-[1.8] font-normal">
+                            {topic.article || 'Generating content...'}
+                        </div>
                     </div>
                 </div>
             </div>

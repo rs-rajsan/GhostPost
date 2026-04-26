@@ -42,7 +42,7 @@ const AdminDashboard: React.FC = () => {
     return (
       <div className="flex-1 flex items-center justify-center bg-[var(--void-base)]">
         <div className="flex flex-col items-center gap-4 max-w-xs text-center">
-          <AlertCircle className="text-red-400" size={40} />
+          <AlertCircle className="text-[var(--error)]" size={40} />
           <h2 className="text-[16px] font-semibold text-[var(--text-1)]">Observability Offline</h2>
           <p className="text-[12px] text-[var(--text-3)] leading-relaxed">
             We couldn't connect to the analytical database. Make sure Helicone and Clickhouse services are running.
@@ -68,8 +68,8 @@ const AdminDashboard: React.FC = () => {
   };
 
   const kpis = [
-    { label: 'Total Requests', value: (metrics.total_requests || 0).toLocaleString(), change: '+0%', icon: Zap, color: 'text-blue-400' },
-    { label: 'Avg Latency', value: `${metrics.avg_latency || 0}s`, change: '-0%', icon: Clock, color: 'text-emerald-400' },
+    { label: 'Total Requests', value: (metrics.total_requests || 0).toLocaleString(), change: '+0%', icon: Zap, color: 'text-[var(--info)]' },
+    { label: 'Avg Latency', value: `${metrics.avg_latency || 0}s`, change: '-0%', icon: Clock, color: 'text-[var(--success)]' },
     { label: 'Estimated Cost', value: `$${parseFloat(metrics.total_cost || 0).toFixed(4)}`, change: '+0%', icon: DollarSign, color: 'text-amber-400' },
     { label: 'Total Tokens', value: ((metrics.total_tokens || 0) / 1000000).toFixed(2) + 'M', change: '+0%', icon: Cpu, color: 'text-purple-400' },
   ];
@@ -115,7 +115,7 @@ const AdminDashboard: React.FC = () => {
                 <div className={`p-2 rounded-[6px] bg-white/[0.03] ${kpi.color}`}>
                   <kpi.icon size={18} />
                 </div>
-                <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${kpi.change.startsWith('+') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${kpi.change.startsWith('+') ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--info)]/10 text-[var(--info)]'}`}>
                   {kpi.change}
                 </span>
               </div>
@@ -183,7 +183,7 @@ const AdminDashboard: React.FC = () => {
                 <div className="text-[11px] text-[var(--text-3)] text-center py-10 italic">No model data available</div>
               )}
               <div className="pt-4 mt-4 border-t border-[var(--border)]">
-                <div className="flex items-center gap-2 text-[#34D399] mb-2">
+                <div className="flex items-center gap-2 text-[var(--success)] mb-2">
                   <TrendingUp size={14} />
                   <span className="text-[11px] font-semibold">Cost Efficiency: High</span>
                 </div>
@@ -229,7 +229,7 @@ const AdminDashboard: React.FC = () => {
                     <td className="px-5 py-3 text-[11px] text-[var(--text-2)]">{log.tokens.toLocaleString()}</td>
                     <td className="px-5 py-3 text-[11px] text-[var(--text-2)] font-mono">{log.cost}</td>
                     <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-wider ${log.status === 'success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                      <span className={`px-2 py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-wider ${log.status === 'success' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--error)]/10 text-[var(--error)]'}`}>
                         {log.status}
                       </span>
                     </td>
@@ -250,11 +250,11 @@ const AdminDashboard: React.FC = () => {
         <div className="flex items-center justify-between text-[10px] text-[var(--text-3)] px-2">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span>Valhalla Proxy: Active</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse"></div>
+              <span className="text-[10px] text-[var(--text-2)] font-geist uppercase tracking-widest">LIVE DATA SYNC</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)]"></div>
               <span>OpenAI API: Operational</span>
             </div>
           </div>

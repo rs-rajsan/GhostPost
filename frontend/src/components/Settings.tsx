@@ -122,17 +122,28 @@ function ThemeSettings() {
         { name: 'Cyber Emerald', color: '150', id: 'void' },
         { name: 'Midnight Violet', color: '270', id: 'void' },
         { name: 'Solar Flare', color: '35', id: 'void' },
-        { name: 'Atlantic Signal', color: '221', id: 'atlantic' }
+        { name: 'Atlantic Signal', color: '221', id: 'atlantic' },
+        { name: 'Nordic Night', color: '215', id: 'nordic' },
+        { name: 'Cyber Slate', color: '270', id: 'slate' },
+        { name: 'Solarized Paper', color: '45', id: 'solar' },
+        { name: 'Midnight Violet', color: '270', id: 'violet' },
+        { name: 'Cyber Emerald', color: '150', id: 'emerald' },
+        { name: 'Solar Flare', color: '35', id: 'solar-flare' }
     ];
 
     const applyTheme = async (hue: string, id: string = 'void') => {
         setHueValue(hue);
         setThemeName(id);
 
-        if (id === 'atlantic') {
-            document.documentElement.classList.add('theme-atlantic');
+        // Remove all theme classes first
+        document.documentElement.classList.remove(
+            'theme-atlantic', 'theme-nordic', 'theme-slate', 'theme-solar',
+            'theme-violet', 'theme-emerald', 'theme-solar-flare'
+        );
+        
+        if (id !== 'void') {
+            document.documentElement.classList.add(`theme-${id}`);
         } else {
-            document.documentElement.classList.remove('theme-atlantic');
             const hsl = `${hue} 100% 60%`;
             document.documentElement.style.setProperty('--plasma', `hsl(${hsl})`);
             document.documentElement.style.setProperty('--plasma-dim', `hsla(${hsl}, 0.1)`);
@@ -155,8 +166,8 @@ function ThemeSettings() {
                         key={t.name}
                         onClick={() => applyTheme(t.color, t.id)}
                         className={`p-4 bg-[var(--void-surface-2)] border rounded-[8px] cursor-pointer transition-all group 
-                            ${(t.id === 'atlantic' ? themeName === 'atlantic' : (themeName === 'void' && hueValue === t.color)) 
-                                ? 'border-[var(--plasma)]' 
+                            ${(t.id === 'void' ? (themeName === 'void' && hueValue === t.color) : themeName === t.id) 
+                                ? 'border-[var(--plasma)] shadow-lg shadow-[var(--plasma)]/10' 
                                 : 'border-[var(--border)] hover:border-[var(--plasma)]/40'}`}
                     >
                         <div className="flex items-center gap-3">

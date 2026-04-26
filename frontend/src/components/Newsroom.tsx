@@ -44,14 +44,14 @@ export default function Newsroom() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`
-                            flex items-center gap-2 px-4 py-2.5 text-[11px] font-medium cursor-pointer transition-all border-r border-[var(--border)] min-w-[100px] max-w-[200px]
+                            flex items-center gap-2 px-4 py-2.5 text-[var(--text-sm)] font-medium cursor-pointer transition-all border-r border-[var(--border)] min-w-[100px] max-w-[200px]
                             ${activeTab === tab.id ? 'nav-item-active' : 'nav-item-inactive'}
                         `}
                     >
                         {tab.type === 'newsroom' ? <Search size={12} /> : <FileText size={12} />}
                         <span className="truncate">{tab.title}</span>
                         {tab.id !== 'newsroom' && (
-                            <button onClick={(e) => closeTab(tab.id, e)} className="ml-1 p-0.5 hover:bg-red-500/20 hover:text-red-400 rounded transition-colors">
+                            <button onClick={(e) => closeTab(tab.id, e)} className="ml-1 p-0.5 hover:bg-[var(--error)]/20 hover:text-[var(--error)] rounded transition-colors">
                                 <X size={10} />
                             </button>
                         )}

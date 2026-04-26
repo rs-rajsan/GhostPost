@@ -56,21 +56,21 @@ export default function Watchlist() {
         <div className="p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex flex-col gap-1">
-                    <h2 className="text-[15px] font-bold text-[var(--text-1)]">Source Watchlist</h2>
-                    <p className="text-[11px] text-[var(--text-3)]">Managed priority lists for Research Bot prioritization</p>
+                    <h2 className="text-[var(--text-md)] font-bold text-[var(--text-1)]">Source Watchlist</h2>
+                    <p className="text-[var(--text-sm)] text-[var(--text-3)]">Managed priority lists for Research Bot prioritization</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={handleRefresh}
                         disabled={isRefreshing}
-                        className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] text-[var(--text-2)] text-[11px] font-bold rounded-[4px] hover:text-[var(--text-1)] hover:bg-white/[0.03] transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] text-[var(--text-2)] text-[var(--text-sm)] font-bold rounded-[4px] hover:text-[var(--text-1)] hover:bg-white/[0.03] transition-all disabled:opacity-50"
                     >
                         <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
                         Refresh Market Rankings
                     </button>
                     <button 
                         onClick={handleAddCategory}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-[var(--plasma-dim)] text-[var(--plasma)] text-[11px] font-bold rounded-[4px] hover:bg-[var(--plasma)] hover:text-[var(--void-base)] transition-all"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-[var(--plasma-dim)] text-[var(--plasma)] text-[var(--text-sm)] font-bold rounded-[4px] hover:bg-[var(--plasma)] hover:text-[var(--void-base)] transition-all"
                     >
                         <Plus size={12} />
                         Add Category
@@ -84,7 +84,7 @@ export default function Watchlist() {
                     <button
                         key={cat}
                         onClick={() => setActiveCategory(cat)}
-                        className={`px-4 py-1.5 rounded-[3px] text-[11px] font-bold transition-all ${activeCategory === cat ? 'bg-[var(--plasma)] text-[var(--void-base)] shadow-lg' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}
+                        className={`px-4 py-1.5 rounded-[3px] text-[var(--text-sm)] font-bold transition-all ${activeCategory === cat ? 'bg-[var(--plasma)] text-[var(--void-base)] shadow-lg' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}
                     >
                         {cat}
                     </button>
@@ -106,9 +106,9 @@ export default function Watchlist() {
                         <tbody className="">
                             {currentItems.sort((a, b) => (a.marketRank || 0) - (b.marketRank || 0)).map(item => (
                                 <tr key={item.id} className="hover:bg-white/[0.01] transition-colors group">
-                                    <td className="py-[2px] px-3 text-[var(--plasma)] font-mono font-bold text-[10px]">#{ (item.marketRank || 0).toString().padStart(2, '0')}</td>
-                                    <td className="py-[2px] px-3 text-[var(--text-1)] font-medium text-[10px]">{item.name}</td>
-                                    <td className="py-[2px] px-3 text-right text-[var(--text-3)] text-[10px]">
+                                    <td className="py-[2px] px-3 text-[var(--plasma)] font-mono font-bold text-[var(--text-xs)]">#{ (item.marketRank || 0).toString().padStart(2, '0')}</td>
+                                    <td className="py-[2px] px-3 text-[var(--text-1)] font-medium text-[var(--text-xs)]">{item.name}</td>
+                                    <td className="py-[2px] px-3 text-right text-[var(--text-3)] text-[var(--text-xs)]">
                                         {item.lastUpdate ? new Date(item.lastUpdate).toLocaleDateString() : 'N/A'}
                                     </td>
                                     <td className="py-[2px] px-3">
@@ -133,7 +133,7 @@ export default function Watchlist() {
                 <div className="p-3 bg-[var(--plasma-dim)]/30 border-t border-[var(--border)] flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <AlertTriangle size={14} className="text-[var(--plasma)]" />
-                        <span className="text-[10px] text-[var(--text-2)] font-geist">
+                        <span className="text-[var(--text-xs)] text-[var(--text-2)] font-geist">
                             Market rankings for <strong>{activeCategory}</strong> are synced. 
                             {currentItems[0]?.lastUpdate ? ` Last Update: ${new Date(currentItems[0].lastUpdate).toLocaleString()}` : ' (No sync data)'}
                         </span>
@@ -141,7 +141,7 @@ export default function Watchlist() {
                     <button 
                         onClick={handleRefresh}
                         disabled={isRefreshing}
-                        className="text-[10px] font-bold text-[var(--plasma)] hover:underline flex items-center gap-1 disabled:opacity-50"
+                        className="text-[var(--text-xs)] font-bold text-[var(--plasma)] hover:underline flex items-center gap-1 disabled:opacity-50"
                     >
                         Run AI Sync <ChevronRight size={10} />
                     </button>

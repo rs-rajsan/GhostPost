@@ -5,7 +5,16 @@
 @import "tailwindcss/utilities";
 
 :root {
-  /* Default Void Theme (Dark) */
+  /* --- TYPOGRAPHY ENGINE --- */
+  --text-xs: 10px;    /* Status badges / Tiny labels */
+  --text-sm: 11px;    /* Table headers / System mono */
+  --text-base: 13px;  /* Main body / Table cells */
+  --text-md: 15px;    /* Inputs / Article lead-ins */
+  --text-lg: 18px;    /* Section titles / Buttons */
+  --text-xl: 24px;    /* Page sub-titles */
+  --text-2xl: 32px;   /* Hero headers / Article titles */
+
+  /* --- DEFAULT VOID THEME (Dark) --- */
   --void-base: #03050D;
   --void-surface: #080C18;
   --void-surface-2: #0D1220;
@@ -47,6 +56,132 @@
   --info: #0EA5E9;
 }
 
+.theme-nordic {
+  --void-base: #0F172A;
+  --void-surface: #1E293B;
+  --void-surface-2: #334155;
+  --plasma: #38BDF8;
+  --plasma-dim: rgba(56, 189, 248, 0.12);
+  --plasma-glow: rgba(56, 189, 248, 0.06);
+  --violet: #818CF8;
+  --violet-dim: rgba(129, 140, 248, 0.12);
+  --text-1: #F8FAFC;
+  --text-2: #94A3B8;
+  --text-3: #475569;
+  --border: rgba(148, 163, 184, 0.1);
+  --border-hover: rgba(148, 163, 184, 0.2);
+
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+  --info: #0EA5E9;
+}
+
+.theme-slate {
+  --void-base: #111111;
+  --void-surface: #1A1A1A;
+  --void-surface-2: #27272A;
+  --plasma: #A855F7;
+  --plasma-dim: rgba(168, 85, 247, 0.12);
+  --plasma-glow: rgba(168, 85, 247, 0.06);
+  --violet: #EC4899;
+  --violet-dim: rgba(236, 72, 153, 0.12);
+  --text-1: #FFFFFF;
+  --text-2: #A1A1AA;
+  --text-3: #52525B;
+  --border: #27272A;
+  --border-hover: #3F3F46;
+
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+  --info: #0EA5E9;
+}
+
+.theme-solar {
+  --void-base: #FDF6E3;
+  --void-surface: #EEE8D5;
+  --void-surface-2: #E5DFC5;
+  --plasma: #B58900;
+  --plasma-dim: rgba(181, 137, 0, 0.12);
+  --plasma-glow: rgba(181, 137, 0, 0.06);
+  --violet: #CB4B16;
+  --violet-dim: rgba(203, 75, 22, 0.12);
+  --text-1: #073642;
+  --text-2: #586E75;
+  --text-3: #93A1A1;
+  --border: #D5D1C1;
+  --border-hover: #BEBAA5;
+
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+  --info: #0EA5E9;
+}
+
+.theme-violet {
+  --void-base: #0B071A;
+  --void-surface: #170E2D;
+  --void-surface-2: #241646;
+  --plasma: #A78BFA;
+  --plasma-dim: rgba(167, 139, 250, 0.12);
+  --plasma-glow: rgba(167, 139, 250, 0.06);
+  --violet: #8B5CF6;
+  --violet-dim: rgba(139, 92, 246, 0.12);
+  --text-1: #F5F3FF;
+  --text-2: #A78BFA;
+  --text-3: #5B21B6;
+  --border: rgba(167, 139, 250, 0.15);
+  --border-hover: rgba(167, 139, 250, 0.3);
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+}
+
+.theme-emerald {
+  --void-base: #020617;
+  --void-surface: #064E3B;
+  --void-surface-2: #065F46;
+  --plasma: #10B981;
+  --plasma-dim: rgba(16, 185, 129, 0.12);
+  --plasma-glow: rgba(16, 185, 129, 0.06);
+  --violet: #34D399;
+  --violet-dim: rgba(52, 211, 153, 0.12);
+  --text-1: #ECFDF5;
+  --text-2: #6EE7B7;
+  --text-3: #065F46;
+  --border: rgba(16, 185, 129, 0.15);
+  --border-hover: rgba(16, 185, 129, 0.3);
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+}
+
+.theme-solar-flare {
+  --void-base: #0F0000;
+  --void-surface: #450A0A;
+  --void-surface-2: #7F1D1D;
+  --plasma: #F97316;
+  --plasma-dim: rgba(249, 115, 22, 0.12);
+  --plasma-glow: rgba(249, 115, 22, 0.06);
+  --violet: #EF4444;
+  --violet-dim: rgba(239, 68, 68, 0.12);
+  --text-1: #FFF7ED;
+  --text-2: #FDBA74;
+  --text-3: #7F1D1D;
+  --border: rgba(249, 115, 22, 0.15);
+  --border-hover: rgba(249, 115, 22, 0.3);
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 12px;
@@ -60,14 +195,19 @@ body {
 }
 
 /* Scrollbar Styling */
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { 
-  background: rgba(56, 189, 248, 0.15); 
-  border-radius: 2px; 
+  background: var(--text-3); 
+  opacity: 0.3;
+  border-radius: 10px; 
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 5px; 
+  border: 2px solid var(--void-surface);
 }
 ::-webkit-scrollbar-thumb:hover { 
-  background: rgba(56, 189, 248, 0.3); 
+  background: var(--plasma); 
 }
 
 /* Utility Classes */

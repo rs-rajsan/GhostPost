@@ -24,7 +24,6 @@ interface FormValues {
 
 function AppContent() {
     const [result, setResult] = useState<Partial<EnhanceResponse>>({});
-    const [statusMessage, setStatusMessage] = useState<string | null>("System Ready");
     const [isGenerating, setIsGenerating] = useState(false);
     const [abortController, setAbortController] = useState<AbortController | null>(null);
     const [showToneMenu, setShowToneMenu] = useState(false);
@@ -56,10 +55,9 @@ function AppContent() {
                 const settings = res.data;
                 
                 // 1. Theme
-                if (settings.themeName === 'atlantic') {
-                    document.documentElement.classList.add('theme-atlantic');
+                if (settings.themeName && settings.themeName !== 'void') {
+                    document.documentElement.classList.add(`theme-${settings.themeName}`);
                 } else if (settings.themeHue) {
-                    document.documentElement.classList.remove('theme-atlantic');
                     const hue = settings.themeHue;
                     const hsl = `${hue} 100% 60%`;
                     document.documentElement.style.setProperty('--plasma', `hsl(${hsl})`);
@@ -96,7 +94,6 @@ function AppContent() {
         const controller = new AbortController();
         setAbortController(controller);
         setIsGenerating(true);
-        setStatusMessage(`GhostPost agents are working on your ${tone} variant...`);
         
         try {
             const requestId = crypto.randomUUID();
@@ -131,17 +128,13 @@ function AppContent() {
                 });
             }
             
-            setStatusMessage(null);
             setIsGenerating(false);
             setAbortController(null);
         } catch (error: any) {
             if (error.name === 'CanceledError' || error.message === 'canceled') {
-                setStatusMessage("Generation Stopped");
-                setTimeout(() => setStatusMessage(null), 2000);
             } else {
                 const errorMsg = error.response?.data?.error || error.message || 'Generation failed';
                 alert(`Error: ${errorMsg}`);
-                setStatusMessage(null);
             }
             setIsGenerating(false);
             setAbortController(null);
@@ -161,11 +154,11 @@ function AppContent() {
                 <aside className="w-56 h-full flex flex-col bg-[var(--void-surface)] border-r border-[var(--border)] hidden md:flex">
                     <div className="p-6">
                         {/* Logo Row */}
-                        <div className="flex items-center gap-2.5 mb-1">
-                            <div className="w-7 h-7 border-2 border-[var(--plasma)] rounded-[4px] flex items-center justify-center bg-[var(--plasma-glow)]">
-                                <Sparkles className="text-[var(--plasma)]" size={14} />
+                        <div className="flex items-center gap-2 mb-8 px-2">
+                            <div className="w-8 h-8 bg-[var(--plasma)] rounded-[4px] flex items-center justify-center shadow-lg shadow-[var(--plasma)]/20">
+                                <Sparkles className="text-[var(--void-base)]" size={18} />
                             </div>
-                            <span className="font-geist font-medium text-[15px] tracking-tight text-[var(--text-1)]">GhostPost</span>
+                            <span className="text-[var(--text-base)] font-bold text-[var(--text-1)] tracking-tight">GhostPost <span className="text-[var(--plasma)]">Studio</span></span>
                         </div>
                         <div className="text-[10px] text-[var(--text-3)] font-geist tracking-[0.2em] uppercase pl-[2px] mb-8">
                             Agentic Content OS
@@ -259,9 +252,21 @@ function AppContent() {
                                     <h1 className="text-[13px] font-medium text-[var(--text-1)]">Content Enhancer</h1>
                                     <p className="text-[11px] text-[var(--text-3)] font-geist">Agentic pipeline · 4 tone variants</p>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-[var(--plasma-glow)] border border-[var(--plasma)]/20 rounded-full px-3 py-1 text-[11px] font-mono text-[var(--plasma)]">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--plasma)] animate-pulse mr-1" />
-                                    {statusMessage || 'System Ready'}
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-full">
+                                        <div className="w-1.5 h-1.5 bg-[var(--success)] rounded-full animate-pulse" />
+                                        <span className="text-[var(--text-xs)] font-bold text-[var(--text-2)] tracking-wider">SYSTEM READY</span>
+                                    </div>
+                                    <div className="h-4 w-[1px] bg-[var(--border)]" />
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-full bg-[var(--plasma-dim)] border border-[var(--plasma)]/20 flex items-center justify-center text-[var(--plasma)] font-bold text-[var(--text-xs)]">
+                                            RS
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[var(--text-xs)] font-bold text-[var(--text-1)] leading-none mb-0.5">Raj S.</span>
+                                            <span className="text-[var(--text-xs)] text-[var(--text-3)] leading-none">Pro Editor</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </header>
 
@@ -377,7 +382,7 @@ function AppContent() {
                                             onClick={() => setValue('deepResearch', !deepResearch)}
                                             className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[11px] transition-all
                                                 ${deepResearch 
-                                                    ? 'border-[#34D399]/40 text-[#34D399] bg-[#34D399]/8' 
+                                                    ? 'border-[var(--success)]/40 text-[var(--success)] bg-[var(--success)]/10' 
                                                     : 'border-[var(--border)] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent hover:border-[var(--border-hover)]'
                                                 }
                                             `}

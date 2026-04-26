@@ -14,7 +14,6 @@ export default function Sessions() {
         { id: 'sessions', title: 'Archive', type: 'sessions' }
     ]);
     const [activeTabId, setActiveTabId] = useState('sessions');
-    const [tabCounter, setTabCounter] = useState(1);
 
     const addArticleTab = (articleId: number, topic: string) => {
         const existingTab = tabs.find(t => t.articleId === articleId);
@@ -24,16 +23,16 @@ export default function Sessions() {
         }
         
         const newTabId = `art-${articleId}`;
+        const shortTitle = topic.length > 15 ? topic.substring(0, 12) + '...' : topic;
         const newTab: Tab = {
             id: newTabId,
-            title: `Art ${tabCounter}`,
+            title: `Art: ${shortTitle}`,
             type: 'article',
             articleId
         };
         
         setTabs([...tabs, newTab]);
         setActiveTabId(newTabId);
-        setTabCounter(prev => prev + 1);
     };
 
     const closeTab = (e: React.MouseEvent, tabId: string) => {
@@ -55,7 +54,7 @@ export default function Sessions() {
                     <div
                         key={tab.id}
                         onClick={() => setActiveTabId(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2 text-[11px] font-bold rounded-t-[4px] cursor-pointer transition-all border-b-2 ${
+                        className={`flex items-center gap-2 px-4 py-2 text-[var(--text-sm)] font-bold rounded-t-[4px] cursor-pointer transition-all border-b-2 ${
                             activeTabId === tab.id 
                             ? 'bg-[var(--void-base)] text-[var(--plasma)] border-[var(--plasma)]' 
                             : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)] hover:bg-[var(--void-base)]/50'
@@ -66,7 +65,7 @@ export default function Sessions() {
                         {tab.id !== 'sessions' && (
                             <button 
                                 onClick={(e) => closeTab(e, tab.id)}
-                                className="ml-1 p-0.5 hover:bg-red-500/10 hover:text-red-500 rounded transition-colors"
+                                className="ml-1 p-0.5 hover:bg-[var(--error)]/10 hover:text-[var(--error)] rounded transition-colors"
                             >
                                 <X size={10} />
                             </button>
@@ -80,9 +79,7 @@ export default function Sessions() {
                 {activeTab.id === 'sessions' ? (
                     <TopicGrid mode="sessions" onOpenArticle={addArticleTab} />
                 ) : (
-                    <div className="h-full overflow-y-auto">
-                        <ArticleDetailView id={activeTab.articleId} />
-                    </div>
+                    <ArticleDetailView id={activeTab.articleId} />
                 )}
             </div>
         </div>
