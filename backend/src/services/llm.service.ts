@@ -6,6 +6,7 @@ const orchestrator = new AgentOrchestrator();
 
 export interface ToneResponse {
     title: string;
+    hook: string;
     enhancedPost: string;
     hookScore: number;
     hookTip: string;

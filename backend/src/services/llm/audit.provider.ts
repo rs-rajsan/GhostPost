@@ -17,6 +17,7 @@ export class AuditProvider implements LLMProvider {
             return JSON.stringify({
                 isValid: true,
                 qualityScore: 10,
+                confidenceScore: 95,
                 hallucinations: [],
                 suggestions: ["Keep up the good work!"]
             });

@@ -14,8 +14,8 @@ export interface ValidationResult {
 export class ValidationAgent extends BaseAgent {
     private provider: AuditProvider;
 
-    constructor() {
-        super('ValidationAgent');
+    constructor(requestId?: string) {
+        super('ValidationAgent', requestId);
         this.provider = new AuditProvider();
     }
 
@@ -57,11 +57,17 @@ export class ValidationAgent extends BaseAgent {
             }
             `;
 
-            let text = await this.provider.generateText([
-                { role: 'user', content: prompt }
-            ]);
+            let text = await this.withRetry(async () => {
+                return await this.provider.generateText([
+                    { role: 'user', content: prompt }
+                ]);
+            });
 
             const parsed = extractAndParseJson<ValidationResult>(text);
+            
+            // Ensure scores are numbers
+            parsed.qualityScore = Number(parsed.qualityScore) || 0;
+            parsed.confidenceScore = Number(parsed.confidenceScore) || 0;
 
             return {
                 success: true,

@@ -14,6 +14,7 @@ interface EnhanceRequest {
 
 export interface ToneResponse {
     title: string;
+    hook: string;
     enhancedPost: string;
     hookScore: number;
     hookTip: string;

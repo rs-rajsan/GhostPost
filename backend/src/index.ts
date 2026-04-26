@@ -6,6 +6,9 @@ import config from './config';
 import { requestTracer } from './middleware/requestTracer';
 import logger from './utils/logger';
 import enhanceRouter from './routes/enhance.routes';
+import researchRouter from './routes/research.routes';
+import dataRouter from './routes/data.routes';
+import adminRouter from './routes/admin.routes';
 
 const app = express();
 const port = config.port;
@@ -32,8 +35,11 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-logger.info('Registering routes: /api/enhance');
+logger.info('Registering routes: /api/enhance, /api/research, /api/data');
 app.use('/api/enhance', enhanceRouter);
+app.use('/api/research', researchRouter);
+app.use('/api/data', dataRouter);
+app.use('/api/admin', adminRouter);
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -53,8 +59,13 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     });
 });
 
+import { governanceService } from './services/governance.service';
+
 const server = app.listen(port, '0.0.0.0', () => {
     logger.info(`Server is running on port ${port} and listening on 0.0.0.0`);
+    
+    // Maintenance: Purge logs older than 7 days on startup
+    governanceService.purgeOldLogs(7);
 });
 
 server.on('error', (error: NodeJS.ErrnoException) => {

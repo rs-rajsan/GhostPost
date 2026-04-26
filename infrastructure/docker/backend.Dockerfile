@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Install system dependencies for Prisma
 RUN apk add --no-cache openssl libc6-compat
@@ -6,13 +6,15 @@ RUN apk add --no-cache openssl libc6-compat
 WORKDIR /app
 
 # Install dependencies first for better caching
-COPY package*.json ./
-COPY prisma ./prisma/
-RUN npm install
-RUN npx prisma generate
+COPY backend/package*.json ./
+RUN npm install --legacy-peer-deps
+
+# Copy Prisma schema from centralized infrastructure folder
+COPY infrastructure/database/schema.prisma ./prisma/schema.prisma
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Copy the rest of the application
-COPY . .
+COPY backend/ .
 
 # Build the application
 RUN npm run build

@@ -66,6 +66,10 @@ export interface Config {
         filterToxicity: boolean;
         promptProtection: boolean;
     };
+    clickhouse: {
+        url: string;
+        timeout: number;
+    };
 }
 
 export interface PromptOptions {
@@ -143,9 +147,13 @@ const config: Config = {
         filterToxicity: true,
         promptProtection: true,
     },
+    clickhouse: {
+        url: process.env.CLICKHOUSE_URL || 'http://clickhouse:8123',
+        timeout: 5000,
+    },
     prompts: {
         article: (options: PromptOptions) => {
-            const { tone, text, targetPages = 2, researchData, isTopic } = options;
+            const { tone, text, targetPages = 0.5, researchData, isTopic } = options;
             const wordCount = Math.round(targetPages * 1600);
             return `
 You are a world-class investigative journalist and technical writer.
@@ -159,9 +167,36 @@ ${tone.toLowerCase() === 'conversational' ? `
 STYLE GUIDE (CONVERSATIONAL - TWO FRIENDS CHATTING):
 - STYLE: Write like two friends or peers talking over coffee. USE CONTRACTIONS (don't, it's, you're).
 - VIBE: Casual, informal, and relaxed. Avoid "corporate speak" or "interview mode".
-- STRUCTURE: A natural back-and-forth flow. DO NOT use labels like "Question:" or "Answer:".
-- PHRASING: Use fillers and transitions like "Honestly," "You know?", "Wait, check this out," or "Right?".
-- INTERACTION: Address the reader as a peer. "I was thinking about this...", "Did you hear about...?"` : ''}
+- STRUCTURE: A natural back-and-forth flow. Address the reader as a peer.` : ''}
+
+${tone.toLowerCase() === 'inspirational' ? `
+STYLE GUIDE (INSPIRATIONAL - VISIONARY & UPLIFTING):
+- STYLE: Future-oriented, motivational, and high-energy. Focus on "what's possible".
+- PHRASING: Use powerful verbs (Imagine, Transform, Ignite) and rhetorical questions about the future.
+- VIBE: Empowering and hopeful. End with a strong "call to greatness".` : ''}
+
+${tone.toLowerCase() === 'provocative' ? `
+STYLE GUIDE (PROVOCATIVE - PATTERN INTERRUPT):
+- STYLE: Contrarian and assertive. Challenge the status quo or common industry "best practices".
+- PHRASING: Start with a bold, controversial claim. Use strong, unapologetic language.
+- VIBE: Intellectual friction. Force the reader to stop and re-think their current position.` : ''}
+
+${tone.toLowerCase() === 'academic' ? `
+STYLE GUIDE (ACADEMIC - FORMAL & ANALYTICAL):
+- STYLE: Objective, third-person perspective. Use formal vocabulary and complex sentence structures.
+- PHRASING: Focus on evidence, methodology, and logical derivation. AVOID CONTRACTIONS.
+- VIBE: High-authority, rigorous, and completely objective.` : ''}
+
+${tone.toLowerCase() === 'story' ? `
+STYLE GUIDE (STORY - JOURNALISTIC NARRATIVE):
+- STYLE: Narrative-driven. Use a classic "Lead" followed by a character or situation-based arc.
+- PHRASING: Use sensory details and quotes (real or illustrative) to bring the "story" to life.
+- VIBE: Captivating and human. Like a front-page feature story in a major publication.` : ''}
+
+${tone.startsWith('custom:') ? `
+STYLE GUIDE (CUSTOM PERSONA - ADOPT THIS CHARACTER):
+- YOU ARE NOW: ${tone.replace('custom:', '')}
+- INSTRUCTION: You must adopt this persona's specific vocabulary, biases, and perspective throughout the entire article.` : ''}
 
 ${isTopic ? 'CORE TOPIC/THEME' : 'INPUT MATERIAL'}:
 """
@@ -180,9 +215,10 @@ OUTPUT FORMAT (MANDATORY):
 Return ONLY a valid JSON object with this structure:
 {
   "title": "A compelling, catchy title for the article",
+  "hook": "The actual attention-grabbing hook text (1-3 sentences)",
   "enhancedPost": "The full article text starting with the TITLE in ALL CAPS",
   "hookScore": 9,
-  "hookTip": "Optimization advice",
+  "hookTip": "Optimization advice or strategy used for this hook",
   "hashtags": ["#AgentAISchool", "#tag1", "#tag2"],
   "visualSuggestion": "Image description"
 }
@@ -203,15 +239,41 @@ Return ONLY a JSON object.
 OUTPUT FORMAT (MANDATORY):
 {
   "title": "A short, punchy title",
+  "hook": "The actual attention-grabbing hook text (1-2 sentences)",
   "enhancedPost": "The post text starting with the TITLE",
   "hookScore": 9,
-  "hookTip": "...",
+  "hookTip": "Optimization advice or strategy used for this hook",
   "hashtags": ["#AgentAISchool", "#tag1"],
   "visualSuggestion": "..."
 }
 
 TONE: ${tone}
 STRICT RULE: Your response must be 300 words or less. DO NOT exceed this limit.
+
+${tone.toLowerCase() === 'conversational' ? `
+STYLE GUIDE (CONVERSATIONAL - TWO FRIENDS CHATTING):
+- STYLE: Write like two friends talking. USE CONTRACTIONS. Casual and relaxed.` : ''}
+
+${tone.toLowerCase() === 'inspirational' ? `
+STYLE GUIDE (INSPIRATIONAL - VISIONARY & UPLIFTING):
+- STYLE: Motivational and high-energy. Focus on "what's possible".` : ''}
+
+${tone.toLowerCase() === 'provocative' ? `
+STYLE GUIDE (PROVOCATIVE - PATTERN INTERRUPT):
+- STYLE: Contrarian and assertive. Challenge the status quo.` : ''}
+
+${tone.toLowerCase() === 'academic' ? `
+STYLE GUIDE (ACADEMIC - FORMAL & ANALYTICAL):
+- STYLE: Objective and formal. Use evidence and logic. AVOID CONTRACTIONS.` : ''}
+
+${tone.toLowerCase() === 'story' ? `
+STYLE GUIDE (STORY - JOURNALISTIC NARRATIVE):
+- STYLE: Narrative-driven. Use a compelling hook followed by a short arc.` : ''}
+
+${tone.startsWith('custom:') ? `
+STYLE GUIDE (CUSTOM PERSONA - ADOPT THIS CHARACTER):
+- YOU ARE NOW: ${tone.replace('custom:', '')}
+- INSTRUCTION: Adopt this persona's specific voice and perspective for this post.` : ''}
 
 ${isTopic ? 'CORE TOPIC/THEME' : 'INPUT MATERIAL'}:
 """
@@ -236,6 +298,7 @@ OUTPUT REQUIREMENTS:
 
 RESPONSE FORMAT:
 {
+  "hook": "...",
   "enhancedPost": "...",
   "hookScore": 9,
   "hookTip": "...",

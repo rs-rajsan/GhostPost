@@ -1,13 +1,13 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
 # Install dependencies first for better caching
-COPY package*.json ./
-RUN npm install
+COPY frontend/package*.json ./
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application
-COPY . .
+COPY frontend/ .
 
 EXPOSE 5173
 

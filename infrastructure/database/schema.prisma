@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id              String   @id @default(uuid())
+  rawThoughts     String   @db.Text
+  enhancedPost    String   @db.Text
+  tone            String
+  hookScore       Int
+  hookTip         String?
+  hashtags        String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PipelineTopic {
+  id              Int      @id @default(autoincrement())
+  topic           String   @db.Text
+  newsDate        String?
+  sourceUrl       String?  @db.Text
+  status          String   @default("draft") // draft, approved, generating, generated, posted
+  tone            String   @default("professional")
+  mode            String   @default("post")
+  pages           Float    @default(1.0)
+  trendScore      Int      @default(0)
+  momentumScores  Json?    // Stores platform-specific scores
+  article         String?  @db.Text
+  hook            String?  @db.Text
+  hookScore       Int?
+  confidenceScore Int?
+  generatedAt     DateTime?
+  deletedAt       DateTime?
+  createdAt       DateTime @default(now())
+}
+
+model Watchlist {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  category   String   @default("AI Companies")
+  marketRank Int?
+  lastUpdate DateTime?
+  createdAt  DateTime @default(now())
+}
+
+model Settings {
+  id        String   @id @default("global")
+  userName  String?
+  themeHue  Int      @default(250)
+  updatedAt DateTime @updatedAt
+}
+
+model AgentLog {
+  id              String   @id @default(uuid())
+  requestId       String   // Correlation ID
+  agentName       String   // e.g., "DraftingAgent", "ValidationAgent"
+  action          String   // e.g., "research", "draft", "sanitize"
+  inputSnapshot   String   @db.Text // Sanitized input
+  outputSnapshot  String   @db.Text // Agent output
+  latencyMs       Int
+  tokenUsage      Int?
+  cost            Float?
+  modelUsed       String
+  metadata        Json?    // Any extra context (scores, research results)
+  createdAt       DateTime @default(now())
+
+  @@index([requestId])
+  @@index([createdAt])
+}

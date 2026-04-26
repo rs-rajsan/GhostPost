@@ -7,8 +7,8 @@ import { extractAndParseJson, extractJsonString } from '../../utils/json.util';
 export class RefiningAgent extends BaseAgent {
     private provider: RefinementProvider;
 
-    constructor() {
-        super('RefiningAgent');
+    constructor(requestId?: string) {
+        super('RefiningAgent', requestId);
         this.provider = new RefinementProvider();
     }
 
@@ -43,9 +43,11 @@ export class RefiningAgent extends BaseAgent {
             Return ONLY the updated JSON draft.
             `;
 
-            let text = await this.provider.generateText([
-                { role: 'user', content: prompt }
-            ]);
+            let text = await this.withRetry(async () => {
+                return await this.provider.generateText([
+                    { role: 'user', content: prompt }
+                ]);
+            });
 
             const cleaned = extractJsonString(text);
             return { success: true, data: cleaned };
