@@ -107,83 +107,88 @@ function ProfileSettings() {
 }
 
 function ThemeSettings() {
-    const [hueValue, setHueValue] = useState('245');
     const [themeName, setThemeName] = useState('void');
 
     useEffect(() => {
         axios.get(`${API_BASE}/settings`).then(res => {
-            if (res.data.themeHue) setHueValue(res.data.themeHue.toString());
             if (res.data.themeName) setThemeName(res.data.themeName);
         });
     }, []);
 
     const themes = [
-        { name: 'Plasma Void', color: '245', id: 'void' },
-        { name: 'Cyber Emerald', color: '150', id: 'void' },
-        { name: 'Midnight Violet', color: '270', id: 'void' },
-        { name: 'Solar Flare', color: '35', id: 'void' },
-        { name: 'Atlantic Signal', color: '221', id: 'atlantic' },
-        { name: 'Nordic Night', color: '215', id: 'nordic' },
-        { name: 'Cyber Slate', color: '270', id: 'slate' },
-        { name: 'Solarized Paper', color: '45', id: 'solar' },
-        { name: 'Midnight Violet', color: '270', id: 'violet' },
-        { name: 'Cyber Emerald', color: '150', id: 'emerald' },
-        { name: 'Solar Flare', color: '35', id: 'solar-flare' }
+        { name: 'Plasma Void', id: 'void', base: '#020617', surface: '#0F172A', plasma: '#6366F1', text: '#F8FAFC' },
+        { name: 'Atlantic Signal', id: 'atlantic', base: '#F8FAFC', surface: '#FFFFFF', plasma: '#2563EB', text: '#0F172A' },
+        { name: 'Nordic Night', id: 'nordic', base: '#0F172A', surface: '#1E293B', plasma: '#38BDF8', text: '#F8FAFC' },
+        { name: 'Cyber Slate', id: 'slate', base: '#111111', surface: '#1A1A1A', plasma: '#A855F7', text: '#FFFFFF' },
+        { name: 'Solarized Paper', id: 'solar', base: '#FDF6E3', surface: '#EEE8D5', plasma: '#B58900', text: '#073642' },
+        { name: 'Midnight Violet', id: 'violet', base: '#0B071A', surface: '#170E2D', plasma: '#A78BFA', text: '#F5F3FF' },
+        { name: 'Cyber Emerald', id: 'emerald', base: '#020617', surface: '#064E3B', plasma: '#10B981', text: '#ECFDF5' },
+        { name: 'Solar Flare', id: 'solar-flare', base: '#0F0000', surface: '#450A0A', plasma: '#F97316', text: '#FFF7ED' }
     ];
 
-    const applyTheme = async (hue: string, id: string = 'void') => {
-        setHueValue(hue);
+    const applyTheme = async (id: string) => {
         setThemeName(id);
 
         // Remove all theme classes first
         document.documentElement.classList.remove(
             'theme-atlantic', 'theme-nordic', 'theme-slate', 'theme-solar',
-            'theme-violet', 'theme-emerald', 'theme-solar-flare'
+            'theme-violet', 'theme-emerald', 'theme-solar-flare', 'theme-void'
         );
         
-        if (id !== 'void') {
-            document.documentElement.classList.add(`theme-${id}`);
-        } else {
-            const hsl = `${hue} 100% 60%`;
-            document.documentElement.style.setProperty('--plasma', `hsl(${hsl})`);
-            document.documentElement.style.setProperty('--plasma-dim', `hsla(${hsl}, 0.1)`);
-            document.documentElement.style.setProperty('--plasma-glow', `hsla(${hsl}, 0.05)`);
-        }
+        document.documentElement.classList.add(`theme-${id}`);
         
         await axios.patch(`${API_BASE}/settings`, { 
-            themeHue: parseInt(hue),
             themeName: id
         });
     };
 
     return (
-        <div className="p-10 max-w-2xl">
-            <h2 className="text-[20px] font-bold text-[var(--text-1)] mb-8">Visual Theme</h2>
+        <div className="p-10 max-w-4xl">
+            <div className="flex flex-col gap-1 mb-8">
+                <h2 className="text-[20px] font-bold text-[var(--text-1)]">Visual Universe</h2>
+                <p className="text-[var(--text-3)] text-[12px]">Select a curated environment for your agentic studio</p>
+            </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
                 {themes.map(t => (
                     <div 
-                        key={t.name}
-                        onClick={() => applyTheme(t.color, t.id)}
-                        className={`p-4 bg-[var(--void-surface-2)] border rounded-[8px] cursor-pointer transition-all group 
-                            ${(t.id === 'void' ? (themeName === 'void' && hueValue === t.color) : themeName === t.id) 
-                                ? 'border-[var(--plasma)] shadow-lg shadow-[var(--plasma)]/10' 
-                                : 'border-[var(--border)] hover:border-[var(--plasma)]/40'}`}
+                        key={t.id}
+                        onClick={() => applyTheme(t.id)}
+                        style={{ 
+                            backgroundColor: t.surface,
+                            borderColor: themeName === t.id ? t.plasma : 'rgba(255,255,255,0.05)',
+                            boxShadow: themeName === t.id ? `0 0 20px ${t.plasma}33` : 'none'
+                        }}
+                        className={`group relative overflow-hidden border rounded-[12px] cursor-pointer transition-all duration-300
+                            ${themeName === t.id ? 'ring-1 ring-inset' : 'hover:border-white/20'}`}
                     >
-                        <div className="flex items-center gap-3">
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: t.id === 'atlantic' ? '#2563EB' : `hsl(${t.color} 100% 60%)` }} />
-                            <span className="text-[12px] font-medium text-[var(--text-2)] group-hover:text-[var(--text-1)]">{t.name}</span>
+                        {/* Theme Preview Header */}
+                        <div className="h-16 flex border-b border-white/5">
+                            <div className="flex-1" style={{ backgroundColor: t.base }} />
+                            <div className="flex-1" style={{ backgroundColor: t.surface }} />
+                            <div className="flex-1 relative" style={{ backgroundColor: t.plasma }}>
+                                <div className="absolute inset-0 bg-white/10" />
+                            </div>
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="p-4 flex items-center justify-between">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[13px] font-bold" style={{ color: t.text }}>{t.name}</span>
+                                <div className="flex gap-1.5 items-center">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: t.plasma }} />
+                                    <span className="text-[9px] uppercase tracking-widest font-bold opacity-40" style={{ color: t.text }}>Accent</span>
+                                </div>
+                            </div>
+
+                            {themeName === t.id && (
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: t.plasma, color: t.base }}>
+                                    <CheckCircle2 size={14} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}
-            </div>
-
-            <div className="mt-12 flex flex-col gap-4">
-                <label className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-widest">Advanced HSL Calibration</label>
-                <div className="flex items-center gap-4">
-                    <input type="range" className="flex-1 accent-[var(--plasma)]" min="0" max="360" value={hueValue} onChange={(e) => applyTheme(e.target.value)} />
-                </div>
-                <p className="text-[10px] text-[var(--text-3)] italic">Adjust the global plasma hue across all components (Stored in Postgres)</p>
             </div>
         </div>
     );
