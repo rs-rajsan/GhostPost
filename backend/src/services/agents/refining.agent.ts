@@ -21,9 +21,9 @@ export class RefiningAgent extends BaseAgent {
         try {
 
             const prompt = `
-            Act as an Expert Content Polisher.
-            Fix the following "Draft Content" based on these "Audit Findings".
-            
+            Act as an Expert Human Ghostwriter and Content Polisher.
+            Your mission is to "Humanize" the "Draft Content" while addressing the "Audit Findings".
+
             DRAFT CONTENT:
             """
             ${content}
@@ -34,13 +34,15 @@ export class RefiningAgent extends BaseAgent {
             - Quality Score: ${audit.qualityScore}/10
             - Suggestions: ${audit.suggestions.join(', ')}
 
-            REQUIREMENTS:
-            1. REMOVE all hallucinated facts.
-            2. IMPROVE flow and punchiness based on suggestions.
-            3. MAINTAIN the original JSON structure.
+            HUMANIZATION REQUIREMENTS:
+            1. RHYTHM & FLOW: Break up monotonous sentence structures. If three sentences in a row are the same length, shorten one and lengthen another.
+            2. CLICHÉ REPLACEMENT: Replace academic transitions (Additionally, Furthermore, Consequently) with natural human alternatives (On top of that, Plus, So, What's more).
+            3. VOICE INJECTION: Add subtle "Human Markers" like parenthetical asides, rhetorical questions, or "Insider" phrases (e.g., "Truth be told," "Here's why this matters").
+            4. REMOVE ALL HALUCINATIONS: Ensure the content strictly follows the Audit Findings regarding factual errors.
+            5. MAINTAIN STRUCTURE: Keep the [TITLE], [HOOK], [CONTENT], etc. tags intact.
 
             RESPONSE:
-            Return ONLY the updated JSON draft.
+            Return ONLY the updated content.
             `;
 
             let text = await this.withRetry(async () => {
@@ -49,8 +51,7 @@ export class RefiningAgent extends BaseAgent {
                 ]);
             });
 
-            const cleaned = extractJsonString(text);
-            return { success: true, data: cleaned };
+            return { success: true, data: text };
         } catch (error: any) {
             this.logError('Refinement failed', error);
             return { success: false, data: content, error: error.message };

@@ -54,7 +54,7 @@ export default function Sessions() {
                     <div
                         key={tab.id}
                         onClick={() => setActiveTabId(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2 text-[var(--text-sm)] font-bold rounded-t-[4px] cursor-pointer transition-all border-b-2 ${
+                        className={`flex items-center gap-2 px-4 py-2 text-[var(--text-sm)] font-light rounded-t-[4px] cursor-pointer transition-all border-b-2 ${
                             activeTabId === tab.id 
                             ? 'bg-[var(--void-base)] text-[var(--plasma)] border-[var(--plasma)]' 
                             : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)] hover:bg-[var(--void-base)]/50'

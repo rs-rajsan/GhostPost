@@ -18,7 +18,15 @@ export const refreshWatchlist = asyncHandler(async (req: Request, res: Response)
     }
 
     const researchService = ResearchService.getInstance();
-    const companies = await researchService.findMarketRankings(category);
+    let companies = await researchService.findMarketRankings(category);
+    
+    // Safety check for array iteration
+    if (!Array.isArray(companies)) {
+        console.warn(`[Watchlist] Research returned non-array result for ${category}. Falling back to empty list.`);
+        companies = [];
+    }
+    
+    console.log(`[Watchlist] Found ${companies.length} companies for category: ${category}`);
 
     // Bulk upsert logic
     const lastUpdate = new Date();

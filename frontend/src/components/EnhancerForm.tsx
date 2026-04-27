@@ -98,7 +98,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                     }
                                 }}
                                 className={`
-                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[var(--text-sm)] font-medium
+                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[var(--text-sm)] font-light
                                     ${isPending ? 'opacity-50 cursor-not-allowed' : ''}
                                 `}
                             >
@@ -117,7 +117,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                                 setShowToneMenu(false);
                                             }}
                                             className={`
-                                                w-full text-left px-3 py-[1px] hover:bg-[#f5f5f5] text-[var(--text-sm)] font-medium transition-colors
+                                                w-full text-left px-3 py-[1px] hover:bg-[#f5f5f5] text-[var(--text-sm)] font-light transition-colors
                                                 ${currentTone === t.toLowerCase() ? 'text-[#b86b3e]' : 'text-[#1a1a1a]/70'}
                                             `}
                                         >
@@ -140,7 +140,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                     }
                                 }}
                                 className={`
-                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[var(--text-sm)] font-medium
+                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[var(--text-sm)] font-light
                                     ${isPending ? 'opacity-50 cursor-not-allowed' : ''}
                                 `}
                             >
@@ -204,11 +204,11 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                                             if (val === '') setValue('targetPages', 0 + dec);
                                                             else setValue('targetPages', Math.min(10, Number(val)) + dec);
                                                         }}
-                                                        className="w-4 bg-transparent text-right text-[#b86b3e] text-[var(--text-xs)] font-bold outline-none"
+                                                        className="w-4 bg-transparent text-right text-[#b86b3e] text-[var(--text-xs)] font-light outline-none"
                                                     />
                                                     
                                                     {/* Fixed Dot */}
-                                                    <span className="text-[#b86b3e]/40 font-bold text-[var(--text-xs)] select-none mx-[0.5px]">.</span>
+                                                    <span className="text-[#b86b3e]/40 font-light text-[var(--text-xs)] select-none mx-[0.5px]">.</span>
                                                     
                                                     {/* Decimal Part */}
                                                     <input 
@@ -224,7 +224,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                                             if (val === '') setValue('targetPages', int + 0);
                                                             else setValue('targetPages', int + (Number(val) / 100));
                                                         }}
-                                                        className="w-5 bg-transparent text-left text-[#b86b3e] text-[var(--text-xs)] font-bold outline-none"
+                                                        className="w-5 bg-transparent text-left text-[#b86b3e] text-[var(--text-xs)] font-light outline-none"
                                                     />
                                                 </div>
 

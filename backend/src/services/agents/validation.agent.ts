@@ -41,11 +41,14 @@ export class ValidationAgent extends BaseAgent {
             """
 
             AUDIT CRITERIA:
-            1. HALLUCINATIONS: List any specific factual claims in the draft NOT supported by or contradicted by the context.
+            1. HALLUCINATIONS: List any specific factual claims in the draft NOT supported by or contradicted by the context. 
+               - BE AGGRESSIVE. If a claim is not in the context, it is a hallucination.
             2. STRUCTURE: Does it have a strong Hook, Body, and CTA?
             3. QUALITY SCORE: Rate from 1-10.
             4. CONFIDENCE SCORE: Rate from 0-100. How much of the content is verifiable against the provided research?
             5. IMPROVEMENTS: Provide 2-3 actionable tips.
+
+            STRICT RULE: If there are ANY hallucinations, "isValid" MUST be false.
 
             RESPONSE FORMAT (Strict JSON):
             {

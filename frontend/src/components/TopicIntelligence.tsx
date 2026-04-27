@@ -181,11 +181,11 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
 
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--void-surface)]/50 backdrop-blur-md sticky top-0 z-20">
                 <div className="flex items-center gap-4">
-                    <h2 className="text-[var(--text-base)] font-bold text-[var(--text-1)] tracking-tight">
+                    <h2 className="text-[var(--text-base)] font-light text-[var(--text-1)] tracking-tight">
                         {mode === 'pipeline' ? 'Newsroom Assistant' : 'Content Sessions'}
                     </h2>
                     <div className="h-4 w-[1px] bg-[var(--border)]" />
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--plasma-dim)] text-[var(--plasma)] rounded-full text-[var(--text-xs)] font-bold tracking-widest border border-[var(--plasma)]/20">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--plasma-dim)] text-[var(--plasma)] rounded-full text-[var(--text-xs)] font-light tracking-widest border border-[var(--plasma)]/20">
                         {mode === 'pipeline' ? (
                             <>
                                 <div className="w-1 h-1 bg-[var(--plasma)] rounded-full animate-pulse" />
@@ -246,12 +246,12 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                 <div className="flex-1 overflow-y-auto">
                     <table className="w-full text-left border-collapse text-[var(--text-sm)]">
                         <thead className="sticky top-0 z-10 bg-[var(--void-surface-2)] border-b border-[var(--border)]">
-                            <tr className="text-[var(--text-sm)] text-[var(--text-3)] font-medium text-left">
+                            <tr className="text-[var(--text-sm)] text-[var(--text-3)] font-light text-left">
                                 <th className="py-1 px-3">Topic</th>
                                 <th className="py-1 px-3 w-[240px]">
                                     <div className="flex flex-col gap-0 w-full">
                                         <span className="">Momentum Breakdown</span>
-                                        <div className="flex items-center justify-between text-[var(--text-xs)] text-[var(--text-2)] font-medium w-full">
+                                        <div className="flex items-center justify-between text-[var(--text-xs)] text-[var(--text-2)] font-light w-full">
                                             <span className="w-[60px] text-left">Avg</span>
                                             <div className="flex-1 flex items-center justify-between border-l border-[var(--border)] ml-2 pl-4">
                                                 <span className="w-[32px] text-center">Tw</span>
@@ -331,23 +331,23 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                         <td className="py-[2px] px-4 max-w-[400px]" style={{ paddingBlock: '2px' }}>
                                             <div className="flex items-center gap-2">
                                                 {(topic.status === 'generated' || topic.status === 'posted') && <Eye size={10} className="text-[var(--plasma)]" />}
-                                                <span className="text-[var(--text-sm)] font-medium text-[var(--text-1)] line-clamp-1 leading-none">{topic.topic}</span>
+                                                <span className="text-[var(--text-sm)] font-light text-[var(--text-1)] line-clamp-1 leading-none">{topic.topic}</span>
                                             </div>
                                         </td>
                                     <td className="py-[2px] px-3" style={{ paddingBlock: '2px' }}>
                                         <div className="flex items-center justify-between w-full">
-                                            <div className="w-[60px] text-left"><span className="text-[var(--text-sm)] font-medium text-[var(--plasma)]">{topic.trendScore}%</span></div>
+                                            <div className="w-[60px] text-left"><span className="text-[var(--text-sm)] font-light text-[var(--plasma)]">{topic.trendScore}%</span></div>
                                             <div className="flex-1 flex items-center justify-between border-l border-[var(--border)] ml-2 pl-4">
                                                 {Object.entries(topic.momentumScores || {}).map(([platform, score]: [string, any], idx, arr) => (
                                                     <div key={platform} className={`w-[32px] text-center ${idx === arr.length - 1 ? 'pr-1' : ''}`}>
-                                                        <span className="text-[var(--text-xs)] font-medium text-[var(--text-1)]">{score}</span>
+                                                        <span className="text-[var(--text-xs)] font-light text-[var(--text-1)]">{score}</span>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-[2px] px-3" style={{ paddingBlock: '2px' }}>
-                                        <span className={`px-2 py-0.5 rounded-[2px] text-[var(--text-xs)] font-medium ${topic.status === 'posted' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--text-3)]/10 text-[var(--text-3)]'}`}>
+                                        <span className={`px-2 py-0.5 rounded-[2px] text-[var(--text-xs)] font-light ${topic.status === 'posted' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--text-3)]/10 text-[var(--text-3)]'}`}>
                                             {topic.status.charAt(0).toUpperCase() + topic.status.slice(1)}
                                         </span>
                                     </td>
@@ -428,7 +428,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                                         const num = Math.min(parseInt(val) || 0, 5000);
                                                         handleUpdateTopic(topic.id!, { pages: num / 800 });
                                                     }}
-                                                    className="w-12 h-4 bg-[var(--void-base)] border border-[var(--border)] rounded-[2px] text-center text-[var(--text-xs)] font-medium text-[var(--plasma)] outline-none focus:border-[var(--plasma)] transition-all px-[1px]"
+                                                    className="w-12 h-4 bg-[var(--void-base)] border border-[var(--border)] rounded-[2px] text-center text-[var(--text-xs)] font-light text-[var(--plasma)] outline-none focus:border-[var(--plasma)] transition-all px-[1px]"
                                                 />
                                                 <button 
                                                     onClick={() => handleUpdateTopic(topic.id!, { pages: Math.min(6.25, topic.pages + 0.0125) })} 
@@ -438,7 +438,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                                                 </button>
                                             </div>
                                         ) : (
-                                            <div className="text-center text-[var(--text-sm)] font-medium text-[var(--text-3)]">
+                                            <div className="text-center text-[var(--text-sm)] font-light text-[var(--text-3)]">
                                                 {Math.round(topic.pages * 800)}
                                             </div>
                                         )}
@@ -578,7 +578,7 @@ export function ArticleDetailView({ id }: { id?: number }) {
         <div className="h-full flex flex-col bg-[var(--void-base)] overflow-hidden">
             <div className="p-6 border-b border-[var(--border)] bg-[var(--void-surface)] flex items-center justify-between">
                 <div>
-                    <h2 className="text-[var(--text-base)] font-bold mb-1">{topic.topic}</h2>
+                    <h2 className="text-[var(--text-base)] font-light mb-1">{topic.topic}</h2>
                     <div className="flex items-center gap-4 text-[var(--text-sm)] text-[var(--text-3)] font-geist">
                         <div className="flex items-center gap-1"><FileText size={12} className="text-[var(--plasma)]" /> Analytics Ready</div>
                         <div className="flex items-center gap-1"><Check size={12} className="text-[var(--success)]" /> Quality Verified</div>
@@ -587,7 +587,7 @@ export function ArticleDetailView({ id }: { id?: number }) {
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={handleCopy} 
-                        className="flex items-center gap-2 px-4 py-2 bg-[var(--void-surface-2)] border border-[var(--border)] text-[var(--text-1)] text-[var(--text-sm)] font-bold rounded-[4px] hover:border-[var(--plasma)] transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-[var(--void-surface-2)] border border-[var(--border)] text-[var(--text-1)] text-[var(--text-sm)] font-light rounded-[4px] hover:border-[var(--plasma)] transition-all"
                     >
                         {copying ? <Check size={14} className="text-[var(--success)]" /> : <Copy size={14} />}
                         {copying ? 'Copied' : 'Copy Content'}
@@ -596,7 +596,7 @@ export function ArticleDetailView({ id }: { id?: number }) {
                     <div className="relative">
                         <button 
                             onClick={() => setShowDownloadMenu(!showDownloadMenu)} 
-                            className="flex items-center gap-2 px-4 py-2 bg-[var(--plasma)] text-[var(--void-base)] text-[var(--text-sm)] font-bold rounded-[4px] hover:opacity-90 transition-all shadow-lg shadow-[var(--plasma)]/20"
+                            className="flex items-center gap-2 px-4 py-2 bg-[var(--plasma)] text-[var(--void-base)] text-[var(--text-sm)] font-light rounded-[4px] hover:opacity-90 transition-all shadow-lg shadow-[var(--plasma)]/20"
                         >
                             <Download size={14} />
                             Download
@@ -607,13 +607,13 @@ export function ArticleDetailView({ id }: { id?: number }) {
                             <>
                                 <div className="fixed inset-0 z-40" onClick={() => setShowDownloadMenu(false)} />
                                 <div className="absolute right-0 mt-2 w-48 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[6px] shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-                                    <button onClick={downloadPDF} className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-sm)] font-medium text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors border-b border-[var(--border)]">
+                                    <button onClick={downloadPDF} className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-sm)] font-light text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors border-b border-[var(--border)]">
                                         <FileDown size={16} className="text-[var(--error)]" /> Export as PDF
                                     </button>
-                                    <button onClick={downloadWord} className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-sm)] font-medium text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors border-b border-[var(--border)]">
+                                    <button onClick={downloadWord} className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-sm)] font-light text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors border-b border-[var(--border)]">
                                         <FileText size={16} className="text-[var(--info)]" /> Export as Word (.docx)
                                     </button>
-                                    <button onClick={downloadMarkdown} className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-sm)] font-medium text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors">
+                                    <button onClick={downloadMarkdown} className="w-full flex items-center gap-3 px-4 py-3 text-[var(--text-sm)] font-light text-[var(--text-1)] hover:bg-[var(--plasma-dim)] transition-colors">
                                         <FileDown size={16} className="text-[var(--plasma)]" /> Export as Markdown
                                     </button>
                                 </div>
@@ -625,16 +625,16 @@ export function ArticleDetailView({ id }: { id?: number }) {
             <div className="flex-1 overflow-y-auto p-12 font-sans leading-relaxed text-[var(--text-base)]">
                 <div className="max-w-3xl mx-auto space-y-10">
                     <div className="text-center mb-16">
-                        <h1 className="text-[var(--text-xl)] font-bold text-[var(--text-1)] leading-tight mb-4">{topic.topic}</h1>
+                        <h1 className="text-[var(--text-xl)] font-light text-[var(--text-1)] leading-tight mb-4">{topic.topic}</h1>
                         <div className="w-20 h-1 bg-[var(--plasma)] mx-auto rounded-full opacity-50" />
                     </div>
                     
                     <div className="space-y-8">
-                        <p className="text-[var(--text-lg)] text-[var(--text-1)] italic leading-relaxed font-medium border-l-4 border-[var(--plasma)]/30 pl-6 py-2">
+                        <p className="text-[var(--text-lg)] text-[var(--text-1)] italic leading-relaxed font-light border-l-4 border-[var(--plasma)]/30 pl-6 py-2">
                             {topic.hook || 'Generating hook...'}
                         </p>
                         
-                        <div className="text-[var(--text-2)] whitespace-pre-wrap text-[var(--text-base)] leading-[1.8] font-normal">
+                        <div className="text-[var(--text-2)] whitespace-pre-wrap text-[var(--text-base)] leading-[1.8] font-light">
                             {topic.article || 'Generating content...'}
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from '../config';
+import { extractAndParseJson } from '../utils/json.util';
 
 export interface ResearchTopic {
     topic: string;
@@ -66,8 +67,7 @@ export class ResearchService {
             });
 
             const content = response.data.choices[0].message.content;
-            const cleanedContent = content.replace(/```json|```/g, '').trim();
-            return JSON.parse(cleanedContent);
+            return extractAndParseJson<ResearchTopic[]>(content);
         } catch (error: any) {
             if (axios.isCancel(error)) {
                 console.log('Research request cancelled');
@@ -120,8 +120,7 @@ export class ResearchService {
             });
 
             const content = response.data.choices[0].message.content;
-            const cleanedContent = content.replace(/```json|```/g, '').trim();
-            return JSON.parse(cleanedContent);
+            return extractAndParseJson<any[]>(content);
         } catch (error: any) {
             console.error('Market Rankings Bot Error:', error);
             return this.getMockRankings(category);

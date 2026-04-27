@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useForm, FormProvider } from 'react-hook-form';
 import axios from 'axios';
-import { Sparkles, LayoutDashboard, Settings, Plus, History, Zap, Palette, Layers, ChevronDown, ArrowUp, Link2, FileText, Octagon, BarChart3, RotateCcw } from 'lucide-react';
+import { Sparkles, LayoutDashboard, Settings, Plus, History, Zap, Palette, Layers, ChevronDown, ArrowUp, Link2, FileText, Octagon, BarChart3, RotateCcw, Eye } from 'lucide-react';
 import OutputDisplay from './components/OutputDisplay';
 import Newsroom from './components/Newsroom';
 import SettingsView from './components/Settings';
 import Sessions from './components/Sessions';
 import AdminDashboard from './components/AdminDashboard';
+import Watchlist from './components/Watchlist';
 import { useEnhance, type EnhanceResponse } from './hooks/useEnhance';
 
 const queryClient = new QueryClient();
@@ -29,7 +30,7 @@ function AppContent() {
     const [showToneMenu, setShowToneMenu] = useState(false);
     const [showModeMenu, setShowModeMenu] = useState(false);
     const [showInputTypeMenu, setShowInputTypeMenu] = useState(false);
-    const [activeView, setActiveView] = useState<'enhance' | 'sessions' | 'pipelines' | 'settings' | 'admin'>('enhance');
+    const [activeView, setActiveView] = useState<'enhance' | 'sessions' | 'pipelines' | 'settings' | 'admin' | 'watchlist'>('enhance');
     
     const [userName, setUserName] = useState('Ghost Writer');
     const enhanceMutation = useEnhance();
@@ -164,57 +165,61 @@ function AppContent() {
                                 <img src="/logo.png" alt="GhostPost Logo" className="w-full h-full object-cover scale-110" />
                             </div>
                             <div className="flex flex-col leading-[1.1]">
-                                <span className="text-[var(--text-md)] font-bold text-[var(--text-1)] tracking-tight">GhostPost</span>
-                                <span className="text-[var(--text-md)] font-bold text-[var(--plasma)] tracking-tight">Studio</span>
+                                <span className="text-[var(--text-md)] font-light text-[var(--text-1)] tracking-tight">GhostPost</span>
+                                <span className="text-[var(--text-md)] font-light text-[var(--plasma)] tracking-tight">Studio</span>
                             </div>
-                        </div>
-                        <div className="text-[var(--text-xs)] text-[var(--text-3)] font-geist tracking-[0.2em] uppercase pl-[2px] mb-8">
-                            Agentic Content OS
                         </div>
 
 
                     </div>
                     {/* Nav Section */}
                     <nav className="flex-1 px-3 mt-4 space-y-0.5">
-                        <div className="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-3)] font-geist px-2 mb-2 uppercase">
+                        <div className="text-[var(--text-xs)] text-[var(--text-3)] font-geist px-2 mb-2">
                             Workspace
                         </div>
                         
                         <button 
                             onClick={() => setActiveView('enhance')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-r-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'enhance' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-r-[3px] text-[var(--text-sm)] transition-all font-light ${activeView === 'enhance' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <LayoutDashboard size={14} />
-                            Enhance
+                            Ghost Post
                         </button>
                         <button 
-                            onClick={() => setActiveView('sessions')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'sessions' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            onClick={() => setActiveView('watchlist')}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-light ${activeView === 'watchlist' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
-                            <History size={14} />
-                            Sessions
+                            <Eye size={14} />
+                            Source Watchlist
                         </button>
                         <button 
                             onClick={() => setActiveView('pipelines')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'pipelines' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-light ${activeView === 'pipelines' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <Zap size={14} />
                             Pipelines
                         </button>
                         <button 
+                            onClick={() => setActiveView('sessions')}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-light ${activeView === 'sessions' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                        >
+                            <History size={14} />
+                            Sessions
+                        </button>
+                        <button 
                             onClick={() => setActiveView('settings')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'settings' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-light ${activeView === 'settings' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <Settings size={14} />
                             Settings
                         </button>
 
-                        <div className="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-3)] font-geist px-2 mb-2 mt-6 uppercase">
+                        <div className="text-[var(--text-xs)] text-[var(--text-3)] font-geist px-2 mb-2 mt-6">
                             Infrastructure
                         </div>
                         <button 
                             onClick={() => setActiveView('admin')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'admin' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-light ${activeView === 'admin' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <BarChart3 size={14} />
                             Observability
@@ -228,9 +233,9 @@ function AppContent() {
                                 {userName.charAt(0)}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className="text-[var(--text-sm)] font-medium text-[var(--text-1)] truncate">{userName}</div>
+                                <div className="text-[var(--text-sm)] font-light text-[var(--text-1)] truncate">{userName}</div>
                             </div>
-                            <div className="text-[var(--text-xs)] bg-[var(--plasma-dim)] text-[var(--plasma)] px-1.5 py-0.5 rounded-[2px] font-geist font-medium">
+                            <div className="text-[var(--text-xs)] bg-[var(--plasma-dim)] text-[var(--plasma)] px-1.5 py-0.5 rounded-[2px] font-geist font-light">
                                 PRO
                             </div>
                         </div>
@@ -248,26 +253,28 @@ function AppContent() {
                         <Sessions />
                     ) : activeView === 'admin' ? (
                         <AdminDashboard />
+                    ) : activeView === 'watchlist' ? (
+                        <Watchlist />
                     ) : (
                         <>
                             {/* TOPBAR */}
                             <header className="border-b border-[var(--border)] px-5 py-3 flex justify-between items-center bg-[var(--void-base)]/80 backdrop-blur-md z-20">
                                 <div>
-                                    <h1 className="text-[var(--text-base)] font-medium text-[var(--text-1)]">Content Enhancer</h1>
+                                    <h1 className="text-[var(--text-base)] font-light text-[var(--text-1)]">Content Studio</h1>
                                     <p className="text-[var(--text-sm)] text-[var(--text-3)] font-geist">Agentic pipeline · 4 tone variants</p>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-2 px-3 py-1 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-full">
                                         <div className="w-1.5 h-1.5 bg-[var(--success)] rounded-full animate-pulse" />
-                                        <span className="text-[var(--text-xs)] font-bold text-[var(--text-2)] tracking-wider">SYSTEM READY</span>
+                                        <span className="text-[var(--text-xs)] font-light text-[var(--text-2)] tracking-wider">SYSTEM READY</span>
                                     </div>
                                     <div className="h-4 w-[1px] bg-[var(--border)]" />
                                     <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-[var(--plasma-dim)] border border-[var(--plasma)]/20 flex items-center justify-center text-[var(--plasma)] font-bold text-[var(--text-xs)]">
+                                        <div className="w-8 h-8 rounded-full bg-[var(--plasma-dim)] border border-[var(--plasma)]/20 flex items-center justify-center text-[var(--plasma)] font-light text-[var(--text-xs)]">
                                             RS
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[var(--text-xs)] font-bold text-[var(--text-1)] leading-none mb-0.5">Raj S.</span>
+                                            <span className="text-[var(--text-xs)] font-light text-[var(--text-1)] leading-none mb-0.5">Raj S.</span>
                                             <span className="text-[var(--text-xs)] text-[var(--text-3)] leading-none">Pro Editor</span>
                                         </div>
                                     </div>
@@ -280,7 +287,7 @@ function AppContent() {
                                     {Object.keys(result).length === 0 && !isGenerating ? (
                                         <div className="flex-1 flex flex-col items-center justify-center opacity-10">
                                             <Sparkles size={40} className="text-[var(--plasma)] mb-4" />
-                                            <p className="text-[var(--text-base)] text-[var(--text-3)] font-medium">Waiting for input</p>
+                                            <p className="text-[var(--text-base)] text-[var(--text-3)] font-light">Waiting for input</p>
                                             <p className="text-[var(--text-sm)] text-[var(--text-3)] italic mt-1 font-geist tracking-wide">Paste your ideas below and hit Generate</p>
                                         </div>
                                     ) : (
@@ -370,7 +377,7 @@ function AppContent() {
                                                                 <span className="text-[var(--text-xs)] text-[var(--text-3)]">Target Pages</span>
                                                                 <div className="flex items-center border border-[var(--border)] rounded-[2px] bg-[var(--void-base)] overflow-hidden">
                                                                     <button type="button" onClick={() => setValue('targetPages', Math.max(0.25, (Number(targetPages) || 0.5) - 0.25))} className="px-1.5 py-0.5 hover:text-[var(--plasma)] transition-colors border-r border-[var(--border)] text-[var(--text-xs)]">-</button>
-                                                                    <span className="px-2 text-[var(--plasma)] text-[var(--text-xs)] font-mono font-bold">{(Number(targetPages) || 0.5).toFixed(2)}</span>
+                                                                    <span className="px-2 text-[var(--plasma)] text-[var(--text-xs)] font-mono font-light">{(Number(targetPages) || 0.5).toFixed(2)}</span>
                                                                     <button type="button" onClick={() => setValue('targetPages', Math.min(50, (Number(targetPages) || 0.5) + 0.25))} className="px-1.5 py-0.5 hover:text-[var(--plasma)] transition-colors border-l border-[var(--border)] text-[var(--text-xs)]">+</button>
                                                                 </div>
                                                             </div>

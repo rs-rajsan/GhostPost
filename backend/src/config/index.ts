@@ -97,6 +97,21 @@ const draftingApiKey = resolveKey(process.env.DRAFTING_API_KEY);
 const validationApiKey = resolveKey(process.env.VALIDATION_API_KEY);
 const refinementApiKey = resolveKey(process.env.REFINEMENT_API_KEY);
 
+const AI_BAN_LIST = [
+    "Furthermore", "Moreover", "In conclusion", "Additionally", 
+    "In today's fast-paced world", "Unlock the potential", "It's important to note", 
+    "In the digital age", "Navigate the landscape", "Game changer", 
+    "Harness the power", "Testament to"
+];
+
+const HUMAN_GUIDELINES = `
+HUMAN-LIKE WRITING GUIDELINES:
+1. BURSTINESS: Vary your sentence length significantly. Use short, punchy sentences (3-7 words) followed by longer, more complex ones (15-25 words). This creates a natural human rhythm.
+2. AI-ISM BAN LIST: DO NOT use the following words or phrases: ${AI_BAN_LIST.join(', ')}.
+3. NO REPETITIVE STRUCTURES: Avoid starting consecutive paragraphs with the same word or thematic structure.
+4. SPECIFICITY: Avoid generic "high-level" summaries. Focus on specific, messy details, raw quotes (if available), and tactical insights.
+`;
+
 const config: Config = {
     env,
     port: parseInt(process.env.PORT || '5000', 10),
@@ -167,7 +182,8 @@ ${tone.toLowerCase() === 'conversational' ? `
 STYLE GUIDE (CONVERSATIONAL - TWO FRIENDS CHATTING):
 - STYLE: Write like two friends or peers talking over coffee. USE CONTRACTIONS (don't, it's, you're).
 - VIBE: Casual, informal, and relaxed. Avoid "corporate speak" or "interview mode".
-- STRUCTURE: A natural back-and-forth flow. Address the reader as a peer.` : ''}
+- PHRASING: Start sentences with "And", "But", or "So" to maintain flow. Use parenthetical asides (like this one) to add personality.
+- STRUCTURE: A natural back-and-forth flow. Address the reader directly as a peer.` : ''}
 
 ${tone.toLowerCase() === 'inspirational' ? `
 STYLE GUIDE (INSPIRATIONAL - VISIONARY & UPLIFTING):
@@ -190,8 +206,8 @@ STYLE GUIDE (ACADEMIC - FORMAL & ANALYTICAL):
 ${tone.toLowerCase() === 'story' ? `
 STYLE GUIDE (STORY - JOURNALISTIC NARRATIVE):
 - STYLE: Narrative-driven. Use a classic "Lead" followed by a character or situation-based arc.
-- PHRASING: Use sensory details and quotes (real or illustrative) to bring the "story" to life.
-- VIBE: Captivating and human. Like a front-page feature story in a major publication.` : ''}
+- PHRASING: "Show, don't tell." Use sensory details (sights, sounds, feelings) and quotes to bring the "story" to life.
+- VIBE: Captivating and human. Focus on the emotional or practical stakes for the people involved.` : ''}
 
 ${tone.startsWith('custom:') ? `
 STYLE GUIDE (CUSTOM PERSONA - ADOPT THIS CHARACTER):
@@ -209,23 +225,26 @@ ${researchData}
 """` : ''}
 
 You are an elite, highly-efficient Content Generation Engine. 
-Your ONLY task is to return a valid JSON object containing a deep-dive article based on the provided data.
+Your ONLY task is to return a deep-dive article based on the provided data.
+
+${HUMAN_GUIDELINES}
 
 OUTPUT FORMAT (MANDATORY):
-Return ONLY a valid JSON object with this structure:
-{
-  "title": "A compelling, catchy title for the article",
-  "hook": "The actual attention-grabbing hook text (1-3 sentences)",
-  "enhancedPost": "The full article text starting with the TITLE in ALL CAPS",
-  "hookScore": 9,
-  "hookTip": "Optimization advice or strategy used for this hook",
-  "hashtags": ["#AgentAISchool", "#tag1", "#tag2"],
-  "visualSuggestion": "Image description"
-}
+Return the content in the following structured text format:
+
+[TITLE]: A compelling, catchy title for the article
+[HOOK]: The actual attention-grabbing hook text (1-3 sentences)
+[CONTENT]: 
+The full article text starting here. Use simple capitalized titles and blank lines for structure. 
+NO Markdown, NO bolding (**), NO special headers (##).
+
+[HASHTAGS]: #AgentAISchool, #tag1, #tag2
+[VISUAL]: Image description
+[TIP]: Optimization advice or strategy used for this hook
 
 GUIDELINES:
-1. FORMATTING: Use PLAIN TEXT for the "enhancedPost" value. NO Markdown, NO bolding (**), NO special headers (##). Use simple capitalized titles and blank lines for structure.
-2. CITATIONS: List all source URLs in a "SOURCES & CITATIONS" section at the very bottom of the article text.
+1. FORMATTING: Use PLAIN TEXT for the content.
+2. CITATIONS: List all source URLs in a "SOURCES & CITATIONS" section at the very bottom of the [CONTENT] block.
 3. CONTENT: Provide detailed explanations and at least 5-7 relevant facts or statistics.
 4. NO META-COMMENTARY: DO NOT include word counts or section notes.
 `;
@@ -286,25 +305,23 @@ ${researchData}
 """` : ''}
 
 GUIDELINES:
-1. FORMATTING: PLAIN TEXT only. No markdown.
-2. CITATIONS: List source links only at the very bottom of the post.
-3. HASHTAGS: Always include #AgentAISchool as the first hashtag.
-4. NO META-COMMENTARY: No word counts.
+1. HUMAN-LIKE FLOW: Use bursty sentence structures. Vary length between 5 and 20 words.
+2. AI-ISM BAN: Absolutely NO ${AI_BAN_LIST.slice(0, 4).join(', ')}, or "${AI_BAN_LIST[4]}".
+3. FORMATTING: PLAIN TEXT only. No markdown.
+4. CITATIONS: List source links only at the very bottom of the post.
+5. HASHTAGS: Always include #AgentAISchool as the first hashtag.
+6. NO META-COMMENTARY: No word counts.
 
 OUTPUT REQUIREMENTS:
-- Return ONLY a valid JSON object. No conversational preamble.
-- JSON structure must include:
-- enhancedPost: The complete, formatted post content.
+Return the content in the following structured text format:
 
-RESPONSE FORMAT:
-{
-  "hook": "...",
-  "enhancedPost": "...",
-  "hookScore": 9,
-  "hookTip": "...",
-  "hashtags": ["#tag1", "#tag2"],
-  "visualSuggestion": "..."
-}
+[TITLE]: A short, punchy title
+[HOOK]: The actual attention-grabbing hook text (1-2 sentences)
+[CONTENT]: 
+The complete post content.
+[HASHTAGS]: #AgentAISchool, #tag1
+[VISUAL]: Image description
+[TIP]: Optimization advice or strategy used for this hook
 `;
         },
         hook: (tone: string, hookTip: string, content: string) => {

@@ -43,8 +43,12 @@ export default function Watchlist() {
     const handleRefresh = async () => {
         setIsRefreshing(true);
         try {
-            await axios.post(`${API_BASE}/watchlist/refresh`, { category: activeCategory });
-            await fetchWatchlist();
+            const response = await axios.post(`${API_BASE}/watchlist/refresh`, { category: activeCategory });
+            setWatchlist(prev => {
+                // Merge new data into existing watchlist
+                const otherItems = prev.filter(w => (w.category || 'AI Companies') !== activeCategory);
+                return [...otherItems, ...response.data];
+            });
         } catch (err) {
             console.error('Failed to refresh rankings:', err);
         } finally {
@@ -56,21 +60,21 @@ export default function Watchlist() {
         <div className="p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex flex-col gap-1">
-                    <h2 className="text-[var(--text-md)] font-bold text-[var(--text-1)]">Source Watchlist</h2>
+                    <h2 className="text-[var(--text-md)] font-light text-[var(--text-1)]">Source Watchlist</h2>
                     <p className="text-[var(--text-sm)] text-[var(--text-3)]">Managed priority lists for Research Bot prioritization</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={handleRefresh}
                         disabled={isRefreshing}
-                        className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] text-[var(--text-2)] text-[var(--text-sm)] font-bold rounded-[4px] hover:text-[var(--text-1)] hover:bg-white/[0.03] transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-1.5 border border-[var(--border)] text-[var(--text-2)] text-[var(--text-sm)] font-light rounded-[4px] hover:text-[var(--text-1)] hover:bg-white/[0.03] transition-all disabled:opacity-50"
                     >
                         <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
-                        Refresh Market Rankings
+                        {isRefreshing ? 'Syncing...' : 'Refresh Market Rankings'}
                     </button>
                     <button 
                         onClick={handleAddCategory}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-[var(--plasma-dim)] text-[var(--plasma)] text-[var(--text-sm)] font-bold rounded-[4px] hover:bg-[var(--plasma)] hover:text-[var(--void-base)] transition-all"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-[var(--plasma-dim)] text-[var(--plasma)] text-[var(--text-sm)] font-light rounded-[4px] hover:bg-[var(--plasma)] hover:text-[var(--void-base)] transition-all"
                     >
                         <Plus size={12} />
                         Add Category
@@ -84,7 +88,7 @@ export default function Watchlist() {
                     <button
                         key={cat}
                         onClick={() => setActiveCategory(cat)}
-                        className={`px-4 py-1.5 rounded-[3px] text-[var(--text-sm)] font-bold transition-all ${activeCategory === cat ? 'bg-[var(--plasma)] text-[var(--void-base)] shadow-lg' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}
+                        className={`px-4 py-1.5 rounded-[3px] text-[var(--text-sm)] font-light transition-all ${activeCategory === cat ? 'bg-[var(--plasma)] text-[var(--void-base)] shadow-lg' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}
                     >
                         {cat}
                     </button>
@@ -96,7 +100,7 @@ export default function Watchlist() {
                 <div className="overflow-y-auto flex-1">
                     <table className="w-full text-left border-collapse text-[var(--text-sm)]">
                         <thead className="sticky top-0 z-10 bg-[var(--void-surface-2)] border-b border-[var(--border)]">
-                            <tr className="text-[var(--text-3)] font-medium">
+                            <tr className="text-[var(--text-3)] font-light">
                                 <th className="py-1 px-3 w-16">Rank</th>
                                 <th className="py-1 px-3">Company Name</th>
                                 <th className="py-1 px-3 text-right">Last Updated</th>
@@ -106,10 +110,10 @@ export default function Watchlist() {
                         <tbody className="">
                             {currentItems.sort((a, b) => (a.marketRank || 0) - (b.marketRank || 0)).map(item => (
                                 <tr key={item.id} className="hover:bg-white/[0.01] transition-colors group">
-                                    <td className="py-[2px] px-3 text-[var(--plasma)] font-mono font-medium text-[var(--text-xs)]">#{ (item.marketRank || 0).toString().padStart(2, '0')}</td>
-                                    <td className="py-[2px] px-3 text-[var(--text-1)] font-medium text-[var(--text-xs)]">{item.name}</td>
+                                    <td className="py-[2px] px-3 text-[var(--plasma)] font-mono font-light text-[var(--text-xs)]">#{ (item.marketRank || 0).toString().padStart(2, '0')}</td>
+                                    <td className="py-[2px] px-3 text-[var(--text-1)] font-light text-[var(--text-xs)]">{item.name}</td>
                                     <td className="py-[2px] px-3 text-right text-[var(--text-3)] text-[var(--text-xs)]">
-                                        {item.lastUpdate ? new Date(item.lastUpdate).toLocaleDateString() : 'N/A'}
+                                        {item.lastUpdate ? new Date(item.lastUpdate).toLocaleString() : 'N/A'}
                                     </td>
                                     <td className="py-[2px] px-3">
                                         <div className="flex justify-center">
@@ -141,7 +145,7 @@ export default function Watchlist() {
                     <button 
                         onClick={handleRefresh}
                         disabled={isRefreshing}
-                        className="text-[var(--text-xs)] font-bold text-[var(--plasma)] hover:underline flex items-center gap-1 disabled:opacity-50"
+                        className="text-[var(--text-xs)] font-light text-[var(--plasma)] hover:underline flex items-center gap-1 disabled:opacity-50"
                     >
                         Run AI Sync <ChevronRight size={10} />
                     </button>

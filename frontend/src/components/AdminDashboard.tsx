@@ -32,7 +32,7 @@ const AdminDashboard: React.FC = () => {
       <div className="flex-1 flex items-center justify-center bg-[var(--void-base)]">
         <div className="flex flex-col items-center gap-4">
           <RefreshCw className="text-[var(--plasma)] animate-spin" size={32} />
-          <p className="text-[var(--text-sm)] text-[var(--text-2)] font-medium">Syncing with Clickhouse analytics...</p>
+          <p className="text-[var(--text-sm)] text-[var(--text-2)] font-light">Syncing with Clickhouse analytics...</p>
         </div>
       </div>
     );
@@ -49,7 +49,7 @@ const AdminDashboard: React.FC = () => {
           </p>
           <button 
             onClick={() => refetch()}
-            className="mt-2 px-4 py-2 bg-[var(--plasma)] text-[var(--void-base)] text-[var(--text-sm)] font-bold rounded-[4px] hover:opacity-90 transition-all flex items-center gap-2"
+            className="mt-2 px-4 py-2 bg-[var(--plasma)] text-[var(--void-base)] text-[var(--text-sm)] font-light rounded-[4px] hover:opacity-90 transition-all flex items-center gap-2"
           >
             <RefreshCw size={14} /> Try Reconnecting
           </button>
@@ -115,12 +115,12 @@ const AdminDashboard: React.FC = () => {
                 <div className={`p-2 rounded-[6px] bg-white/[0.03] ${kpi.color}`}>
                   <kpi.icon size={18} />
                 </div>
-                <span className={`text-[var(--text-xs)] font-mono font-bold px-1.5 py-0.5 rounded ${kpi.change.startsWith('+') ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--info)]/10 text-[var(--info)]'}`}>
+                <span className={`text-[var(--text-xs)] font-mono font-light px-1.5 py-0.5 rounded ${kpi.change.startsWith('+') ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--info)]/10 text-[var(--info)]'}`}>
                   {kpi.change}
                 </span>
               </div>
               <div className="text-[var(--text-md)] font-semibold text-[var(--text-1)] mb-1">{kpi.value}</div>
-              <div className="text-[var(--text-sm)] text-[var(--text-3)] font-medium uppercase tracking-wider">{kpi.label}</div>
+              <div className="text-[var(--text-sm)] text-[var(--text-3)] font-light uppercase tracking-wider">{kpi.label}</div>
             </div>
           ))}
         </div>
@@ -156,7 +156,7 @@ const AdminDashboard: React.FC = () => {
               {volumeData.length === 0 && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <BarChart3 size={32} className="text-[var(--text-3)] mb-3 opacity-40" />
-                  <p className="text-[var(--text-sm)] text-[var(--text-2)] font-medium">Metric visualization pending data sync</p>
+                  <p className="text-[var(--text-sm)] text-[var(--text-2)] font-light">Metric visualization pending data sync</p>
                   <p className="text-[var(--text-xs)] text-[var(--text-3)] mt-1">Connect to Clickhouse database to enable live charts</p>
                 </div>
               )}
@@ -213,27 +213,27 @@ const AdminDashboard: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[var(--border)] bg-white/[0.01]">
-                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Request ID</th>
-                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Model</th>
-                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Tokens</th>
-                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Cost</th>
-                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Status</th>
-                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Time</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-light text-[var(--text-3)]">Request ID</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-light text-[var(--text-3)]">Model</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-light text-[var(--text-3)]">Tokens</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-light text-[var(--text-3)]">Cost</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-light text-[var(--text-3)]">Status</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-light text-[var(--text-3)]">Time</th>
                 </tr>
               </thead>
               <tbody>
                 {recentLogs.map((log: any, i: number) => (
                   <tr key={i} className="border-b border-[var(--border)] hover:bg-white/[0.02] transition-colors group cursor-pointer">
                     <td className="px-5 py-3 text-[var(--text-sm)] font-mono text-[var(--text-2)] group-hover:text-[var(--plasma)] transition-colors">{log.id}</td>
-                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-1)]">{log.model}</td>
-                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-2)]">{log.tokens.toLocaleString()}</td>
-                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-2)] font-mono">{log.cost}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-light text-[var(--text-1)]">{log.model}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-light text-[var(--text-2)]">{log.tokens.toLocaleString()}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-light text-[var(--text-2)] font-mono">{log.cost}</td>
                     <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded-[4px] text-[var(--text-xs)] font-medium uppercase tracking-wider ${log.status === 'success' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--error)]/10 text-[var(--error)]'}`}>
+                      <span className={`px-2 py-0.5 rounded-[4px] text-[var(--text-xs)] font-light uppercase tracking-wider ${log.status === 'success' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--error)]/10 text-[var(--error)]'}`}>
                         {log.status}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-3)]">{log.time}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-light text-[var(--text-3)]">{log.time}</td>
                   </tr>
                 ))}
               </tbody>

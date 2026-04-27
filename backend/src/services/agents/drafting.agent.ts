@@ -30,7 +30,7 @@ export class DraftingAgent extends BaseAgent {
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are a research assistant. Provide concise, factual information with statistics. ALWAYS include the source URLs for every fact in markdown link format [Source Name](URL).'
+                        content: 'You are a research assistant. Provide specific, high-value information, including direct quotes, obscure statistics, and tactical "insider" details. Avoid generic summaries; focus on the "messy" details that give an article authenticity. ALWAYS include the source URLs for every fact in markdown link format [Source Name](URL).'
                     },
                     {
                         role: 'user',
@@ -105,23 +105,7 @@ export class DraftingAgent extends BaseAgent {
             let content = response.data.choices[0].message.content;
             if (!content) throw new Error('No content returned from Drafting Agent');
 
-            // Post-processing to ensure clean output
-            let finalData = content;
-            try {
-                const parsedData = extractAndParseJson<any>(content);
-                if (parsedData.enhancedPost) {
-                    parsedData.enhancedPost = parsedData.enhancedPost
-                        .replace(/\[\d+\]/g, '') // Remove [1], [2], etc.
-                        .replace(/\(Word count.*?\)/gi, '') // Remove word count artifacts
-                        .replace(/\n{3,}/g, '\n\n') // Normalize spacing
-                        .trim();
-                    finalData = JSON.stringify(parsedData);
-                }
-            } catch (e) {
-                // Parse fail is handled by orchestrator
-            }
-
-            return { success: true, data: finalData };
+            return { success: true, data: content };
         });
     }
 

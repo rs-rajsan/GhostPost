@@ -7,12 +7,17 @@ export function extractJsonString(text: string): string {
     // Strip common markdown markers
     let cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
 
-    // Find the first '{' and last '}'
+    // Find the first structural character ({ or [) and the last structural character (} or ])
     const firstBrace = cleaned.indexOf('{');
+    const firstBracket = cleaned.indexOf('[');
     const lastBrace = cleaned.lastIndexOf('}');
+    const lastBracket = cleaned.lastIndexOf(']');
 
-    if (firstBrace !== -1 && lastBrace !== -1) {
-        return cleaned.substring(firstBrace, lastBrace + 1);
+    const start = (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) ? firstBrace : firstBracket;
+    const end = (lastBrace !== -1 && (lastBracket === -1 || lastBrace > lastBracket)) ? lastBrace : lastBracket;
+
+    if (start !== -1 && end !== -1) {
+        return cleaned.substring(start, end + 1);
     }
 
     return cleaned;
@@ -95,4 +100,68 @@ export function extractAndParseJson<T>(text: string): T {
             return rawContent as T;
         }
     }
+}
+/**
+ * Parses structured text format into a JSON object.
+ * Format: [FIELD]: value
+ */
+export function parseStructuredText(text: string): any {
+    const result: any = {
+        title: '',
+        hook: '',
+        enhancedPost: '',
+        hookScore: 9,
+        hookTip: '',
+        hashtags: [],
+        visualSuggestion: ''
+    };
+
+    const lines = text.split('\n');
+    let currentField = '';
+
+    for (const line of lines) {
+        if (line.startsWith('[TITLE]:')) {
+            result.title = line.replace('[TITLE]:', '').trim();
+            currentField = 'title';
+        } else if (line.startsWith('[HOOK]:')) {
+            result.hook = line.replace('[HOOK]:', '').trim();
+            currentField = 'hook';
+        } else if (line.startsWith('[CONTENT]:')) {
+            currentField = 'enhancedPost';
+            const val = line.replace('[CONTENT]:', '').trim();
+            if (val) result.enhancedPost += val + '\n';
+        } else if (line.startsWith('[HASHTAGS]:')) {
+            result.hashtags = line.replace('[HASHTAGS]:', '')
+                .split(',')
+                .map(h => h.trim())
+                .filter(h => h.length > 0);
+            currentField = 'hashtags';
+        } else if (line.startsWith('[VISUAL]:')) {
+            result.visualSuggestion = line.replace('[VISUAL]:', '').trim();
+            currentField = 'visualSuggestion';
+        } else if (line.startsWith('[TIP]:')) {
+            result.hookTip = line.replace('[TIP]:', '').trim();
+            currentField = 'hookTip';
+        } else if (currentField === 'enhancedPost') {
+            result.enhancedPost += line + '\n';
+        } else if (currentField === 'hook' && line.trim()) {
+            result.hook += ' ' + line.trim();
+        }
+    }
+
+    result.enhancedPost = result.enhancedPost.trim();
+    
+    // Clean up enhancedPost if it contains meta labels or artifacts
+    result.enhancedPost = result.enhancedPost
+        .replace(/\[TITLE\]:.*?\n/gi, '')
+        .replace(/\[HOOK\]:.*?\n/gi, '')
+        .replace(/\[HASHTAGS\]:.*?\n/gi, '')
+        .replace(/\[VISUAL\]:.*?\n/gi, '')
+        .replace(/\[TIP\]:.*?\n/gi, '')
+        .replace(/\[\d+\]/g, '') // Remove citations like [1], [2]
+        .replace(/\(Word count.*?\)/gi, '') // Remove word count artifacts
+        .replace(/\n{3,}/g, '\n\n') // Normalize spacing
+        .trim();
+
+    return result;
 }

@@ -1,36 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Palette, User, Shield, Zap, CheckCircle2 } from 'lucide-react';
+import { Palette, User, Zap, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
-import Watchlist from './Watchlist';
 
 const API_BASE = 'http://localhost:5000/api/data';
 
 export default function Settings() {
-    const [activeTab, setActiveTab] = useState<'profile' | 'watchlist' | 'theme'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'theme'>('profile');
 
     return (
         <div className="flex h-full overflow-hidden bg-[var(--void-base)]">
             {/* Settings Sidebar */}
             <div className="w-56 border-r border-[var(--border)] bg-[var(--void-surface)] flex flex-col p-4 gap-2">
-                <h3 className="text-[var(--text-xs)] font-bold text-[var(--text-3)] uppercase tracking-widest px-3 mb-2">Preferences</h3>
+                <h3 className="text-[var(--text-xs)] font-light text-[var(--text-3)] uppercase tracking-widest px-3 mb-2">Preferences</h3>
                 
                 <button 
                     onClick={() => setActiveTab('profile')}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-[4px] text-[var(--text-sm)] font-medium transition-all ${activeTab === 'profile' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)]' : 'text-[var(--text-2)] hover:bg-white/[0.03]'}`}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-[4px] text-[var(--text-sm)] font-light transition-all ${activeTab === 'profile' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)]' : 'text-[var(--text-2)] hover:bg-white/[0.03]'}`}
                 >
                     <User size={14} />
                     User Identity
                 </button>
                 <button 
-                    onClick={() => setActiveTab('watchlist')}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-[4px] text-[var(--text-sm)] font-medium transition-all ${activeTab === 'watchlist' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)]' : 'text-[var(--text-2)] hover:bg-white/[0.03]'}`}
-                >
-                    <Shield size={14} />
-                    Source Watchlist
-                </button>
-                <button 
                     onClick={() => setActiveTab('theme')}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-[4px] text-[var(--text-sm)] font-medium transition-all ${activeTab === 'theme' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)]' : 'text-[var(--text-2)] hover:bg-white/[0.03]'}`}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-[4px] text-[var(--text-sm)] font-light transition-all ${activeTab === 'theme' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)]' : 'text-[var(--text-2)] hover:bg-white/[0.03]'}`}
                 >
                     <Palette size={14} />
                     Visual Theme
@@ -48,7 +40,6 @@ export default function Settings() {
             {/* Content Area */}
             <div className="flex-1 overflow-y-auto bg-[var(--void-base)]">
                 {activeTab === 'profile' && <ProfileSettings />}
-                {activeTab === 'watchlist' && <Watchlist />}
                 {activeTab === 'theme' && <ThemeSettings />}
             </div>
         </div>
@@ -71,18 +62,18 @@ function ProfileSettings() {
     
     return (
         <div className="p-10 max-w-2xl">
-            <h2 className="text-[var(--text-md)] font-bold text-[var(--text-1)] mb-8">User Identity</h2>
+            <h2 className="text-[var(--text-md)] font-light text-[var(--text-1)] mb-8">User Identity</h2>
             
             <div className="flex items-center gap-8 mb-10">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--plasma)] to-[var(--violet)] flex items-center justify-center text-[var(--text-xl)] font-bold text-[var(--void-base)] shadow-2xl relative group cursor-pointer">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--plasma)] to-[var(--violet)] flex items-center justify-center text-[var(--text-xl)] font-light text-[var(--void-base)] shadow-2xl relative group cursor-pointer">
                     {name.charAt(0)}
-                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-xs)] uppercase font-bold tracking-widest">
+                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-xs)] uppercase font-light tracking-widest">
                         Change
                     </div>
                 </div>
                 <div className="flex-1 flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-[var(--text-xs)] font-bold text-[var(--text-3)] uppercase tracking-widest">Display Name</label>
+                        <label className="text-[var(--text-xs)] font-light text-[var(--text-3)] uppercase tracking-widest">Display Name</label>
                         <input 
                             type="text" 
                             value={name}
@@ -96,7 +87,7 @@ function ProfileSettings() {
             <div className="p-6 rounded-[8px] bg-[var(--plasma-dim)]/10 border border-[var(--plasma)]/20">
                 <div className="flex items-center gap-3 mb-2 text-[var(--plasma)]">
                     <Zap size={16} />
-                    <h4 className="text-[var(--text-base)] font-bold">Personalized Agent Prompting</h4>
+                    <h4 className="text-[var(--text-base)] font-light">Personalized Agent Prompting</h4>
                 </div>
                 <p className="text-[var(--text-sm)] text-[var(--text-3)] leading-relaxed">
                     Your identity is now stored in PostgreSQL. It is injected into every article generation request to ensure the tone and perspective match your unique writing style.
@@ -145,7 +136,7 @@ function ThemeSettings() {
     return (
         <div className="p-10 max-w-4xl">
             <div className="flex flex-col gap-1 mb-8">
-                <h2 className="text-[var(--text-md)] font-bold text-[var(--text-1)]">Visual Universe</h2>
+                <h2 className="text-[var(--text-md)] font-light text-[var(--text-1)]">Visual Universe</h2>
                 <p className="text-[var(--text-3)] text-[var(--text-sm)]">Select a curated environment for your agentic studio</p>
             </div>
             
@@ -174,10 +165,10 @@ function ThemeSettings() {
                         {/* Content Area */}
                         <div className="p-4 flex items-center justify-between">
                             <div className="flex flex-col gap-1">
-                                <span className="text-[var(--text-base)] font-bold" style={{ color: t.text }}>{t.name}</span>
+                                <span className="text-[var(--text-base)] font-light" style={{ color: t.text }}>{t.name}</span>
                                 <div className="flex gap-1.5 items-center">
                                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: t.plasma }} />
-                                    <span className="text-[var(--text-xs)] uppercase tracking-widest font-bold opacity-40" style={{ color: t.text }}>Accent</span>
+                                    <span className="text-[var(--text-xs)] uppercase tracking-widest font-light opacity-40" style={{ color: t.text }}>Accent</span>
                                 </div>
                             </div>
 

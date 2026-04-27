@@ -220,17 +220,17 @@ export default function OutputDisplay({ data, activeTone, isPending }: OutputDis
                         {/* Meta Row */}
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
-                                <span className="text-[var(--text-xs)] font-geist font-bold bg-[var(--violet-dim)] text-[var(--violet)] px-2 py-0.5 rounded-[2px] uppercase tracking-wider">
+                                <span className="text-[var(--text-xs)] font-geist font-light bg-[var(--violet-dim)] text-[var(--violet)] px-2 py-0.5 rounded-[2px] uppercase tracking-wider">
                                     {mappedKey}
                                 </span>
                                 <div className="flex items-center gap-3 border-l border-[var(--border)] pl-3">
                                     <div className="flex items-center gap-1.5">
                                         <span className="text-[var(--text-3)] text-[var(--text-xs)] font-geist">HOOK:</span>
-                                        <span className="text-[var(--plasma)] font-geist font-bold text-[var(--text-sm)]">{activeData.hookScore || 0}/10</span>
+                                        <span className="text-[var(--plasma)] font-geist font-light text-[var(--text-sm)]">{activeData.hookScore || 0}/10</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <span className="text-[var(--text-3)] text-[var(--text-xs)] font-geist">CONF:</span>
-                                        <span className="text-[var(--success)] font-geist font-bold text-[var(--text-sm)]">{activeData.confidenceScore || 0}%</span>
+                                        <span className="text-[var(--success)] font-geist font-light text-[var(--text-sm)]">{activeData.confidenceScore || 0}%</span>
                                     </div>
                                 </div>
                             </div>
@@ -238,7 +238,7 @@ export default function OutputDisplay({ data, activeTone, isPending }: OutputDis
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={copyToClipboard}
-                                    className="text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors flex items-center gap-1 text-[var(--text-sm)] font-medium"
+                                    className="text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors flex items-center gap-1 text-[var(--text-sm)] font-light"
                                 >
                                     {copied ? <Check size={12} className="text-[var(--success)]" /> : <Copy size={12} />}
                                     {copied ? 'Copied' : 'Copy'}
@@ -247,7 +247,7 @@ export default function OutputDisplay({ data, activeTone, isPending }: OutputDis
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                                        className="text-[var(--text-2)] hover:text-[var(--text-1)] transition-all flex items-center gap-1 text-[var(--text-sm)] font-medium"
+                                        className="text-[var(--text-2)] hover:text-[var(--text-1)] transition-all flex items-center gap-1 text-[var(--text-sm)] font-light"
                                     >
                                         <Download size={12} />
                                         <span>Export</span>
@@ -256,13 +256,13 @@ export default function OutputDisplay({ data, activeTone, isPending }: OutputDis
 
                                     {showDownloadMenu && (
                                         <div className="absolute right-0 mt-2 w-28 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] shadow-2xl z-50 flex flex-col overflow-hidden">
-                                            <button onClick={downloadPDF} className="w-full text-left px-3 py-2 hover:bg-[var(--plasma-dim)] text-[var(--text-2)] hover:text-[var(--text-1)] text-[var(--text-sm)] font-medium transition-colors">
+                                            <button onClick={downloadPDF} className="w-full text-left px-3 py-2 hover:bg-[var(--plasma-dim)] text-[var(--text-2)] hover:text-[var(--text-1)] text-[var(--text-sm)] font-light transition-colors">
                                                 PDF Document
                                             </button>
-                                            <button onClick={downloadWord} className="w-full text-left px-3 py-2 hover:bg-[var(--plasma-dim)] text-[var(--text-2)] hover:text-[var(--text-1)] text-[var(--text-sm)] font-medium transition-colors">
+                                            <button onClick={downloadWord} className="w-full text-left px-3 py-2 hover:bg-[var(--plasma-dim)] text-[var(--text-2)] hover:text-[var(--text-1)] text-[var(--text-sm)] font-light transition-colors">
                                                 Word Doc
                                             </button>
-                                            <button onClick={downloadMarkdown} className="w-full text-left px-3 py-2 hover:bg-[var(--plasma-dim)] text-[var(--text-2)] hover:text-[var(--text-1)] text-[var(--text-sm)] font-medium transition-colors">
+                                            <button onClick={downloadMarkdown} className="w-full text-left px-3 py-2 hover:bg-[var(--plasma-dim)] text-[var(--text-2)] hover:text-[var(--text-1)] text-[var(--text-sm)] font-light transition-colors">
                                                 Markdown (.md)
                                             </button>
                                         </div>
@@ -274,7 +274,7 @@ export default function OutputDisplay({ data, activeTone, isPending }: OutputDis
                         {/* Hook - Moved to Top */}
                         {activeData.hook && (
                             <div className="mb-5 pl-4 border-l-2 border-[var(--plasma)] text-[var(--text-base)] bg-[var(--plasma-glow)] py-3 pr-2 rounded-r-[4px]">
-                                <span className="font-bold text-[var(--text-xs)] uppercase text-[var(--plasma)] block mb-1 tracking-wider">Hook</span>
+                                <span className="font-light text-[var(--text-xs)] uppercase text-[var(--plasma)] block mb-1 tracking-wider">Hook</span>
                                 {activeData.hook}
                             </div>
                         )}
