@@ -30,7 +30,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
     ];
 
     return (
-        <div className="space-y-1.5 text-[13px] font-normal">
+        <div className="space-y-1.5 text-[var(--text-base)] font-normal">
             {/* Row 1: Header (Input Selection) */}
             <div className="flex items-center justify-between py-[2px] border-t border-[#4a6b8c]/10 whitespace-nowrap">
                 <div className="flex gap-6 items-center">
@@ -57,7 +57,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
 
             {/* Content Input Area - Simplified */}
             <div className="space-y-1 pt-1">
-                <div className="flex justify-between items-center text-[#4a6b8c] text-[11px]">
+                <div className="flex justify-between items-center text-[#4a6b8c] text-[var(--text-sm)]">
                     <label>{currentInputType === 'text' ? 'Your Ideas' : 'Article URL'}</label>
                     {currentInputType === 'text' && (
                         <span className="opacity-50 text-[#1a1a1a]">
@@ -98,7 +98,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                     }
                                 }}
                                 className={`
-                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[11px] font-medium
+                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[var(--text-sm)] font-medium
                                     ${isPending ? 'opacity-50 cursor-not-allowed' : ''}
                                 `}
                             >
@@ -117,7 +117,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                                 setShowToneMenu(false);
                                             }}
                                             className={`
-                                                w-full text-left px-3 py-[1px] hover:bg-[#f5f5f5] text-[11px] font-medium transition-colors
+                                                w-full text-left px-3 py-[1px] hover:bg-[#f5f5f5] text-[var(--text-sm)] font-medium transition-colors
                                                 ${currentTone === t.toLowerCase() ? 'text-[#b86b3e]' : 'text-[#1a1a1a]/70'}
                                             `}
                                         >
@@ -140,7 +140,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                     }
                                 }}
                                 className={`
-                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[11px] font-medium
+                                    flex items-center gap-1.5 px-1 py-0.5 text-[#4a6b8c] hover:text-[#b86b3e] transition-all text-[var(--text-sm)] font-medium
                                     ${isPending ? 'opacity-50 cursor-not-allowed' : ''}
                                 `}
                             >
@@ -153,14 +153,14 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                     <button
                                         type="button"
                                         onClick={() => setValue('mode', 'post')}
-                                        className={`w-full text-left px-2 py-0.5 rounded-[1px] text-[11px] transition-colors ${currentMode === 'post' ? 'bg-[#b86b3e]/10 text-[#b86b3e]' : 'hover:bg-[#f5f5f5] text-[#1a1a1a]/70'}`}
+                                        className={`w-full text-left px-2 py-0.5 rounded-[1px] text-[var(--text-sm)] transition-colors ${currentMode === 'post' ? 'bg-[#b86b3e]/10 text-[#b86b3e]' : 'hover:bg-[#f5f5f5] text-[#1a1a1a]/70'}`}
                                     >
                                         Social Post
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setValue('mode', 'article')}
-                                        className={`w-full text-left px-2 py-0.5 rounded-[1px] text-[11px] transition-colors ${currentMode === 'article' ? 'bg-[#b86b3e]/10 text-[#b86b3e]' : 'hover:bg-[#f5f5f5] text-[#1a1a1a]/70'}`}
+                                        className={`w-full text-left px-2 py-0.5 rounded-[1px] text-[var(--text-sm)] transition-colors ${currentMode === 'article' ? 'bg-[#b86b3e]/10 text-[#b86b3e]' : 'hover:bg-[#f5f5f5] text-[#1a1a1a]/70'}`}
                                     >
                                         Full Article
                                     </button>
@@ -169,7 +169,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                     
                                     {/* Deep Research Toggle inside Dropdown */}
                                     <div className="flex items-center justify-between px-2 py-0.5">
-                                        <span className="text-[#4a6b8c] text-[10px]">Deep Research</span>
+                                        <span className="text-[#4a6b8c] text-[var(--text-xs)]">Deep Research</span>
                                         <button
                                             type="button"
                                             onClick={() => setValue('deepResearch', !deepResearch)}
@@ -182,9 +182,9 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                     {/* Pages Stepper inside Dropdown (Conditional) */}
                                     {isArticle && (
                                         <div className="flex items-center justify-between px-2 py-0.5">
-                                            <span className="text-[#4a6b8c] text-[10px]">Pages</span>
+                                            <span className="text-[#4a6b8c] text-[var(--text-xs)]">Pages</span>
                                             <div className="flex items-center border border-[#4a6b8c]/20 rounded-[2px] bg-[#dce1e6] overflow-hidden">
-                                                <button type="button" onClick={() => setValue('targetPages', Math.max(0.25, (Number(targetPages) || 1) - 0.25))} className="px-1 hover:text-[#b86b3e] transition-colors border-r border-[#4a6b8c]/20 text-[10px]">-</button>
+                                                <button type="button" onClick={() => setValue('targetPages', Math.max(0.25, (Number(targetPages) || 1) - 0.25))} className="px-1 hover:text-[#b86b3e] transition-colors border-r border-[#4a6b8c]/20 text-[var(--text-xs)]">-</button>
                                                 
                                                 <div className="flex items-center px-1">
                                                     {/* Integer Part */}
@@ -204,11 +204,11 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                                             if (val === '') setValue('targetPages', 0 + dec);
                                                             else setValue('targetPages', Math.min(10, Number(val)) + dec);
                                                         }}
-                                                        className="w-4 bg-transparent text-right text-[#b86b3e] text-[10px] font-bold outline-none"
+                                                        className="w-4 bg-transparent text-right text-[#b86b3e] text-[var(--text-xs)] font-bold outline-none"
                                                     />
                                                     
                                                     {/* Fixed Dot */}
-                                                    <span className="text-[#b86b3e]/40 font-bold text-[10px] select-none mx-[0.5px]">.</span>
+                                                    <span className="text-[#b86b3e]/40 font-bold text-[var(--text-xs)] select-none mx-[0.5px]">.</span>
                                                     
                                                     {/* Decimal Part */}
                                                     <input 
@@ -224,11 +224,11 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                                                             if (val === '') setValue('targetPages', int + 0);
                                                             else setValue('targetPages', int + (Number(val) / 100));
                                                         }}
-                                                        className="w-5 bg-transparent text-left text-[#b86b3e] text-[10px] font-bold outline-none"
+                                                        className="w-5 bg-transparent text-left text-[#b86b3e] text-[var(--text-xs)] font-bold outline-none"
                                                     />
                                                 </div>
 
-                                                <button type="button" onClick={() => setValue('targetPages', Math.min(10, (Number(targetPages) || 1) + 0.25))} className="px-1 hover:text-[#b86b3e] transition-colors border-l border-[#4a6b8c]/20 text-[10px]">+</button>
+                                                <button type="button" onClick={() => setValue('targetPages', Math.min(10, (Number(targetPages) || 1) + 0.25))} className="px-1 hover:text-[#b86b3e] transition-colors border-l border-[#4a6b8c]/20 text-[var(--text-xs)]">+</button>
                                             </div>
                                         </div>
                                     )}
@@ -249,7 +249,7 @@ export default function EnhancerForm({ isPending, apiError, onGenerate, onStop }
                         {isPending ? <Octagon size={14} /> : <ArrowRight size={14} />}
                     </button>
                 </div>
-                {errors.text && <p className="text-red-500/70 text-[11px]">{errors.text.message as string}</p>}
+                {errors.text && <p className="text-red-500/70 text-[var(--text-sm)]">{errors.text.message as string}</p>}
             </div>
 
             {apiError && (

@@ -33,12 +33,14 @@ Every universe is defined in `index.css` under a specific class (e.g., `.theme-v
 ## 📐 Layout & Typography
 
 ### Typography Hierarchy:
-GhostPost uses the **Inter** font family (or system sans-serif) with the following token scale:
-- `text-xs`: 0.75rem (Metadata, Citations)
-- `text-sm`: 0.875rem (Standard Labels, Sidebar)
-- `text-base`: 1rem (Body Text, Form Inputs)
-- `text-xl`: 1.25rem (Card Headers)
-- `text-2xl`: 1.5rem (Page Titles)
+GhostPost uses the **Inter** font family (or system sans-serif) with the following token scale (based on a 1.25x modular ratio):
+- `text-xs`: 0.75rem (12px) - Metadata, Citations, Tiny Labels
+- `text-sm`: 0.875rem (14px) - Sidebar Items, Secondary UI, Buttons
+- `text-base`: 1rem (16px) - Primary Body Text, Form Inputs
+- `text-md`: 1.25rem (20px) - Section Sub-headers
+- `text-lg`: 1.5rem (24px) - Page Section Titles
+- `text-xl`: 2rem (32px) - Main Page Titles
+- `text-2xl`: 3rem (48px) - Hero / Large Headlines
 
 ### Spacing:
 We follow a 4px grid system:

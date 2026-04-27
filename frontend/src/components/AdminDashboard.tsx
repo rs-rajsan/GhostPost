@@ -32,7 +32,7 @@ const AdminDashboard: React.FC = () => {
       <div className="flex-1 flex items-center justify-center bg-[var(--void-base)]">
         <div className="flex flex-col items-center gap-4">
           <RefreshCw className="text-[var(--plasma)] animate-spin" size={32} />
-          <p className="text-[12px] text-[var(--text-2)] font-medium">Syncing with Clickhouse analytics...</p>
+          <p className="text-[var(--text-sm)] text-[var(--text-2)] font-medium">Syncing with Clickhouse analytics...</p>
         </div>
       </div>
     );
@@ -43,13 +43,13 @@ const AdminDashboard: React.FC = () => {
       <div className="flex-1 flex items-center justify-center bg-[var(--void-base)]">
         <div className="flex flex-col items-center gap-4 max-w-xs text-center">
           <AlertCircle className="text-[var(--error)]" size={40} />
-          <h2 className="text-[16px] font-semibold text-[var(--text-1)]">Observability Offline</h2>
-          <p className="text-[12px] text-[var(--text-3)] leading-relaxed">
+          <h2 className="text-[var(--text-md)] font-semibold text-[var(--text-1)]">Observability Offline</h2>
+          <p className="text-[var(--text-sm)] text-[var(--text-3)] leading-relaxed">
             We couldn't connect to the analytical database. Make sure Helicone and Clickhouse services are running.
           </p>
           <button 
             onClick={() => refetch()}
-            className="mt-2 px-4 py-2 bg-[var(--plasma)] text-[var(--void-base)] text-[12px] font-bold rounded-[4px] hover:opacity-90 transition-all flex items-center gap-2"
+            className="mt-2 px-4 py-2 bg-[var(--plasma)] text-[var(--void-base)] text-[var(--text-sm)] font-bold rounded-[4px] hover:opacity-90 transition-all flex items-center gap-2"
           >
             <RefreshCw size={14} /> Try Reconnecting
           </button>
@@ -83,23 +83,23 @@ const AdminDashboard: React.FC = () => {
       {/* Topbar */}
       <header className="border-b border-[var(--border)] px-6 py-4 flex justify-between items-center bg-[var(--void-base)]/80 backdrop-blur-md sticky top-0 z-20">
         <div>
-          <h1 className="text-[14px] font-semibold text-[var(--text-1)]">Admin Observability</h1>
-          <p className="text-[11px] text-[var(--text-3)] font-geist">Helicone-powered LLM metrics & KPIs</p>
+          <h1 className="text-[var(--text-base)] font-semibold text-[var(--text-1)]">Admin Observability</h1>
+          <p className="text-[var(--text-sm)] text-[var(--text-3)] font-geist">Helicone-powered LLM metrics & KPIs</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => refetch()}
             disabled={isFetching}
-            className="flex items-center gap-2 px-3 py-1.5 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] text-[11px] text-[var(--text-2)] hover:text-[var(--text-1)] transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] text-[var(--text-sm)] text-[var(--text-2)] hover:text-[var(--text-1)] transition-all"
           >
             <RefreshCw size={12} className={`${isFetching ? 'animate-spin text-[var(--plasma)]' : ''}`} />
             {isFetching ? 'Refreshing...' : 'Refresh Data'}
           </button>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[6px] text-[11px] text-[var(--text-2)]">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[6px] text-[var(--text-sm)] text-[var(--text-2)]">
             <Database size={12} className="text-[var(--plasma)]" />
             <span>Clickhouse: Online</span>
           </div>
-          <button className="px-3 py-1.5 bg-[var(--plasma)] text-[var(--void-base)] text-[11px] font-semibold rounded-[4px] hover:opacity-90 transition-opacity">
+          <button className="px-3 py-1.5 bg-[var(--plasma)] text-[var(--void-base)] text-[var(--text-sm)] font-semibold rounded-[4px] hover:opacity-90 transition-opacity">
             Export Report
           </button>
         </div>
@@ -115,12 +115,12 @@ const AdminDashboard: React.FC = () => {
                 <div className={`p-2 rounded-[6px] bg-white/[0.03] ${kpi.color}`}>
                   <kpi.icon size={18} />
                 </div>
-                <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${kpi.change.startsWith('+') ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--info)]/10 text-[var(--info)]'}`}>
+                <span className={`text-[var(--text-xs)] font-mono font-bold px-1.5 py-0.5 rounded ${kpi.change.startsWith('+') ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--info)]/10 text-[var(--info)]'}`}>
                   {kpi.change}
                 </span>
               </div>
-              <div className="text-[20px] font-semibold text-[var(--text-1)] mb-1">{kpi.value}</div>
-              <div className="text-[11px] text-[var(--text-3)] font-medium uppercase tracking-wider">{kpi.label}</div>
+              <div className="text-[var(--text-md)] font-semibold text-[var(--text-1)] mb-1">{kpi.value}</div>
+              <div className="text-[var(--text-sm)] text-[var(--text-3)] font-medium uppercase tracking-wider">{kpi.label}</div>
             </div>
           ))}
         </div>
@@ -132,11 +132,11 @@ const AdminDashboard: React.FC = () => {
             <div className="px-5 py-4 border-b border-[var(--border)] flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Activity size={16} className="text-[var(--plasma)]" />
-                <h2 className="text-[13px] font-semibold">Request Volume (24h)</h2>
+                <h2 className="text-[var(--text-base)] font-semibold">Request Volume (24h)</h2>
               </div>
               <div className="flex gap-1">
                 {['1h', '24h', '7d', '30d'].map(t => (
-                  <button key={t} className={`px-2 py-1 text-[10px] rounded ${t === '24h' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)]' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>
+                  <button key={t} className={`px-2 py-1 text-[var(--text-xs)] rounded ${t === '24h' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)]' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>
                     {t}
                   </button>
                 ))}
@@ -156,8 +156,8 @@ const AdminDashboard: React.FC = () => {
               {volumeData.length === 0 && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <BarChart3 size={32} className="text-[var(--text-3)] mb-3 opacity-40" />
-                  <p className="text-[12px] text-[var(--text-2)] font-medium">Metric visualization pending data sync</p>
-                  <p className="text-[10px] text-[var(--text-3)] mt-1">Connect to Clickhouse database to enable live charts</p>
+                  <p className="text-[var(--text-sm)] text-[var(--text-2)] font-medium">Metric visualization pending data sync</p>
+                  <p className="text-[var(--text-xs)] text-[var(--text-3)] mt-1">Connect to Clickhouse database to enable live charts</p>
                 </div>
               )}
             </div>
@@ -166,12 +166,12 @@ const AdminDashboard: React.FC = () => {
           {/* Model Distribution */}
           <div className="bg-[var(--void-surface)] border border-[var(--border)] rounded-[12px] flex flex-col">
             <div className="px-5 py-4 border-b border-[var(--border)]">
-              <h2 className="text-[13px] font-semibold">Model Distribution</h2>
+              <h2 className="text-[var(--text-base)] font-semibold">Model Distribution</h2>
             </div>
             <div className="p-5 flex-1 space-y-4">
               {modelDist.length > 0 ? modelDist.map((model: any, i: number) => (
                 <div key={i} className="space-y-1.5">
-                  <div className="flex justify-between text-[11px]">
+                  <div className="flex justify-between text-[var(--text-sm)]">
                     <span className="text-[var(--text-2)]">{model.model}</span>
                     <span className="text-[var(--text-1)] font-mono">{model.percentage}%</span>
                   </div>
@@ -180,14 +180,14 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               )) : (
-                <div className="text-[11px] text-[var(--text-3)] text-center py-10 italic">No model data available</div>
+                <div className="text-[var(--text-sm)] text-[var(--text-3)] text-center py-10 italic">No model data available</div>
               )}
               <div className="pt-4 mt-4 border-t border-[var(--border)]">
                 <div className="flex items-center gap-2 text-[var(--success)] mb-2">
                   <TrendingUp size={14} />
-                  <span className="text-[11px] font-semibold">Cost Efficiency: High</span>
+                  <span className="text-[var(--text-sm)] font-semibold">Cost Efficiency: High</span>
                 </div>
-                <p className="text-[10px] text-[var(--text-3)] leading-relaxed font-geist">
+                <p className="text-[var(--text-xs)] text-[var(--text-3)] leading-relaxed font-geist">
                   Your current model mix is optimized for performance. GPT-4o handles 65% of critical tasks while cost-effective models handle secondary logic.
                 </p>
               </div>
@@ -198,9 +198,9 @@ const AdminDashboard: React.FC = () => {
         {/* Recent Requests Table */}
         <div className="bg-[var(--void-surface)] border border-[var(--border)] rounded-[12px] overflow-hidden">
           <div className="px-5 py-4 border-b border-[var(--border)] flex justify-between items-center">
-            <h2 className="text-[13px] font-semibold">Recent Requests (Live)</h2>
+            <h2 className="text-[var(--text-base)] font-semibold">Recent Requests (Live)</h2>
             <div className="flex gap-2">
-              <div className="flex items-center gap-2 px-2.5 py-1 bg-[var(--void-base)] border border-[var(--border)] rounded-[4px] text-[10px]">
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-[var(--void-base)] border border-[var(--border)] rounded-[4px] text-[var(--text-xs)]">
                 <Search size={10} className="text-[var(--text-3)]" />
                 <input type="text" placeholder="Search logs..." className="bg-transparent outline-none w-24 text-[var(--text-2)]" />
               </div>
@@ -213,45 +213,45 @@ const AdminDashboard: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[var(--border)] bg-white/[0.01]">
-                  <th className="px-5 py-3 text-[10px] font-semibold text-[var(--text-3)] uppercase tracking-wider">Request ID</th>
-                  <th className="px-5 py-3 text-[10px] font-semibold text-[var(--text-3)] uppercase tracking-wider">Model</th>
-                  <th className="px-5 py-3 text-[10px] font-semibold text-[var(--text-3)] uppercase tracking-wider">Tokens</th>
-                  <th className="px-5 py-3 text-[10px] font-semibold text-[var(--text-3)] uppercase tracking-wider">Cost</th>
-                  <th className="px-5 py-3 text-[10px] font-semibold text-[var(--text-3)] uppercase tracking-wider">Status</th>
-                  <th className="px-5 py-3 text-[10px] font-semibold text-[var(--text-3)] uppercase tracking-wider">Time</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Request ID</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Model</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Tokens</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Cost</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Status</th>
+                  <th className="px-5 py-3 text-[var(--text-xs)] font-medium text-[var(--text-3)]">Time</th>
                 </tr>
               </thead>
               <tbody>
                 {recentLogs.map((log: any, i: number) => (
                   <tr key={i} className="border-b border-[var(--border)] hover:bg-white/[0.02] transition-colors group cursor-pointer">
-                    <td className="px-5 py-3 text-[11px] font-mono text-[var(--text-2)] group-hover:text-[var(--plasma)] transition-colors">{log.id}</td>
-                    <td className="px-5 py-3 text-[11px] text-[var(--text-1)]">{log.model}</td>
-                    <td className="px-5 py-3 text-[11px] text-[var(--text-2)]">{log.tokens.toLocaleString()}</td>
-                    <td className="px-5 py-3 text-[11px] text-[var(--text-2)] font-mono">{log.cost}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-mono text-[var(--text-2)] group-hover:text-[var(--plasma)] transition-colors">{log.id}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-1)]">{log.model}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-2)]">{log.tokens.toLocaleString()}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-2)] font-mono">{log.cost}</td>
                     <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded-[4px] text-[9px] font-bold uppercase tracking-wider ${log.status === 'success' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--error)]/10 text-[var(--error)]'}`}>
+                      <span className={`px-2 py-0.5 rounded-[4px] text-[var(--text-xs)] font-medium uppercase tracking-wider ${log.status === 'success' ? 'bg-[var(--success)]/10 text-[var(--success)]' : 'bg-[var(--error)]/10 text-[var(--error)]'}`}>
                         {log.status}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-[11px] text-[var(--text-3)]">{log.time}</td>
+                    <td className="px-5 py-3 text-[var(--text-sm)] font-medium text-[var(--text-3)]">{log.time}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <div className="px-5 py-3 bg-white/[0.01] flex justify-center">
-            <button className="text-[10px] text-[var(--text-3)] hover:text-[var(--plasma)] font-semibold transition-colors">
+            <button className="text-[var(--text-xs)] text-[var(--text-3)] hover:text-[var(--plasma)] font-semibold transition-colors">
               View All Interaction Logs
             </button>
           </div>
         </div>
 
         {/* System Health Footer */}
-        <div className="flex items-center justify-between text-[10px] text-[var(--text-3)] px-2">
+        <div className="flex items-center justify-between text-[var(--text-xs)] text-[var(--text-3)] px-2">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse"></div>
-              <span className="text-[10px] text-[var(--text-2)] font-geist uppercase tracking-widest">LIVE DATA SYNC</span>
+              <span className="text-[var(--text-xs)] text-[var(--text-2)] font-geist uppercase tracking-widest">LIVE DATA SYNC</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)]"></div>

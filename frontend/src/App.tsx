@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useForm, FormProvider } from 'react-hook-form';
 import axios from 'axios';
-import { Sparkles, LayoutDashboard, Settings, Plus, History, Zap, Palette, Layers, ChevronDown, ArrowUp, Link2, FileText, Octagon, BarChart3 } from 'lucide-react';
+import { Sparkles, LayoutDashboard, Settings, Plus, History, Zap, Palette, Layers, ChevronDown, ArrowUp, Link2, FileText, Octagon, BarChart3, RotateCcw } from 'lucide-react';
 import OutputDisplay from './components/OutputDisplay';
 import Newsroom from './components/Newsroom';
 import SettingsView from './components/Settings';
@@ -147,6 +147,11 @@ function AppContent() {
         }
     };
 
+    const handleClear = () => {
+        setValue('text', '');
+        setResult({});
+    };
+
     return (
         <div className="flex h-screen w-full bg-[var(--void-base)] text-[var(--text-1)] overflow-hidden font-sans">
             <FormProvider {...methods}>
@@ -154,63 +159,62 @@ function AppContent() {
                 <aside className="w-56 h-full flex flex-col bg-[var(--void-surface)] border-r border-[var(--border)] hidden md:flex">
                     <div className="p-6">
                         {/* Logo Row */}
-                        <div className="flex items-center gap-2 mb-8 px-2">
-                            <div className="w-8 h-8 bg-[var(--plasma)] rounded-[4px] flex items-center justify-center shadow-lg shadow-[var(--plasma)]/20">
-                                <Sparkles className="text-[var(--void-base)]" size={18} />
+                        <div className="flex items-center gap-3 mb-8 px-2">
+                            <div className="w-12 h-12 rounded-[6px] overflow-hidden flex items-center justify-center shadow-2xl shadow-[var(--plasma)]/30 border border-[var(--plasma)]/10">
+                                <img src="/logo.png" alt="GhostPost Logo" className="w-full h-full object-cover scale-110" />
                             </div>
-                            <span className="text-[var(--text-base)] font-bold text-[var(--text-1)] tracking-tight">GhostPost <span className="text-[var(--plasma)]">Studio</span></span>
+                            <div className="flex flex-col leading-[1.1]">
+                                <span className="text-[var(--text-md)] font-bold text-[var(--text-1)] tracking-tight">GhostPost</span>
+                                <span className="text-[var(--text-md)] font-bold text-[var(--plasma)] tracking-tight">Studio</span>
+                            </div>
                         </div>
-                        <div className="text-[10px] text-[var(--text-3)] font-geist tracking-[0.2em] uppercase pl-[2px] mb-8">
+                        <div className="text-[var(--text-xs)] text-[var(--text-3)] font-geist tracking-[0.2em] uppercase pl-[2px] mb-8">
                             Agentic Content OS
                         </div>
 
-                        {/* New Session Button */}
-                        <button className="w-full flex items-center justify-center gap-2 px-3 py-2 border border-[var(--border)] bg-[var(--plasma-dim)] text-[var(--plasma)] text-[12px] rounded-[3px] hover:bg-[var(--plasma)] hover:text-[var(--void-base)] transition-all font-medium group">
-                            <Plus size={12} className="transition-transform group-hover:rotate-90" />
-                            New Session
-                        </button>
+
                     </div>
                     {/* Nav Section */}
                     <nav className="flex-1 px-3 mt-4 space-y-0.5">
-                        <div className="text-[9px] tracking-[0.2em] text-[var(--text-3)] font-geist px-2 mb-2 uppercase">
+                        <div className="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-3)] font-geist px-2 mb-2 uppercase">
                             Workspace
                         </div>
                         
                         <button 
                             onClick={() => setActiveView('enhance')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-r-[3px] text-[12px] transition-all font-medium ${activeView === 'enhance' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-r-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'enhance' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <LayoutDashboard size={14} />
                             Enhance
                         </button>
                         <button 
                             onClick={() => setActiveView('sessions')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[12px] transition-all font-medium ${activeView === 'sessions' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'sessions' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <History size={14} />
                             Sessions
                         </button>
                         <button 
                             onClick={() => setActiveView('pipelines')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[12px] transition-all font-medium ${activeView === 'pipelines' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'pipelines' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <Zap size={14} />
                             Pipelines
                         </button>
                         <button 
                             onClick={() => setActiveView('settings')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[12px] transition-all font-medium ${activeView === 'settings' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'settings' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <Settings size={14} />
                             Settings
                         </button>
 
-                        <div className="text-[9px] tracking-[0.2em] text-[var(--text-3)] font-geist px-2 mb-2 mt-6 uppercase">
+                        <div className="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-3)] font-geist px-2 mb-2 mt-6 uppercase">
                             Infrastructure
                         </div>
                         <button 
                             onClick={() => setActiveView('admin')}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[12px] transition-all font-medium ${activeView === 'admin' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-[3px] text-[var(--text-sm)] transition-all font-medium ${activeView === 'admin' ? 'bg-[var(--plasma-dim)] text-[var(--plasma)] border-l-2 border-[var(--plasma)]' : 'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.03]'}`}
                         >
                             <BarChart3 size={14} />
                             Observability
@@ -220,13 +224,13 @@ function AppContent() {
                     {/* User Footer */}
                     <div className="p-3 border-t border-[var(--border)]">
                         <div className="flex items-center gap-3 px-2 py-1.5 rounded-[6px] hover:bg-white/[0.03] cursor-pointer transition-all">
-                            <div className="w-7 h-7 rounded-full bg-[var(--violet-dim)] border border-[var(--violet)]/30 text-[var(--violet)] font-geist text-[10px] flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-[var(--violet-dim)] border border-[var(--violet)]/30 text-[var(--violet)] font-geist text-[var(--text-xs)] flex items-center justify-center shrink-0">
                                 {userName.charAt(0)}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className="text-[12px] font-medium text-[var(--text-1)] truncate">{userName}</div>
+                                <div className="text-[var(--text-sm)] font-medium text-[var(--text-1)] truncate">{userName}</div>
                             </div>
-                            <div className="text-[9px] bg-[var(--plasma-dim)] text-[var(--plasma)] px-1.5 py-0.5 rounded-[2px] font-geist font-medium">
+                            <div className="text-[var(--text-xs)] bg-[var(--plasma-dim)] text-[var(--plasma)] px-1.5 py-0.5 rounded-[2px] font-geist font-medium">
                                 PRO
                             </div>
                         </div>
@@ -249,8 +253,8 @@ function AppContent() {
                             {/* TOPBAR */}
                             <header className="border-b border-[var(--border)] px-5 py-3 flex justify-between items-center bg-[var(--void-base)]/80 backdrop-blur-md z-20">
                                 <div>
-                                    <h1 className="text-[13px] font-medium text-[var(--text-1)]">Content Enhancer</h1>
-                                    <p className="text-[11px] text-[var(--text-3)] font-geist">Agentic pipeline · 4 tone variants</p>
+                                    <h1 className="text-[var(--text-base)] font-medium text-[var(--text-1)]">Content Enhancer</h1>
+                                    <p className="text-[var(--text-sm)] text-[var(--text-3)] font-geist">Agentic pipeline · 4 tone variants</p>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-2 px-3 py-1 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-full">
@@ -276,8 +280,8 @@ function AppContent() {
                                     {Object.keys(result).length === 0 && !isGenerating ? (
                                         <div className="flex-1 flex flex-col items-center justify-center opacity-10">
                                             <Sparkles size={40} className="text-[var(--plasma)] mb-4" />
-                                            <p className="text-[13px] text-[var(--text-3)] font-medium">Waiting for input</p>
-                                            <p className="text-[11px] text-[var(--text-3)] italic mt-1 font-geist tracking-wide">Paste your ideas below and hit Generate</p>
+                                            <p className="text-[var(--text-base)] text-[var(--text-3)] font-medium">Waiting for input</p>
+                                            <p className="text-[var(--text-sm)] text-[var(--text-3)] italic mt-1 font-geist tracking-wide">Paste your ideas below and hit Generate</p>
                                         </div>
                                     ) : (
                                         <OutputDisplay
@@ -299,7 +303,7 @@ function AppContent() {
                                             <button 
                                                 type="button"
                                                 onClick={() => setShowInputTypeMenu(!showInputTypeMenu)}
-                                                className="flex items-center gap-1.5 px-3 py-1 border border-[var(--border)] hover:border-[var(--border-hover)] rounded-full text-[11px] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent transition-all"
+                                                className="flex items-center gap-1.5 px-3 py-1 border border-[var(--border)] hover:border-[var(--border-hover)] rounded-full text-[var(--text-sm)] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent transition-all"
                                             >
                                                 {currentInputType === 'text' ? <FileText size={12} /> : <Link2 size={12} />}
                                                 <span>{currentInputType === 'text' ? 'Raw Text' : 'Article URL'}</span>
@@ -307,10 +311,10 @@ function AppContent() {
                                             </button>
                                             {showInputTypeMenu && (
                                                 <div className="absolute bottom-full mb-2 left-0 w-32 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col z-50">
-                                                    <button onClick={() => { setValue('inputType', 'text'); setShowInputTypeMenu(false); }} className="px-3 py-1.5 text-left text-[11px] hover:bg-[var(--plasma-dim)] transition-colors flex items-center gap-2">
+                                                    <button onClick={() => { setValue('inputType', 'text'); setShowInputTypeMenu(false); }} className="px-3 py-1.5 text-left text-[var(--text-sm)] hover:bg-[var(--plasma-dim)] transition-colors flex items-center gap-2">
                                                         <FileText size={12} /> Raw Text
                                                     </button>
-                                                    <button onClick={() => { setValue('inputType', 'article'); setShowInputTypeMenu(false); }} className="px-3 py-1.5 text-left text-[11px] hover:bg-[var(--plasma-dim)] transition-colors flex items-center gap-2">
+                                                    <button onClick={() => { setValue('inputType', 'article'); setShowInputTypeMenu(false); }} className="px-3 py-1.5 text-left text-[var(--text-sm)] hover:bg-[var(--plasma-dim)] transition-colors flex items-center gap-2">
                                                         <Link2 size={12} /> Article URL
                                                     </button>
                                                 </div>
@@ -322,7 +326,7 @@ function AppContent() {
                                             <button 
                                                 type="button"
                                                 onClick={() => setShowToneMenu(!showToneMenu)}
-                                                className="flex items-center gap-1.5 px-3 py-1 border border-[var(--border)] hover:border-[var(--border-hover)] rounded-full text-[11px] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent transition-all"
+                                                className="flex items-center gap-1.5 px-3 py-1 border border-[var(--border)] hover:border-[var(--border-hover)] rounded-full text-[var(--text-sm)] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent transition-all"
                                             >
                                                 <Palette size={12} />
                                                 <span>Tone: <span className="text-[var(--plasma)] capitalize">{currentTone}</span></span>
@@ -331,7 +335,7 @@ function AppContent() {
                                             {showToneMenu && (
                                                 <div className="absolute bottom-full mb-2 left-0 w-32 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col z-50">
                                                     {['Professional', 'Conversational', 'Story', 'Bold'].map((t) => (
-                                                        <button key={t} onClick={() => { setValue('tone', t.toLowerCase() as any); setShowToneMenu(false); }} className="px-3 py-1.5 text-left text-[11px] hover:bg-[var(--plasma-dim)] transition-colors capitalize">
+                                                        <button key={t} onClick={() => { setValue('tone', t.toLowerCase() as any); setShowToneMenu(false); }} className="px-3 py-1.5 text-left text-[var(--text-sm)] hover:bg-[var(--plasma-dim)] transition-colors capitalize">
                                                             {t}
                                                         </button>
                                                     ))}
@@ -344,7 +348,7 @@ function AppContent() {
                                             <button 
                                                 type="button"
                                                 onClick={() => setShowModeMenu(!showModeMenu)}
-                                                className="flex items-center gap-1.5 px-3 py-1 border border-[var(--border)] hover:border-[var(--border-hover)] rounded-full text-[11px] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent transition-all"
+                                                className="flex items-center gap-1.5 px-3 py-1 border border-[var(--border)] hover:border-[var(--border-hover)] rounded-full text-[var(--text-sm)] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent transition-all"
                                             >
                                                 <Layers size={12} />
                                                 <span>Mode: <span className="text-[var(--plasma)] capitalize">{currentMode}</span></span>
@@ -352,10 +356,10 @@ function AppContent() {
                                             </button>
                                             {showModeMenu && (
                                                 <div className="absolute bottom-full mb-2 left-0 w-44 bg-[var(--void-surface-2)] border border-[var(--border)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col z-50 p-1 gap-1">
-                                                    <button onClick={() => { setValue('mode', 'post'); setShowModeMenu(false); }} className="px-2 py-1.5 text-left text-[11px] hover:bg-[var(--plasma-dim)] transition-colors rounded text-[var(--text-1)]">
+                                                    <button onClick={() => { setValue('mode', 'post'); setShowModeMenu(false); }} className="px-2 py-1.5 text-left text-[var(--text-sm)] hover:bg-[var(--plasma-dim)] transition-colors rounded text-[var(--text-1)]">
                                                         Social Post
                                                     </button>
-                                                    <button onClick={() => { setValue('mode', 'article'); setShowModeMenu(false); }} className="px-2 py-1.5 text-left text-[11px] hover:bg-[var(--plasma-dim)] transition-colors rounded text-[var(--text-1)]">
+                                                    <button onClick={() => { setValue('mode', 'article'); setShowModeMenu(false); }} className="px-2 py-1.5 text-left text-[var(--text-sm)] hover:bg-[var(--plasma-dim)] transition-colors rounded text-[var(--text-1)]">
                                                         Full Article
                                                     </button>
                                                     
@@ -363,11 +367,11 @@ function AppContent() {
                                                         <>
                                                             <div className="h-[1px] bg-[var(--border)] my-1" />
                                                             <div className="flex items-center justify-between px-2 py-1">
-                                                                <span className="text-[10px] text-[var(--text-3)]">Target Pages</span>
+                                                                <span className="text-[var(--text-xs)] text-[var(--text-3)]">Target Pages</span>
                                                                 <div className="flex items-center border border-[var(--border)] rounded-[2px] bg-[var(--void-base)] overflow-hidden">
-                                                                    <button type="button" onClick={() => setValue('targetPages', Math.max(0.25, (Number(targetPages) || 0.5) - 0.25))} className="px-1.5 py-0.5 hover:text-[var(--plasma)] transition-colors border-r border-[var(--border)] text-[10px]">-</button>
-                                                                    <span className="px-2 text-[var(--plasma)] text-[10px] font-mono font-bold">{(Number(targetPages) || 0.5).toFixed(2)}</span>
-                                                                    <button type="button" onClick={() => setValue('targetPages', Math.min(50, (Number(targetPages) || 0.5) + 0.25))} className="px-1.5 py-0.5 hover:text-[var(--plasma)] transition-colors border-l border-[var(--border)] text-[10px]">+</button>
+                                                                    <button type="button" onClick={() => setValue('targetPages', Math.max(0.25, (Number(targetPages) || 0.5) - 0.25))} className="px-1.5 py-0.5 hover:text-[var(--plasma)] transition-colors border-r border-[var(--border)] text-[var(--text-xs)]">-</button>
+                                                                    <span className="px-2 text-[var(--plasma)] text-[var(--text-xs)] font-mono font-bold">{(Number(targetPages) || 0.5).toFixed(2)}</span>
+                                                                    <button type="button" onClick={() => setValue('targetPages', Math.min(50, (Number(targetPages) || 0.5) + 0.25))} className="px-1.5 py-0.5 hover:text-[var(--plasma)] transition-colors border-l border-[var(--border)] text-[var(--text-xs)]">+</button>
                                                                 </div>
                                                             </div>
                                                         </>
@@ -380,9 +384,9 @@ function AppContent() {
                                         <button 
                                             type="button"
                                             onClick={() => setValue('deepResearch', !deepResearch)}
-                                            className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[11px] transition-all
+                                            className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[var(--text-sm)] transition-all
                                                 ${deepResearch 
-                                                    ? 'border-[var(--success)]/40 text-[var(--success)] bg-[var(--success)]/10' 
+                                                    ? 'border-[var(--success)] text-[var(--success)] bg-[var(--success)]/10' 
                                                     : 'border-[var(--border)] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent hover:border-[var(--border-hover)]'
                                                 }
                                             `}
@@ -409,23 +413,34 @@ function AppContent() {
                                             }}
                                             rows={1}
                                             placeholder={currentInputType === 'text' ? "Paste your ideas or drop an article URL..." : "https://example.com/article..."}
-                                            className="flex-1 bg-transparent outline-none resize-none text-[13px] text-[var(--text-1)] placeholder:text-[var(--text-3)] min-h-[24px] max-h-[120px] leading-relaxed font-sans"
+                                            className="flex-1 bg-transparent outline-none resize-none text-[var(--text-base)] text-[var(--text-1)] placeholder:text-[var(--text-3)] min-h-[24px] max-h-[120px] leading-relaxed font-sans"
                                         />
 
-                                        <button
-                                            type="button"
-                                            onClick={isGenerating ? handleStop : () => handleGenerate(watch('tone') as any)}
-                                            className={`w-8 h-8 rounded-[6px] flex-shrink-0 flex items-center justify-center transition-all
-                                                ${isGenerating 
-                                                    ? 'bg-red-500/20 border border-red-500/30 text-red-400 animate-pulse' 
-                                                    : 'bg-[var(--plasma)] text-[var(--void-base)] hover:opacity-90'
-                                                }
-                                            `}
-                                        >
-                                            {isGenerating ? <Octagon size={16} /> : <ArrowUp size={16} />}
-                                        </button>
+                                        <div className="flex flex-col gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={handleClear}
+                                                className="w-8 h-8 rounded-[6px] flex-shrink-0 flex items-center justify-center bg-[var(--void-surface)] border border-[var(--border)] text-[var(--text-3)] hover:text-[var(--text-1)] hover:border-[var(--border-hover)] transition-all"
+                                                title="Clear Workspace"
+                                            >
+                                                <RotateCcw size={14} className="opacity-50" />
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={isGenerating ? handleStop : () => handleGenerate(watch('tone') as any)}
+                                                className={`w-8 h-8 rounded-[6px] flex-shrink-0 flex items-center justify-center transition-all
+                                                    ${isGenerating 
+                                                        ? 'bg-red-500/20 border border-red-500/30 text-red-400 animate-pulse' 
+                                                        : 'bg-[var(--plasma)] text-[var(--void-base)] hover:opacity-90'
+                                                    }
+                                                `}
+                                            >
+                                                {isGenerating ? <Octagon size={16} /> : <ArrowUp size={16} />}
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p className="text-center mt-2 text-[10px] text-[var(--text-3)] font-mono">
+                                    <p className="text-center mt-2 text-[var(--text-xs)] text-[var(--text-3)] font-mono">
                                         GhostPost may produce errors · verify before publishing
                                     </p>
                                 </div>

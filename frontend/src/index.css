@@ -6,13 +6,14 @@
 
 :root {
   /* --- TYPOGRAPHY ENGINE --- */
-  --text-xs: 10px;    /* Status badges / Tiny labels */
-  --text-sm: 11px;    /* Table headers / System mono */
-  --text-base: 13px;  /* Main body / Table cells */
-  --text-md: 15px;    /* Inputs / Article lead-ins */
-  --text-lg: 18px;    /* Section titles / Buttons */
-  --text-xl: 24px;    /* Page sub-titles */
-  --text-2xl: 32px;   /* Hero headers / Article titles */
+  /* --- TYPOGRAPHY ENGINE --- */
+  --text-xs: 0.75rem;     /* 12px: Status badges / Tiny labels */
+  --text-sm: 0.875rem;    /* 14px: Table headers / System mono */
+  --text-base: 1rem;      /* 16px: Main body / Table cells */
+  --text-md: 1.25rem;     /* 20px: Inputs / Article lead-ins */
+  --text-lg: 1.5rem;      /* 24px: Section titles / Buttons */
+  --text-xl: 2rem;        /* 32px: Page sub-titles */
+  --text-2xl: 3rem;       /* 48px: Hero headers / Article titles */
 
   /* --- DEFAULT VOID THEME (Dark) --- */
   --void-base: #03050D;
@@ -205,7 +206,7 @@
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 12px;
+  font-size: var(--text-base);
   line-height: 1.6;
   color: var(--text-1);
   background-color: var(--void-base);
@@ -247,7 +248,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    font-size: 11px;
+    font-size: var(--text-sm);
     font-weight: 700;
     border-radius: 4px;
     transition: all 0.2s;
