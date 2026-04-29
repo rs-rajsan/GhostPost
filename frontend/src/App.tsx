@@ -12,7 +12,7 @@ import Watchlist from './components/Watchlist';
 import { useEnhance, type EnhanceResponse } from './hooks/useEnhance';
 
 const queryClient = new QueryClient();
-const API_BASE = 'http://localhost:5000/api/data';
+const API_BASE = '/api/data';
 
 interface FormValues {
     inputType: 'text' | 'topic' | 'article';
@@ -41,7 +41,6 @@ function AppContent() {
             text: '',
             mode: 'post',
             targetPages: 0.5,
-            deepResearch: false,
             tone: 'professional'
         }
     });
@@ -82,7 +81,7 @@ function AppContent() {
     const currentTone = watch('tone');
     const currentMode = watch('mode');
     const currentInputType = watch('inputType');
-    const deepResearch = watch('deepResearch');
+
     const targetPages = watch('targetPages');
 
     const handleGenerate = async (tone: string) => {
@@ -387,20 +386,7 @@ function AppContent() {
                                             )}
                                         </div>
 
-                                        {/* Deep Research Chip */}
-                                        <button 
-                                            type="button"
-                                            onClick={() => setValue('deepResearch', !deepResearch)}
-                                            className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[var(--text-sm)] transition-all
-                                                ${deepResearch 
-                                                    ? 'border-[var(--success)] text-[var(--success)] bg-[var(--success)]/10' 
-                                                    : 'border-[var(--border)] text-[var(--text-2)] hover:text-[var(--text-1)] bg-transparent hover:border-[var(--border-hover)]'
-                                                }
-                                            `}
-                                        >
-                                            <Sparkles size={12} />
-                                            <span>Deep Research</span>
-                                        </button>
+
                                     </div>
 
                                     {/* Input Box */}
@@ -419,7 +405,7 @@ function AppContent() {
                                                 }
                                             }}
                                             rows={1}
-                                            placeholder={currentInputType === 'text' ? "Paste your ideas or drop an article URL..." : "https://example.com/article..."}
+                                            placeholder={currentInputType === 'text' ? "Enter a topic, prompt, or paste your source material..." : "https://example.com/article..."}
                                             className="flex-1 bg-transparent outline-none resize-none text-[var(--text-base)] text-[var(--text-1)] placeholder:text-[var(--text-3)] min-h-[24px] max-h-[120px] leading-relaxed font-sans"
                                         />
 

@@ -253,18 +253,7 @@ GUIDELINES:
             const { tone, text, researchData, isTopic } = options;
             return `
 You are an elite Social Media Copywriter. 
-Return ONLY a JSON object.
-
-OUTPUT FORMAT (MANDATORY):
-{
-  "title": "A short, punchy title",
-  "hook": "The actual attention-grabbing hook text (1-2 sentences)",
-  "enhancedPost": "The post text starting with the TITLE",
-  "hookScore": 9,
-  "hookTip": "Optimization advice or strategy used for this hook",
-  "hashtags": ["#AgentAISchool", "#tag1"],
-  "visualSuggestion": "..."
-}
+Your mission: Write a comprehensive, high-authority post based on the provided input and research.
 
 TONE: ${tone}
 STRICT RULE: Your response must be 300 words or less. DO NOT exceed this limit.

@@ -106,6 +106,25 @@ export function extractAndParseJson<T>(text: string): T {
  * Format: [FIELD]: value
  */
 export function parseStructuredText(text: string): any {
+    // Defensive Check: If the LLM somehow returns JSON despite instructions, use it directly.
+    try {
+        const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
+        const parsed = JSON.parse(cleaned);
+        if (parsed && typeof parsed === 'object' && (parsed.enhancedPost || parsed.title)) {
+            return {
+                title: parsed.title || '',
+                hook: parsed.hook || '',
+                enhancedPost: parsed.enhancedPost || parsed.content || '',
+                hookScore: parsed.hookScore || 9,
+                hookTip: parsed.hookTip || '',
+                hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
+                visualSuggestion: parsed.visualSuggestion || ''
+            };
+        }
+    } catch (e) {
+        // Not JSON, proceed to parse as structured text
+    }
+
     const result: any = {
         title: '',
         hook: '',

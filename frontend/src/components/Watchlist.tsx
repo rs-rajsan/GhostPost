@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Plus, RefreshCw, CheckCircle2, AlertTriangle, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api/data';
+const API_BASE = '/api/data';
 
 interface WatchlistItem {
     id: number;

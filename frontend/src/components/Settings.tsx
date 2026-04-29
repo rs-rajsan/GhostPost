@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Palette, User, Zap, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api/data';
+const API_BASE = '/api/data';
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState<'profile' | 'theme'>('profile');

@@ -16,7 +16,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api/admin';
+const API_BASE = '/api/admin';
 
 const AdminDashboard: React.FC = () => {
   const { data, isLoading, isError, refetch, isFetching } = useQuery({

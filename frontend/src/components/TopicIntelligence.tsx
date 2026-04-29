@@ -3,7 +3,7 @@ import { type PipelineTopic } from '../db';
 import { Search, CheckCircle2, X, AlertCircle, FileText, Download, Copy, Check, FileDown, Trash2, ArrowUpDown, Play, Loader2, Octagon, ChevronRight, Clock, Eye, ChevronDown } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api/data';
+const API_BASE = '/api/data';
 
 export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle: (id: number, topic: string) => void, mode?: 'pipeline' | 'sessions' }) {
     const [topics, setTopics] = useState<PipelineTopic[]>([]);
@@ -63,7 +63,7 @@ export function TopicGrid({ onOpenArticle, mode = 'pipeline' }: { onOpenArticle:
                 return;
             }
 
-            const response = await axios.post('http://localhost:5000/api/research', {
+            const response = await axios.post('/api/research', {
                 watchlist: companyNames
             }, { signal: controller.signal });
 

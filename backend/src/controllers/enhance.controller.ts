@@ -5,6 +5,7 @@ import * as extractionService from '../services/extraction.service';
 import logger from '../utils/logger';
 import { statusService } from '../services/status.service';
 import { v4 as uuidv4 } from 'uuid';
+import { determineIntent } from '../utils/intent.util';
 
 const enhanceSchema = z.object({
     inputType: z.enum(['text', 'article', 'topic']).default('text'),
@@ -18,10 +19,17 @@ const enhanceSchema = z.object({
 
 export const enhance = async (req: Request, res: Response) => {
     try {
-        const { text, inputType, mode, targetPages, deepResearch, requestId: clientRequestId, tone } = enhanceSchema.parse(req.body);
+        const parsedBody = enhanceSchema.parse(req.body);
+        let { text, inputType, mode, targetPages, requestId: clientRequestId, tone } = parsedBody;
+
+        // Intelligent Auto-Routing Heuristic via Utility (SRP)
+        const intent = determineIntent(inputType, text);
+        const isTopic = intent.isTopic;
+        const deepResearch = parsedBody.deepResearch || intent.deepResearch;
+
         const requestId = clientRequestId || uuidv4();
 
-        logger.info({ requestId, inputType, textLength: text.length, mode, targetPages, deepResearch, tone }, 'Processing enhance request via Multi-Agent System');
+        logger.info({ requestId, inputType, textLength: text.length, mode, targetPages, deepResearch, tone, isTopic }, 'Processing enhance request via Multi-Agent System');
 
         // Strategy Pattern for Extraction
         type ExtractorFunction = (input: string) => Promise<string> | string;
@@ -44,7 +52,7 @@ export const enhance = async (req: Request, res: Response) => {
             mode,
             targetPages,
             deepResearch,
-            isTopic: inputType === 'topic',
+            isTopic,
             requestId,
             tone
         });

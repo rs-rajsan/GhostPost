@@ -26,13 +26,24 @@ export class ValidationAgent extends BaseAgent {
         this.log('Performing factual and structural validation...');
 
         try {
+            const isContextEmpty = !context || context.trim() === '';
+            
+            // Design Pattern: Dynamic Template Method
+            const hallucinationInstruction = isContextEmpty
+                ? '- Context is empty. Skip strict hallucination check and evaluate purely on general internal knowledge.'
+                : '- BE AGGRESSIVE. If a specific factual claim is not supported by or contradicted by the context, it is a hallucination.';
+
+            const confidenceInstruction = isContextEmpty
+                ? 'Rate from 0-100 based on structural coherence and internal knowledge accuracy.'
+                : 'Rate from 0-100 based on how much of the content is verifiable against the provided research.';
+
             const prompt = `
             Act as a Senior Editorial Auditor and Fact-Checker.
             Your mission is to audit the "Draft Content" against the "Research Context".
 
             RESEARCH CONTEXT:
             """
-            ${context}
+            ${context || 'NONE PROVIDED'}
             """
 
             DRAFT CONTENT:
@@ -41,14 +52,14 @@ export class ValidationAgent extends BaseAgent {
             """
 
             AUDIT CRITERIA:
-            1. HALLUCINATIONS: List any specific factual claims in the draft NOT supported by or contradicted by the context. 
-               - BE AGGRESSIVE. If a claim is not in the context, it is a hallucination.
+            1. HALLUCINATIONS: 
+               ${hallucinationInstruction}
             2. STRUCTURE: Does it have a strong Hook, Body, and CTA?
             3. QUALITY SCORE: Rate from 1-10.
-            4. CONFIDENCE SCORE: Rate from 0-100. How much of the content is verifiable against the provided research?
+            4. CONFIDENCE SCORE: ${confidenceInstruction}
             5. IMPROVEMENTS: Provide 2-3 actionable tips.
 
-            STRICT RULE: If there are ANY hallucinations, "isValid" MUST be false.
+            STRICT RULE: If there are ANY hallucinations flagged based on the criteria above, "isValid" MUST be false.
 
             RESPONSE FORMAT (Strict JSON):
             {
