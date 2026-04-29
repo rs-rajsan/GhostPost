@@ -54,10 +54,11 @@ export class ValidationAgent extends BaseAgent {
             AUDIT CRITERIA:
             1. HALLUCINATIONS: 
                ${hallucinationInstruction}
-            2. STRUCTURE: Does it have a strong Hook, Body, and CTA?
-            3. QUALITY SCORE: Rate from 1-10.
-            4. CONFIDENCE SCORE: ${confidenceInstruction}
-            5. IMPROVEMENTS: Provide 2-3 actionable tips.
+            2. HUMAN FLOW: Scan strictly for compound hyphenated adjectives (e.g., "fast-paced", "lean-and-mean") and em dashes (—). If ANY are detected, you MUST lower the QUALITY SCORE below 7 to trigger a rewrite.
+            3. STRUCTURE: Does it have a strong Hook, Body, and CTA?
+            4. QUALITY SCORE: Rate from 1-10.
+            5. CONFIDENCE SCORE: ${confidenceInstruction}
+            6. IMPROVEMENTS: Provide 2-3 actionable tips.
 
             STRICT RULE: If there are ANY hallucinations flagged based on the criteria above, "isValid" MUST be false.
 

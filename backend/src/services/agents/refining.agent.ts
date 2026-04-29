@@ -38,8 +38,9 @@ export class RefiningAgent extends BaseAgent {
             1. RHYTHM & FLOW: Break up monotonous sentence structures. If three sentences in a row are the same length, shorten one and lengthen another.
             2. CLICHÉ REPLACEMENT: Replace academic transitions (Additionally, Furthermore, Consequently) with natural human alternatives (On top of that, Plus, So, What's more).
             3. VOICE INJECTION: Add subtle "Human Markers" like parenthetical asides, rhetorical questions, or "Insider" phrases (e.g., "Truth be told," "Here's why this matters").
-            4. REMOVE ALL HALUCINATIONS: Ensure the content strictly follows the Audit Findings regarding factual errors.
-            5. MAINTAIN STRUCTURE: Keep the [TITLE], [HOOK], [CONTENT], etc. tags intact.
+            4. REMOVE AI PUNCTUATION: Surgically remove all compound hyphenated words (e.g. "lean-and-mean", "fast-paced") and all em dashes (—). Replace them with natural phrasing and commas.
+            5. REMOVE ALL HALUCINATIONS: Ensure the content strictly follows the Audit Findings regarding factual errors.
+            6. MAINTAIN STRUCTURE: Keep the [TITLE], [HOOK], [CONTENT], etc. tags intact.
 
             RESPONSE:
             Return ONLY the updated content.

@@ -1,7 +1,7 @@
 # GhostPost Studio 👻
-### The Elite Multi-Agent Content OS
+### The Elite GPT-Like Auto-Routing Content OS
 
-GhostPost is a high-fidelity, agentic environment designed for technical writers, content strategists, and ghostwriters. It transforms raw research and ideas into polished, high-authority articles through a **Parallel Intelligence** orchestration layer.
+GhostPost is a high-fidelity, agentic environment designed for technical writers, content strategists, and ghostwriters. It transforms raw research and ideas into polished, high-authority articles through a seamless **Auto-Routing Multi-Agent** architecture.
 
 ![GhostPost Studio Preview](docs/assets/enhance_dashboard.png)
 
@@ -11,12 +11,12 @@ Experience your workspace in 8 curated **Visual Universes**. Whether you're in t
 ![Universe Gallery](docs/assets/universe_gallery.png)
 
 ## 🧠 Core Intelligence Architecture
-GhostPost utilizes a sophisticated multi-agent system where specialized brains work in parallel to ensure precision, security, and quality.
+GhostPost utilizes a sophisticated multi-agent system where specialized brains work in parallel to ensure precision, security, and quality with zero manual toggles.
 
+- **Auto-Routing Intent (`intent.util.ts`)**: Automatically detects if your input is a short topic (triggering deep web research) or source context (triggering direct enhancement).
 - **Guardian Agent**: Multi-layered security scanning for PII redaction and prompt injection protection.
-- **Sonar Research**: Real-time web-grounded data retrieval for factual accuracy.
-- **Auditor Agent**: Parallel factual validation and hallucination detection.
-- **Refinement Agent**: Self-correcting reflection loops for high-quality output.
+- **Sonar Research**: Real-time web-grounded data retrieval for factual accuracy (Perplexity).
+- **Auditor & Refinement Agent**: Active "Human-Flow" policing using Few-Shot prompt engineering to aggressively eliminate robotic phrasing, hyphens, and AI-isms.
 
 ## 📖 Documentation Vault
 Explore the deep technical and functional details of the studio:

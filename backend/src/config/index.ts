@@ -101,7 +101,7 @@ const AI_BAN_LIST = [
     "Furthermore", "Moreover", "In conclusion", "Additionally", 
     "In today's fast-paced world", "Unlock the potential", "It's important to note", 
     "In the digital age", "Navigate the landscape", "Game changer", 
-    "Harness the power", "Testament to"
+    "Harness the power", "Testament to", "fast-paced", "cutting-edge", "game-changing", "ever-evolving"
 ];
 
 const HUMAN_GUIDELINES = `
@@ -110,6 +110,15 @@ HUMAN-LIKE WRITING GUIDELINES:
 2. AI-ISM BAN LIST: DO NOT use the following words or phrases: ${AI_BAN_LIST.join(', ')}.
 3. NO REPETITIVE STRUCTURES: Avoid starting consecutive paragraphs with the same word or thematic structure.
 4. SPECIFICITY: Avoid generic "high-level" summaries. Focus on specific, messy details, raw quotes (if available), and tactical insights.
+5. NO AI PUNCTUATION: DO NOT use hyphens to connect words in compound adjectives or idioms (e.g., write "lean and mean" or "trial and error" without hyphens). DO NOT use em dashes (—) for punctuation; use standard commas instead to simulate how humans naturally type casually.
+
+FEW-SHOT EXAMPLES (MIMIC THE GOOD, AVOID THE BAD):
+
+BAD AI WRITING (STRICTLY AVOID):
+"In today's fast-paced digital landscape, heuristics are a game-changing paradigm shift. Furthermore, this cutting-edge capability empowers highly-efficient problem-solving—allowing models to seamlessly integrate."
+
+GOOD HUMAN WRITING (MIMIC THIS):
+"Tool calling is a massive upgrade for agentic AI. It transforms passive language models into active problem solvers by letting them perform real world tasks. Instead of just generating text, the AI can check a customer support ticket or update a CRM on its own."
 `;
 
 const config: Config = {
@@ -296,10 +305,11 @@ ${researchData}
 GUIDELINES:
 1. HUMAN-LIKE FLOW: Use bursty sentence structures. Vary length between 5 and 20 words.
 2. AI-ISM BAN: Absolutely NO ${AI_BAN_LIST.slice(0, 4).join(', ')}, or "${AI_BAN_LIST[4]}".
-3. FORMATTING: PLAIN TEXT only. No markdown.
-4. CITATIONS: List source links only at the very bottom of the post.
-5. HASHTAGS: Always include #AgentAISchool as the first hashtag.
-6. NO META-COMMENTARY: No word counts.
+3. NO AI PUNCTUATION: DO NOT use hyphens for compound words (write "lean and mean" without hyphens). DO NOT use em dashes (—); use commas.
+4. FORMATTING: PLAIN TEXT only. No markdown.
+5. CITATIONS: List source links only at the very bottom of the post.
+6. HASHTAGS: Always include #AgentAISchool as the first hashtag.
+7. NO META-COMMENTARY: No word counts.
 
 OUTPUT REQUIREMENTS:
 Return the content in the following structured text format:

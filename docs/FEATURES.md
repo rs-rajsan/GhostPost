@@ -10,8 +10,8 @@ The primary interface for high-precision content generation.
 ### Key Capabilities:
 - **Precision Length Control**: Generate content in increments of 0.25 pages (approx. 400 words per quarter-page).
 - **Tone Orchestration**: Choose from 8+ professional personas including *Provocative*, *Academic*, *Conversational*, and *Inspirational*.
-- **Deep Research**: Toggle "Deep Research" to trigger the **Sonar Agent**, which performs real-time web-grounded research via Perplexity.
-
+- **Auto-Routing Intelligence**: GhostPost automatically detects your intent. Provide a short topic (under 500 characters), and it will automatically trigger the **Sonar Agent** for deep web research. Paste a long document, and it will bypass research to directly enhance your source material.
+- **Tidy Export Menu**: One-click WYSIWYG clipboard copying (what you see is what you get, no hidden artifacts) and clean PDF, Word, and Markdown exports.
 ---
 
 ## 🌌 2. The Visual Universe
